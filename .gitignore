@@ -1,0 +1,3 @@
+# ignore actual data but keep the downloaders.
+/data/*
+!/data/data_downloaders/

@@ -7,6 +7,15 @@ This repositoy contains code to prepare data, models and baseline methods for my
 
 ## Data 
 
+The datasets and corresponding downloaders (scripts) are listed below. 
+
+Usage (COPA example):
+
+ ```
+ bash data/data_downloaders/copa.sh
+ ```
+
+
 | Index | Data      | Data Downloader |
 | --- | ----------- | ----------- |
 | 1 | [COPA](https://people.ict.usc.edu/~gordon/copa.html)      | [downloader](./data/data_downloaders/copa.sh)       |
