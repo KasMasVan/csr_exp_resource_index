@@ -1,3 +1,7 @@
 # ignore actual data but keep the downloaders.
 /data/*
 !/data/data_downloaders/
+
+# ignore actual models but keep the downloaders.
+/models/*
+!/models/model_downloaders/
