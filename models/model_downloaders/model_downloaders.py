@@ -51,12 +51,12 @@ def main():
 
     # download the model
     tokneizer = tokenizer_func.from_pretrained(args.checkpoint)
-    # model = model_func.from_pretrained(args.checkpoint)
+    model = model_func.from_pretrained(args.checkpoint)
 
     # save the model
     save_dir = os.path.join(args.output_dir, args.model_family, args.checkpoint)
     os.makedirs(os.path.dirname(save_dir), exist_ok=True)
-    # model.save_pretrained(save_dir)
+    model.save_pretrained(save_dir)
     tokneizer.save_pretrained(save_dir)
 
 if __name__ == "__main__":
