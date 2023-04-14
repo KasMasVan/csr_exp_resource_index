@@ -7,14 +7,15 @@ This repositoy contains code to prepare data, models and baseline methods for my
 
 ## Data 
 
-The datasets and corresponding downloaders (scripts) are listed below. 
+You can check [this website](https://cs.nyu.edu/~davise/Benchmarks/) for a comprehensive collection of commonsense reasoning benchmarks, which are mentioned in the [accompanying paper](https://arxiv.org/pdf/2302.04752.pdf).
+
+I have tried several benchmarks. Their names and downloaders (scripts) are listed below.
 
 Usage (at the root directory):
 
  ```
  bash data/data_downloaders/copa.sh
  ```
-
 
 | Index | Data      | Data Downloader |
 | --- | ----------- | ----------- |
@@ -24,9 +25,6 @@ Usage (at the root directory):
 | 4 | [Winogrande](https://leaderboard.allenai.org/winogrande/submissions/get-started)   | `./data/data_downloaders/winogrande.sh`        |
 | 5 | [PIQA](https://yonatanbisk.com/piqa/)   | `./data/data_downloaders/piqa.sh`        |
 | 6 | [Social IQA](https://leaderboard.allenai.org/socialiqa/submissions/get-started)   | `./data/data_downloaders/siqa.sh`        |
-
-
-
 
 ## Models
 The language models are listed below. For small language models, I provide the downloaders for the model with the most common head, i.e., language modeling head for GPT2. If you want to download a model with a different head, you may need to tweak the code of the corresponding downloader.
