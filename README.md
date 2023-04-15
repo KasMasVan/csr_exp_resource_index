@@ -40,10 +40,10 @@ bash models/model_downloaders/model_downloaders.sh
 ```
 
 #### Autoregressive Models
-|Index| Model Family| Checkpoints| 
-| --- | ----------- | ----------- | 
-|1 | [GPT2](https://huggingface.co/docs/transformers/main/en/model_doc/gpt2#openai-gpt2) |`gpt2`<br> `gpt2-medium` <br>`gpt2-large`<br> `gpt2-xl` |
-
+|Index| Model Family| Checkpoints| Note |
+| --- | ----------- | ----------- | --- |
+|1 | [GPT2](https://huggingface.co/docs/transformers/main/en/model_doc/gpt2#openai-gpt2) |`gpt2`<br> `gpt2-medium` <br>`gpt2-large`<br> `gpt2-xl` | |
+|2 | [Dolly](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`databricks/dolly-v1-6b` <br> `databricks/dolly-v2-3b`<br> `databricks/dolly-v2-7b`<br> `databricks/dolly-v2-12b` | Code Not Yet |
 
 
 #### Encoder-Decoder Models
