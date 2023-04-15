@@ -68,4 +68,4 @@ TBD
 |1| ChatGPT | `gpt-3.5-turbo` <br> `gpt-3.5-turbo-0301` |
 
 ## Methods
-Some scoring methods.
+Some scoring methods. I may start with Hugging Face guide on [causal language modeling](https://huggingface.co/docs/transformers/tasks/language_modeling)
