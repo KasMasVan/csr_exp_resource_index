@@ -69,5 +69,6 @@ TBD
 
 ## Methods
 Some scoring methods. I may start with Hugging Face guide on [causal language modeling](https://huggingface.co/docs/transformers/tasks/language_modeling) and [multiple chocie](https://huggingface.co/docs/transformers/tasks/multiple_choice). Also, don't forget my two onenote notes on multiple choice in Hugging Face. 
+Also, [scripts](https://huggingface.co/docs/transformers/run_scripts).
 
 Make sure you can re-implement ideas in HuggingFace, and compare that to [PMI_DC paper](https://aclanthology.org/2021.emnlp-main.564.pdf).
