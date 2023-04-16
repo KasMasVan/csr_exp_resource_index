@@ -7,11 +7,13 @@ import sys
 
 import numpy as np
 import torch
+from torch.utils.data import DataLoader
 from transformers import(
     AutoTokenizer, 
     AutoModelForCausalLM,
     AutoModelForSeq2SeqLM,
 )
+from datasets import Dataset
 
 
 from utils.data import(
@@ -60,12 +62,18 @@ def parse_args():
         required=True,
         help="The dataset to inference on.",
     )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=32,
+        help="Batch size for inference.",
+    )
 
     args = parser.parse_args()
     return args
 
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -105,16 +113,25 @@ def main():
     # prepcrocess data: using specific function for each dataset.
     if args.data == "copa":
         file_path = os.path.join("../data", args.data, "copa-dev.xml")
-        # data_loader = copa_loader
-        dev_data = copa_loader(file_path)
+        data_loader = copa_loader
     elif args.data == "winogrande":
         file_path = os.path.join("../data", args.data, "dev.jsonl")
         data_loader = winogrande_loader
-    print(file_path)
-    # data_loader()
-
+    
+    dev_data = data_loader(file_path)
+    # consider using a dataloader here.
+    # https://huggingface.co/docs/datasets/use_with_pytorch
+    dataset = Dataset.from_list(dev_data).with_format("torch")
+    dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
+    for batch in dataloader:
+        print(batch)
+        break
 
     # step 5: inference on data, and compute accuracy.
+    logger.info(f"Start inference on {args.data} using {args.model_family} model: {args.checkpoint}.")
+    # what are the arguments needed for this step? 
+    
+
 
     # step 6: some postprocessing, including saving and displyaing output.
     pass
