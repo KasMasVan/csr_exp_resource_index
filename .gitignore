@@ -5,3 +5,6 @@
 # ignore actual models but keep the downloaders.
 /models/*
 !/models/model_downloaders/
+
+# ignore cache files
+/methods/utils/__pycache__/

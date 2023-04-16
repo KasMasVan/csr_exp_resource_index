@@ -23,6 +23,22 @@ from utils.data import(
 
 logger = logging.getLogger(__name__)
 
+def preprocess_function(examples, **kwargs):
+    # first_sentences = [[context] * len(ending_names) for context in examples["sent1"]]
+    ending_names, header_name, tokenizer = kwargs['ending_names'], kwargs['header_name'], kwargs['tokenizer']
+    num_choice = len(ending_names)
+    question_headers = examples[header_name]
+    second_sentences = [
+        [f"{header} {examples[end][i]}" for end in ending_names] for i, header in enumerate(question_headers)
+    ]
+
+    # first_sentences = sum(first_sentences, [])
+    second_sentences = sum(second_sentences, [])
+
+    # tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True)
+    tokenized_examples = tokenizer(second_sentences, truncation=True)
+    return {k: [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_examples.items()}
+
 def set_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
     random.seed(seed)
@@ -73,7 +89,7 @@ def parse_args():
     return args
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -110,18 +126,23 @@ def main():
 
     # step 4: load and preprocess data.
     logger.info(f"Load data: {args.data}.")
-    # prepcrocess data: using specific function for each dataset.
     if args.data == "copa":
+        ending_names = ['hypothesis0', 'hypothesis1']
+        header_name = "premise"
         file_path = os.path.join("../data", args.data, "copa-dev.xml")
-        data_loader = copa_loader
+        dev_data = copa_loader(file_path)
+        dataset = Dataset.from_list(dev_data).with_format("torch")
     elif args.data == "winogrande":
         file_path = os.path.join("../data", args.data, "dev.jsonl")
         data_loader = winogrande_loader
     
-    dev_data = data_loader(file_path)
-    # next steps: 
-    # 1. preprocess the data with tokenizer
-    # 2. use datacollator to form batches
+    logger.info(f"Preprocess data: {args.data}.")
+    fn_kwargs = {"ending_names": ending_names, 
+                 "header_name": header_name, 
+                 "tokenizer": tokenizer}
+    tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True)
+    
+    # next step: use datacollator to form batches
 
 
     # consider using a dataloader here.
