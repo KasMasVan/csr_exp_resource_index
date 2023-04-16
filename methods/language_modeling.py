@@ -8,12 +8,17 @@ import sys
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
+from torch.nn.utils.rnn import pad_sequence
+import torch.nn.functional as F
 from transformers import(
     AutoTokenizer, 
     AutoModelForCausalLM,
     AutoModelForSeq2SeqLM,
+    DataCollatorForSeq2Seq,
+    DataCollatorWithPadding
 )
 from datasets import Dataset
+import evaluate
 
 
 from utils.data import(
@@ -24,20 +29,27 @@ from utils.data import(
 logger = logging.getLogger(__name__)
 
 def preprocess_function(examples, **kwargs):
-    # first_sentences = [[context] * len(ending_names) for context in examples["sent1"]]
     ending_names, header_name, tokenizer = kwargs['ending_names'], kwargs['header_name'], kwargs['tokenizer']
     num_choice = len(ending_names)
     question_headers = examples[header_name]
+    # the tokenizer handles multiple spaces.
+    first_sentences = [[context] * len(ending_names) for context in examples[header_name]]
+    # second_sentences = [
+    #     [f"{header} {examples[end][i]}" for end in ending_names] for i, header in enumerate(question_header)
+    # ]
     second_sentences = [
-        [f"{header} {examples[end][i]}" for end in ending_names] for i, header in enumerate(question_headers)
+        [f"{examples[end][i]}" for end in ending_names] for i, header in enumerate(question_headers)
     ]
 
-    # first_sentences = sum(first_sentences, [])
+    first_sentences = sum(first_sentences, [])
     second_sentences = sum(second_sentences, [])
 
     # tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True)
-    tokenized_examples = tokenizer(second_sentences, truncation=True)
-    return {k: [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_examples.items()}
+    tokenized_headers = tokenizer(first_sentences, padding=True, truncation=True)
+    tokenized_endings = tokenizer(second_sentences, padding=True, truncation=True)
+    header_dict = {f"header_{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_headers.items()}
+    ending_dict = {f"ending_{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_endings.items()}
+    return {**header_dict, **ending_dict}
 
 def set_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -122,7 +134,6 @@ def main():
     tokenizer = tokenizer_func.from_pretrained(model_path)
     model = model_func.from_pretrained(model_path)
     model.to(device)
-    model.eval()
 
     # step 4: load and preprocess data.
     logger.info(f"Load data: {args.data}.")
@@ -142,20 +153,27 @@ def main():
                  "tokenizer": tokenizer}
     tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True)
     
-    # next step: use datacollator to form batches
+    eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 
-
-    # consider using a dataloader here.
-    # https://huggingface.co/docs/datasets/use_with_pytorch
-    # dataset = Dataset.from_list(dev_data).with_format("torch")
-    # dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
-    # for batch in dataloader:
-    #     print(batch)
-    #     break
-
-    # step 5: inference on data, and compute accuracy.
+    # step 5: (evaluation) inference on data, and compute accuracy.
     logger.info(f"Start inference on {args.data} using {args.model_family} model: {args.checkpoint}.")
-    # what are the arguments needed for this step? 
+    metric = evaluate.load("accuracy")
+    model.eval()
+    for batch in eval_dataloader:
+        # need to flatten
+        
+        header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
+        ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
+        outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
+        loss, logits = outputs.loss, outputs.logits
+        logits = logits.view(-1, logits.shape[-1])
+        loss_none = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none")
+        loss_mean = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="mean")
+        print(loss)
+
+        break
+        # predictions = torch.argmax(logits, dim=-1)
+        # metric.add_batch(predictions=predictions, references=batch["labels"])
     
 
 

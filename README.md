@@ -55,6 +55,8 @@ bash models/model_downloaders/model_downloaders.sh
 
 #### Other Models
 
+- [Open Assistant models](https://huggingface.co/OpenAssistant)
+
 ### Large Language Models
 These models cannot be stored locally, and are accessed through API. For now, the only option is ChatGPT, because it is very powerful, and much cheaper than other GPT-3.5 models.
 
