@@ -119,13 +119,18 @@ def main():
         data_loader = winogrande_loader
     
     dev_data = data_loader(file_path)
+    # next steps: 
+    # 1. preprocess the data with tokenizer
+    # 2. use datacollator to form batches
+
+
     # consider using a dataloader here.
     # https://huggingface.co/docs/datasets/use_with_pytorch
-    dataset = Dataset.from_list(dev_data).with_format("torch")
-    dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
-    for batch in dataloader:
-        print(batch)
-        break
+    # dataset = Dataset.from_list(dev_data).with_format("torch")
+    # dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
+    # for batch in dataloader:
+    #     print(batch)
+    #     break
 
     # step 5: inference on data, and compute accuracy.
     logger.info(f"Start inference on {args.data} using {args.model_family} model: {args.checkpoint}.")

@@ -68,7 +68,15 @@ TBD
 |1| ChatGPT | `gpt-3.5-turbo` <br> `gpt-3.5-turbo-0301` |
 
 ## Methods
-Some scoring methods. I may start with Hugging Face guide on [causal language modeling](https://huggingface.co/docs/transformers/tasks/language_modeling) and [multiple chocie](https://huggingface.co/docs/transformers/tasks/multiple_choice). Also, don't forget my two onenote notes on multiple choice in Hugging Face. 
-Also, [scripts](https://huggingface.co/docs/transformers/run_scripts).
 
-Make sure you can re-implement ideas in HuggingFace, and compare that to [PMI_DC paper](https://aclanthology.org/2021.emnlp-main.564.pdf).
+
+
+### Useful Links
+- [HF: Causal Language Modeling](https://huggingface.co/docs/transformers/tasks/language_modeling)
+- [HF: Multiple Choice](https://huggingface.co/docs/transformers/tasks/multiple_choice)
+- [HF: Scripts](https://huggingface.co/docs/transformers/run_scripts)
+- [Paper: Surface Form Competition](https://aclanthology.org/2021.emnlp-main.564.pdf): Remember to compare your results with the results in this paper.
+- [My Onenotes on multiple choice]
+- [HF: Using Datasets with Pytorch](https://huggingface.co/docs/datasets/use_with_pytorch#use-with-pytorch): Also check the [Datasets Documentation](https://huggingface.co/docs/datasets/index)
+- [Pytorch: Data and Dataloader](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html)
+- [Pytorch: Reproducibility](https://pytorch.org/docs/stable/notes/randomness.html)
