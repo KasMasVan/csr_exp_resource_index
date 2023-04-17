@@ -8,3 +8,6 @@
 
 # ignore cache files
 /methods/utils/__pycache__/
+
+# ignore results
+/results/*

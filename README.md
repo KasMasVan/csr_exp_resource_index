@@ -71,7 +71,10 @@ TBD
 
 ## Methods
 
+### Supported Methods
 
+1. [Language Modeling]
+2. [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf)
 
 ### Useful Links
 - [HF: Causal Language Modeling](https://huggingface.co/docs/transformers/tasks/language_modeling)

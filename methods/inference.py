@@ -1,5 +1,6 @@
 # a framework for inference on multiple choice tasks.
 import argparse
+import csv
 import logging
 import os
 import random
@@ -19,12 +20,18 @@ from transformers import(
     DataCollatorWithPadding
 )
 from datasets import Dataset
-import evaluate
 
 
 from utils.data import(
     copa_loader,
     winogrande_loader,
+)
+from utils.methods import(
+    inference_language_modeling,
+    inference_contrastive_decoding,
+)
+from utils.models import(
+    find_expert_model,
 )
 
 logger = logging.getLogger(__name__)
@@ -97,12 +104,39 @@ def parse_args():
         default=32,
         help="Batch size for inference.",
     )
+    parser.add_argument(
+        "--method",
+        type=str,
+        choices=["all", "language_modeling", "contrastive_decoding"],
+        default=None,
+        required=True,
+        help="The inference method. Choose all to use all avaiable methods."
+    )
 
     args = parser.parse_args()
     return args
 
+def write_to_csv(save_path, args, total_accuracy):
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    csv_exists = os.path.isfile(save_path)
+    with open(save_path, 'a+', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        if not csv_exists:
+            csvwriter.writerow(['model_family', 'checkpoint', 'data', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, args.data, args.method, args.seed, total_accuracy])
+
+def write_to_csv_contrastive_decoding(save_path, args, expert_checkpoint, total_accuracy):
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    csv_exists = os.path.isfile(save_path)
+    with open(save_path, 'a+', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        if not csv_exists:
+            csvwriter.writerow(['model_family', 'amateur_checkpoint', 'expert_checkpoint', 'data', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, expert_checkpoint, args.data, args.method, args.seed, total_accuracy])
+
+
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -157,41 +191,34 @@ def main():
     eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 
     # step 5: (evaluation) inference on data, and compute accuracy.
-    logger.info(f"Start inference on {args.data} using {args.model_family} model: {args.checkpoint}.")
-    model.eval()
-    # create a pytorch tensor to store predictions
-    predictions = torch.zeros(0)
-    labels = torch.zeros(0)
-    # for batch in tqdm(eval_dataloader, desc="Inference", postfix={"Accuracy": 0.0}):
-    with tqdm(eval_dataloader, desc="Inference", postfix=[{"Batch Accuracy": 0.0, "Total Accuracy": 0.0,}]) as t:
-        for batch in t:
-            # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
-            ending_shape = batch["ending_input_ids"].shape 
-            # flatten
-            header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
-            ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
-            outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
-            _, logits = outputs.loss, outputs.logits
-            # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
-            logits = logits.view(-1, logits.shape[-1])
-            # ignore padding token: 0
-            ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
-            # each score is the negative log-likelihood of a ending given a header.
-            batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
-            batch_labels = batch["label"]
-            predictions = torch.cat((predictions, batch_predictions))
-            labels = torch.cat((labels, batch_labels))
-        
-            # make accuracy accumulative
-            batch_accuracy = (batch_predictions == batch_labels).sum().item() / len(batch_labels)
-            total_accuracy = (predictions == labels).sum().item() / len(labels)
-            t.postfix[-1]["Batch Accuracy"] = f"{batch_accuracy:.4f}"
-            t.postfix[-1]["Total Accuracy"] = f"{total_accuracy:.4f}"
-            t.update()
-        
+    logger.info(f"Start inference (method: {args.method}) on {args.data} using {args.model_family} model: {args.checkpoint}.")
+    if args.method == "all":
+        logger.info(f"Method {args.method} not implemented yet.")
+    elif args.method == "language_modeling":
+        total_accuracy = inference_language_modeling(model, eval_dataloader, device)
+    elif args.method == "contrastive_decoding":
+        # need to instantiate an expert model, e.g., the largest model in the model family.
+        amateur_model = model
+        # for now, expert checkpoint is hard coded.
+        expert_checkpoint = find_expert_model(args.model_family)
+        logger.info(f"Load {args.model_family} expert model: {expert_checkpoint}.")
+        expert_model_path = os.path.join("../models", args.model_family, expert_checkpoint)
+        expert_model = model_func.from_pretrained(expert_model_path)
+        expert_model.to(device)
+        total_accuracy = inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader, device)
+    else:
+        # not implemented yet
+        logger.info(f"Method {args.method} not implemented yet.")
+
  
     # step 6: some postprocessing, including saving and displyaing output.
-    pass
+
+    save_path = os.path.join("../results", f"{args.method}.csv")
+    logger.info(f"Save results to {save_path}.")
+    if args.method == "contrastive_decoding":
+        write_to_csv_contrastive_decoding(save_path, args, expert_checkpoint, total_accuracy)
+    else:
+        write_to_csv(save_path, args, total_accuracy)
 
 if __name__ == "__main__":
     main()
