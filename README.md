@@ -5,6 +5,14 @@ With this repo, I do not need to download specific models and data for each proj
 
 This repositoy contains code to prepare data, models and baseline methods for my experiments on CSR.
 
+
+## To Do
+- [ ] Report experiment result for reproducibility?
+- [ ] More language model. Specifically, add support for causal language models.
+- [ ] More data. 
+- [ ] **More methods**. 
+- [ ] TBD.
+
 ## Data 
 
 You can check [this website](https://cs.nyu.edu/~davise/Benchmarks/) for a comprehensive collection of commonsense reasoning benchmarks, which are mentioned in the [accompanying paper](https://arxiv.org/pdf/2302.04752.pdf).
