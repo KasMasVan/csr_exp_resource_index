@@ -77,6 +77,7 @@ TBD
 - [HF: Causal Language Modeling](https://huggingface.co/docs/transformers/tasks/language_modeling)
 - [HF: Multiple Choice](https://huggingface.co/docs/transformers/tasks/multiple_choice)
 - [HF: Scripts](https://huggingface.co/docs/transformers/run_scripts)
+- [HF: Fine-tuning](https://huggingface.co/docs/transformers/training#train-in-native-pytorch)
 - [Paper: Surface Form Competition](https://aclanthology.org/2021.emnlp-main.564.pdf): Remember to compare your results with the results in this paper.
 - [My Onenotes on multiple choice]
 - [HF: Using Datasets with Pytorch](https://huggingface.co/docs/datasets/use_with_pytorch#use-with-pytorch): Also check the [Datasets Documentation](https://huggingface.co/docs/datasets/index)

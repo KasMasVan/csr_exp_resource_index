@@ -4,6 +4,7 @@ import logging
 import os
 import random
 import sys
+from tqdm import tqdm
 
 import numpy as np
 import torch
@@ -157,26 +158,39 @@ def main():
 
     # step 5: (evaluation) inference on data, and compute accuracy.
     logger.info(f"Start inference on {args.data} using {args.model_family} model: {args.checkpoint}.")
-    metric = evaluate.load("accuracy")
     model.eval()
-    for batch in eval_dataloader:
-        # need to flatten
+    # create a pytorch tensor to store predictions
+    predictions = torch.zeros(0)
+    labels = torch.zeros(0)
+    # for batch in tqdm(eval_dataloader, desc="Inference", postfix={"Accuracy": 0.0}):
+    with tqdm(eval_dataloader, desc="Inference", postfix=[{"Batch Accuracy": 0.0, "Total Accuracy": 0.0,}]) as t:
+        for batch in t:
+            # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
+            ending_shape = batch["ending_input_ids"].shape 
+            # flatten
+            header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
+            ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
+            outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
+            _, logits = outputs.loss, outputs.logits
+            # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
+            logits = logits.view(-1, logits.shape[-1])
+            # ignore index 0: <pad>
+            # ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
+            ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=-100).detach().cpu()
+
+            batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmax(dim=-1)
+            batch_labels = batch["label"]
+            predictions = torch.cat((predictions, batch_predictions))
+            labels = torch.cat((labels, batch_labels))
         
-        header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
-        ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
-        outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
-        loss, logits = outputs.loss, outputs.logits
-        logits = logits.view(-1, logits.shape[-1])
-        loss_none = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none")
-        loss_mean = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="mean")
-        print(loss)
-
-        break
-        # predictions = torch.argmax(logits, dim=-1)
-        # metric.add_batch(predictions=predictions, references=batch["labels"])
-    
-
-
+            # make accuracy accumulative
+            batch_accuracy = (batch_predictions == batch_labels).sum().item() / len(batch_labels)
+            total_accuracy = (predictions == labels).sum().item() / len(labels)
+            t.postfix[-1]["Batch Accuracy"] = f"{batch_accuracy:.4f}"
+            t.postfix[-1]["Total Accuracy"] = f"{total_accuracy:.4f}"
+            t.update()
+        
+ 
     # step 6: some postprocessing, including saving and displyaing output.
     pass
 
