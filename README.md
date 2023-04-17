@@ -79,6 +79,11 @@ TBD
 
 ## Methods
 
+Usage: 
+```
+TBD
+```
+
 ### Supported Methods
 
 1. [Language Modeling]
