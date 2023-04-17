@@ -174,11 +174,10 @@ def main():
             _, logits = outputs.loss, outputs.logits
             # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
             logits = logits.view(-1, logits.shape[-1])
-            # ignore index 0: <pad>
-            # ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
-            ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=-100).detach().cpu()
-
-            batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmax(dim=-1)
+            # ignore padding token: 0
+            ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
+            # each score is the negative log-likelihood of a ending given a header.
+            batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
             batch_labels = batch["label"]
             predictions = torch.cat((predictions, batch_predictions))
             labels = torch.cat((labels, batch_labels))
