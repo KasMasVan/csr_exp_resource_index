@@ -16,7 +16,12 @@ def inference_language_modeling(model, eval_dataloader, device):
         # flatten
         header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
         ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
-        outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
+        
+        # adding this line of code takes me more than an hour.
+        # without adding torch.no_grad, GPU usage will muiltply by 4.
+        with torch.no_grad():
+            outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
+        
         _, logits = outputs.loss, outputs.logits
         # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
         logits = logits.view(-1, logits.shape[-1])
@@ -48,9 +53,12 @@ def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader,
         # flatten
         header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
         ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
+        
         # key step: compute logits.
-        amateur_model_logits = amateur_model(input_ids = header_input_ids, labels = ending_input_ids).logits
-        expert_model_logits = expert_model(input_ids = header_input_ids, labels = ending_input_ids).logits
+        with torch.no_grad():
+            amateur_model_logits = amateur_model(input_ids = header_input_ids, labels = ending_input_ids).logits
+            expert_model_logits = expert_model(input_ids = header_input_ids, labels = ending_input_ids).logits
+        
         logits = expert_model_logits - amateur_model_logits
         # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
         logits = logits.view(-1, logits.shape[-1])

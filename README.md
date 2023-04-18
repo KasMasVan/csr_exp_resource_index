@@ -11,7 +11,7 @@ This repositoy contains code to prepare data, models and baseline methods for my
 - [ ] More language model. Specifically, add support for causal language models.
 - [ ] More data. 
 - [ ] **More methods**. 
-- [ ] **Check how batch size and other factors affect cuda usage.**
+- [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
 - [ ] TBD.
 
 ## Data 
@@ -100,3 +100,6 @@ TBD
 - [HF: Using Datasets with Pytorch](https://huggingface.co/docs/datasets/use_with_pytorch#use-with-pytorch): Also check the [Datasets Documentation](https://huggingface.co/docs/datasets/index)
 - [Pytorch: Data and Dataloader](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html)
 - [Pytorch: Reproducibility](https://pytorch.org/docs/stable/notes/randomness.html)
+- [Pytorch: CUDA](https://pytorch.org/docs/stable/notes/cuda.html#cuda-semantics)
+- [Pytorch: no_grad() and eval()](https://discuss.pytorch.org/t/model-eval-vs-with-torch-no-grad/19615): I learnt the hard way that `torch.no_grad()` should be used together with `model.eval()` when testing models.
+- [Deep Learning: Tuning Playbook](https://github.com/google-research/tuning_playbook)

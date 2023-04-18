@@ -137,7 +137,7 @@ def write_to_csv_contrastive_decoding(save_path, args, expert_checkpoint, total_
 
 
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
