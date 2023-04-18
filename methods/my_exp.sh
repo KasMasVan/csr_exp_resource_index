@@ -1,10 +1,10 @@
 model_family="FLAN-T5"
-checkpoint="google/flan-t5-small"
-data="copa"
-batch_size=32
+checkpoint="google/flan-t5-base"
+data="cqa"
+batch_size=16
 # method="language_modeling"
 
-for method in "language_modeling" "contrastive_decoding"
+for method in "language_modeling" # "contrastive_decoding"
 do
     python inference.py \
     --model_family ${model_family} \

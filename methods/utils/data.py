@@ -1,4 +1,6 @@
+import json
 import xml.etree.ElementTree as ET
+
 
 # write my own data loader, or using HF dataloader?
 
@@ -41,3 +43,30 @@ def copa_loader(path, **kwargs):
 
 def winogrande_loader():
     print(f"winogrande loader")
+
+def cqa_loader(path, **kwargs):
+    examples_cqa = []
+    with open(path) as f:
+        for line in f:
+            d = json.loads(line)
+            label = ['A','B','C','D','E'].index(d['answerKey'])
+            premise = ' ' +d['question']['stem']
+            premise = premise[:-1] + '?' 
+            options = [option['text'].lower() for option in d['question']['choices']]
+
+            # examples += [{'options': [{'premise':premise + '? the answer is:' ,
+                        #                 'hypothesis': ' "{}"'.format(c['text'].lower()),
+                        #                 'uncond_premise': ' the answer is:',
+                        #                 'uncond_hypothesis': ' "{}"'.format(c['text'].lower())} for c in d['question']['choices']], 
+                        # 'label':label}]
+            examples_cqa += [{
+                'label': label,
+                'premise': premise + ' the answer is:',
+                'uncond_premise': ' the answer is:',
+                'hypothesis0': options[0],
+                'hypothesis1': options[1],
+                'hypothesis2': options[2],
+                'hypothesis3': options[3],
+                'hypothesis4': options[4],
+            }]
+    return examples_cqa

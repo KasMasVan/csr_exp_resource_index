@@ -11,6 +11,7 @@ This repositoy contains code to prepare data, models and baseline methods for my
 - [ ] More language model. Specifically, add support for causal language models.
 - [ ] More data. 
 - [ ] **More methods**. 
+- [ ] **Check how batch size and other factors affect cuda usage.**
 - [ ] TBD.
 
 ## Data 

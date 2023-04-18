@@ -24,6 +24,7 @@ from datasets import Dataset
 
 from utils.data import(
     copa_loader,
+    cqa_loader,
     winogrande_loader,
 )
 from utils.methods import(
@@ -93,7 +94,7 @@ def parse_args():
     parser.add_argument(
         "--data",
         type=str,
-        choices=["copa", "winogrande"],
+        choices=["copa", "cqa", "winogrande"],
         default=None,
         required=True,
         help="The dataset to inference on.",
@@ -122,8 +123,8 @@ def write_to_csv(save_path, args, total_accuracy):
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if not csv_exists:
-            csvwriter.writerow(['model_family', 'checkpoint', 'data', 'method', "seed", 'accuracy'])
-        csvwriter.writerow([args.model_family, args.checkpoint, args.data, args.method, args.seed, total_accuracy])
+            csvwriter.writerow(['model_family', 'checkpoint', 'data', 'batch_size', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, args.data, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
 
 def write_to_csv_contrastive_decoding(save_path, args, expert_checkpoint, total_accuracy):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -131,12 +132,12 @@ def write_to_csv_contrastive_decoding(save_path, args, expert_checkpoint, total_
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if not csv_exists:
-            csvwriter.writerow(['model_family', 'amateur_checkpoint', 'expert_checkpoint', 'data', 'method', "seed", 'accuracy'])
-        csvwriter.writerow([args.model_family, args.checkpoint, expert_checkpoint, args.data, args.method, args.seed, total_accuracy])
+            csvwriter.writerow(['model_family', 'amateur_checkpoint', 'expert_checkpoint', 'data', 'batch_size', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, expert_checkpoint, args.data, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
 
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -154,6 +155,7 @@ def main():
 
     # step 3: load model, tokenizer. Then move to gpu, and set to evaluation mode.
     logger.info(f"Load {args.model_family} model: {args.checkpoint}.")
+    # torch.cuda.empty_cache()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # get model path: ../models/args.model_family/args.checkpoint
     model_path = os.path.join("../models", args.model_family, args.checkpoint)
@@ -176,17 +178,25 @@ def main():
         ending_names = ['hypothesis0', 'hypothesis1']
         header_name = "premise"
         file_path = os.path.join("../data", args.data, "copa-dev.xml")
-        dev_data = copa_loader(file_path)
-        dataset = Dataset.from_list(dev_data).with_format("torch")
+        loader = copa_loader
+    elif args.data == "cqa":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
+        header_name = "premise"
+        file_path = os.path.join("../data", args.data, "dev.jsonl")
+        loader = cqa_loader
     elif args.data == "winogrande":
         file_path = os.path.join("../data", args.data, "dev.jsonl")
-        data_loader = winogrande_loader
+        loader = winogrande_loader
     
+    dev_data = loader(file_path)
+    dataset = Dataset.from_list(dev_data).with_format("torch")
+    
+
     logger.info(f"Preprocess data: {args.data}.")
     fn_kwargs = {"ending_names": ending_names, 
                  "header_name": header_name, 
                  "tokenizer": tokenizer}
-    tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True)
+    tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
     
     eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 

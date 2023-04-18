@@ -7,6 +7,7 @@ def inference_language_modeling(model, eval_dataloader, device):
     model.eval()
     predictions = torch.zeros(0)
     labels = torch.zeros(0)
+    torch.cuda.empty_cache()
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
@@ -38,6 +39,7 @@ def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader,
     expert_model.eval()
     predictions = torch.zeros(0)
     labels = torch.zeros(0)
+    torch.cuda.empty_cache()
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
