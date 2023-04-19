@@ -12,6 +12,7 @@ This repositoy contains code to prepare data, models and baseline methods for my
 - [ ] More data. 
 - [ ] **More methods**. 
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
+- [ ] **Consider**: Do I need to rearrange the inference pipeline by starting with the method? Different method may require modifications to data and models. Alternatively, I could create a different pipeline for each method.
 - [ ] TBD.
 
 ## Data 

@@ -75,3 +75,8 @@ def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader,
         total_accuracy = (predictions == labels).sum().item() / len(labels)
         pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
     return total_accuracy
+
+def inference_multiple_choice(model, eval_dataloader, device):
+    # modifythe dataset, and call inference_language_modeling() afterwards.
+    total_accuracy = None
+    return total_accuracy

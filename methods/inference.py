@@ -29,6 +29,7 @@ from utils.data import(
 )
 from utils.methods import(
     inference_language_modeling,
+    inference_multiple_choice,
     inference_contrastive_decoding,
 )
 from utils.models import(
@@ -108,7 +109,7 @@ def parse_args():
     parser.add_argument(
         "--method",
         type=str,
-        choices=["all", "language_modeling", "contrastive_decoding"],
+        choices=["all", "language_modeling", "contrastive_decoding", "multiple_choice"],
         default=None,
         required=True,
         help="The inference method. Choose all to use all avaiable methods."
@@ -195,7 +196,7 @@ def main():
     logger.info(f"Preprocess data: {args.data}.")
     fn_kwargs = {"ending_names": ending_names, 
                  "header_name": header_name, 
-                 "tokenizer": tokenizer}
+                 "tokenizer": tokenizer,}
     tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
     
     eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
@@ -206,6 +207,10 @@ def main():
         logger.info(f"Method {args.method} not implemented yet.")
     elif args.method == "language_modeling":
         total_accuracy = inference_language_modeling(model, eval_dataloader, device)
+    elif args.method == "multiple_choice":
+        # the simplest method is to load a slightly different 
+        # dataset, and then do the same as language modeling.
+        pass
     elif args.method == "contrastive_decoding":
         # need to instantiate an expert model, e.g., the largest model in the model family.
         amateur_model = model
