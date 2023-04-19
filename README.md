@@ -91,6 +91,7 @@ TBD
 2. [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf)
 
 ### Useful Links
+- [Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)
 - [HF: Causal Language Modeling](https://huggingface.co/docs/transformers/tasks/language_modeling)
 - [HF: Multiple Choice](https://huggingface.co/docs/transformers/tasks/multiple_choice)
 - [HF: Scripts](https://huggingface.co/docs/transformers/run_scripts)
