@@ -14,6 +14,7 @@ This repositoy contains code to prepare data, models and baseline methods for my
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
 - [ ] **Consider**: Do I need to rearrange the inference pipeline by starting with the method? Different method may require modifications to data and models. Alternatively, I could create a different pipeline for each method.
 - [ ] Some experimends require going over multiple datasets, so maybe I can make this a feature. Without this faeture, a lot of time would be wasted on loading (large) models. Maybe I need to know how to "free" the memory used by a previous dataset when using the next one.
+- [ ] Generate requirements.txt automatically?
 - [ ] TBD.
 
 ## Data 
