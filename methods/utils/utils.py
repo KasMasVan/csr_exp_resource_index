@@ -8,6 +8,21 @@ from tqdm import tqdm
 
 import numpy as np
 import torch
+from transformers import(
+    AutoTokenizer, 
+    AutoModelForCausalLM,
+    AutoModelForSeq2SeqLM,
+)
+from datasets import Dataset
+
+# import data.py, which is located in the same directory
+
+from .data import(
+    preprocess_function,
+    copa_loader,
+    cqa_loader,
+    winogrande_loader,
+)
 
 def set_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -16,6 +31,81 @@ def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     torch.cuda.manual_seed_all(seed)
+
+def parse_args():
+    parser = argparse.ArgumentParser("Inference on multiple choice benchmarks")
+    parser.add_argument(
+        "--seed", 
+        type=int, 
+        default=0,
+        help="Random seed for reproducibility.",
+        )
+    parser.add_argument(
+        "--model_family",
+        type=str,
+        choices=["GPT2", "T5", "FLAN-T5"],
+        default=None,
+        required=True,
+        help="The moddel family, as checkpoints under the same model family use same codes to download.",
+        )
+    parser.add_argument(
+        "--checkpoint",
+        type=str,
+        default=None,
+        required=True,
+        help="The checkpoint name under a model family, e.g. gpt2, gpt2-medium, gpt2-large, gpt2-xl.",
+    )
+    parser.add_argument(
+        "--data",
+        type=str,
+        choices=["copa", "cqa", "winogrande"],
+        default=None,
+        required=True,
+        help="The dataset to inference on.",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=32,
+        help="Batch size for inference.",
+    )
+
+    args = parser.parse_args()
+    return args
+
+def load_data(args):
+    if args.data == "copa":
+        ending_names = ['hypothesis0', 'hypothesis1']
+        header_name = "premise"
+        file_path = os.path.join("../data", args.data, "copa-dev.xml")
+        loader = copa_loader
+    elif args.data == "cqa":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
+        header_name = "premise"
+        file_path = os.path.join("../data", args.data, "dev.jsonl")
+        loader = cqa_loader
+    elif args.data == "winogrande":
+        file_path = os.path.join("../data", args.data, "dev.jsonl")
+        loader = winogrande_loader
+    
+    dev_data = loader(file_path)
+    dataset = Dataset.from_list(dev_data).with_format("torch")
+    return ending_names, header_name, dataset
+
+def load_model(device, model_path, args):
+    if args.model_family == "GPT2":
+        tokenizer_func = AutoTokenizer
+        model_func = AutoModelForCausalLM
+    elif args.model_family in ["T5", "FLAN-T5"]:
+        tokenizer_func = AutoTokenizer
+        model_func = AutoModelForSeq2SeqLM
+    else:
+        print(f"{args.model_family}: downloader not implemented.")
+        return
+    tokenizer = tokenizer_func.from_pretrained(model_path)
+    model = model_func.from_pretrained(model_path)
+    model.to(device)
+    return model, tokenizer
 
 def write_to_csv(save_path, args, total_accuracy):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)

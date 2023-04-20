@@ -22,18 +22,69 @@ from datasets import Dataset
 from utils.data import(
     preprocess_function,
 )
+# the two methods are commented out, because contrastive decoding
+# requires special arguments.
 from utils.utils import(
     load_data,
     load_model,
-    parse_args,
+    # parse_args, 
     set_seed,
-    write_to_csv,
+    # write_to_csv,
 )
 
 logger = logging.getLogger(__name__)
 
-def inference_language_modeling(model, eval_dataloader, device):
-    model.eval()
+def parse_args():
+    parser = argparse.ArgumentParser("Inference on multiple choice benchmarks")
+    parser.add_argument(
+        "--seed", 
+        type=int, 
+        default=0,
+        help="Random seed for reproducibility.",
+        )
+    parser.add_argument(
+        "--model_family",
+        type=str,
+        choices=["GPT2", "T5", "FLAN-T5"],
+        default=None,
+        required=True,
+        help="The moddel family, as checkpoints under the same model family use same codes to download.",
+        )
+    parser.add_argument(
+        "--amateur_checkpoint",
+        type=str,
+        default=None,
+        required=True,
+        help="The amateur checkpoint, which is usually a small model.",
+    )
+    parser.add_argument(
+        "--expert_checkpoint",
+        type=str,
+        default=None,
+        required=True,
+        help="The expert checkpoint, which is usually a large model from the same model family.",
+    )
+    parser.add_argument(
+        "--data",
+        type=str,
+        choices=["copa", "cqa", "winogrande"],
+        default=None,
+        required=True,
+        help="The dataset to inference on.",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=32,
+        help="Batch size for inference.",
+    )
+
+    args = parser.parse_args()
+    return args
+
+def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader, device):
+    amateur_model.eval()
+    expert_model.eval()
     predictions = torch.zeros(0)
     labels = torch.zeros(0)
     torch.cuda.empty_cache()
@@ -46,12 +97,12 @@ def inference_language_modeling(model, eval_dataloader, device):
         header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
         ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
         
-        # adding this line of code takes me more than an hour.
-        # without adding torch.no_grad, GPU usage will muiltply by 4.
+        # key step: compute logits.
         with torch.no_grad():
-            outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
+            amateur_model_logits = amateur_model(input_ids = header_input_ids, labels = ending_input_ids).logits
+            expert_model_logits = expert_model(input_ids = header_input_ids, labels = ending_input_ids).logits
         
-        _, logits = outputs.loss, outputs.logits
+        logits = expert_model_logits - amateur_model_logits
         # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
         logits = logits.view(-1, logits.shape[-1])
         # ignore padding token: 0
@@ -68,12 +119,21 @@ def inference_language_modeling(model, eval_dataloader, device):
         pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
     return total_accuracy
 
+def write_to_csv(save_path, args, total_accuracy):
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    csv_exists = os.path.isfile(save_path)
+    with open(save_path, 'a+', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        if not csv_exists:
+            csvwriter.writerow(['model_family', 'amateur_checkpoint', 'expert_checkpoint', 'data', 'batch_size', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.amateur_checkpoint, args.expert_checkpoint, args.data, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
+
 def main():
     # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
-    args.method = "language_modeling"
+    args.method = "contrastive_decoding"
     # print(args)
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -86,12 +146,16 @@ def main():
     logger.info(f"Set random seed to {args.seed}.")
     set_seed(args.seed)
 
-    # step 3: load model, tokenizer. Then move to gpu, and set to evaluation mode.
-    logger.info(f"Load {args.model_family} model: {args.checkpoint}.")
+    # step 3: load two models, tokenizer. Then move to gpu, and set to evaluation mode.
+    # the two models should come from the same model family, 
+    # so no need to load to two tokenizers.
+    logger.info(f"Load {args.model_family} amateur model: {args.amateur_checkpoint} and expert model: {args.expert_checkpoint}.")
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # get model path: ../models/args.model_family/args.checkpoint
-    model_path = os.path.join("../models", args.model_family, args.checkpoint)
-    model, tokenizer = load_model(device, model_path, args)
+    amateur_model_path = os.path.join("../models", args.model_family, args.amateur_checkpoint)
+    amateur_model, tokenizer = load_model(device, amateur_model_path, args)
+    expert_model_path = os.path.join("../models", args.model_family, args.expert_checkpoint)
+    expert_model, _ = load_model(device, expert_model_path, args)
 
     # step 4: load and preprocess data.
     logger.info(f"Load data: {args.data}.")
@@ -105,8 +169,8 @@ def main():
     eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 
     # step 5: (evaluation) inference on data, and compute accuracy.
-    logger.info(f"Start inference (method: {args.method}) on {args.data} using {args.model_family} model: {args.checkpoint}.")
-    total_accuracy = inference_language_modeling(model, eval_dataloader, device)
+    logger.info(f"Start inference (method: {args.method}) on {args.data} using {args.model_family} amateur model: {args.amateur_checkpoint} and expert model: {args.expert_checkpoint}.")
+    total_accuracy = inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader, device)
  
     # step 6: some postprocessing, including saving and displyaing output.
     save_path = os.path.join("../results", f"{args.method}.csv")
