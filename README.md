@@ -84,6 +84,10 @@ TBD
 
 ## Methods
 
+The following methods are designed for multiple choice tasks. Formally, the task requires a model to select an answer $\hat{y}$ from a set of options $Y = \{y_1, ..., y_n\}$ given a question $x$ using a scoring function $f$: $$ \hat{y}=argmax_i f(x, y_i) $$ 
+
+The following methods focus on different specifications of the scoring method $f$.
+
 Usage: 
 ```
 TBD
@@ -91,8 +95,14 @@ TBD
 
 ### Supported Methods
 
-1. [Language Modeling]
-2. [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf)
+| Index | Method      | Scoring Formula     | Script |
+| ---   | ----------- | ----------- | ----------- |
+| 1 | Language Modeling |   $P_{LM}(y_i \| x)$   | `./methods/language_modeling.py` |
+| 2 | [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf) |   $\frac{P_{ExpertLM}(y_i \| x)}{P_{AmateurLM}(y_i \| x)}$  | `./methods/contrastive_decoding.py` |
+| 3 | Multiple Choice Prompt |      |  |
+| 4 | Process of Elimination |      |  |
+
+
 
 ### Useful Links
 - [Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)
