@@ -62,7 +62,7 @@ def copa_loader(path, args):
                 # B. People brought boats to the pond.
                 # Answer:
                 premise = f"{args.multiple_choice_prompt} {premise}\nA. {a1}\nB. {a2}\nAnswer:"
-        
+
         examples_copa += [{
             'label': int(value)-1,
             'premise': premise,
@@ -82,7 +82,7 @@ def cqa_loader(path, args):
             d = json.loads(line)
             label = ['A','B','C','D','E'].index(d['answerKey'])
             premise = ' ' +d['question']['stem']
-            premise = premise[:-1] + '?' 
+            premise = premise[:-1] + '?'  
             options = [option['text'].lower() for option in d['question']['choices']]
 
             # examples += [{'options': [{'premise':premise + '? the answer is:' ,
@@ -90,9 +90,20 @@ def cqa_loader(path, args):
                         #                 'uncond_premise': ' the answer is:',
                         #                 'uncond_hypothesis': ' "{}"'.format(c['text'].lower())} for c in d['question']['choices']], 
                         # 'label':label}]
+            if args.multiple_choice_prompt is not None:
+                # Question: How does a bishop move from one place to another?
+                # A. chess game
+                # B. church
+                # C. in a car
+                # D. queen
+                # E. cathedral
+                # Answer:
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
+            else:
+                premise = premise + ' the answer is:'
             examples_cqa += [{
                 'label': label,
-                'premise': premise + ' the answer is:',
+                'premise': premise,
                 'uncond_premise': ' the answer is:',
                 'hypothesis0': options[0],
                 'hypothesis1': options[1],

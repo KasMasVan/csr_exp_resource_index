@@ -7,7 +7,8 @@
 !/models/model_downloaders/
 
 # ignore cache files
-/methods/utils/__pycache__/
+methods/utils/__pycache__/
+
 
 # ignore results
 /results/*
