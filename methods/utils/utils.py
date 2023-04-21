@@ -69,6 +69,12 @@ def parse_args():
         default=32,
         help="Batch size for inference.",
     )
+    parser.add_argument(
+        "--multiple_choice_prompt",
+        type=str,
+        default = None,
+        help = "The multiple choice prompt."
+    )
 
     args = parser.parse_args()
     return args
@@ -88,7 +94,7 @@ def load_data(args):
         file_path = os.path.join("../data", args.data, "dev.jsonl")
         loader = winogrande_loader
     
-    dev_data = loader(file_path)
+    dev_data = loader(file_path, args)
     dataset = Dataset.from_list(dev_data).with_format("torch")
     return ending_names, header_name, dataset
 

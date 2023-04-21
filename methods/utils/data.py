@@ -27,7 +27,7 @@ def preprocess_function(examples, **kwargs):
     ending_dict = {f"ending_{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_endings.items()}
     return {**header_dict, **ending_dict}
 
-def copa_loader(path, **kwargs):
+def copa_loader(path, args):
     
     root = ET.parse(path).getroot()
     examples_copa = []
@@ -55,9 +55,17 @@ def copa_loader(path, **kwargs):
         #                                  'uncond_premise': bridge,
         #                                  'uncond_hypothesis': ' ' + a2}], 
         #           'label':int(value)-1}]
+        premise = ' ' + p[:-1] + bridge
+        if args.multiple_choice_prompt is not None:
+                # Question: The pond froze over for the winter so
+                # A. People skated on the pond.
+                # B. People brought boats to the pond.
+                # Answer:
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {a1}\nB. {a2}\nAnswer:"
+        
         examples_copa += [{
             'label': int(value)-1,
-            'premise': ' ' + p[:-1] + bridge,
+            'premise': premise,
             'uncond_premise': bridge,
             'hypothesis0': ' ' + a1,
             'hypothesis1': ' ' + a2,
@@ -67,7 +75,7 @@ def copa_loader(path, **kwargs):
 def winogrande_loader():
     print(f"winogrande loader")
 
-def cqa_loader(path, **kwargs):
+def cqa_loader(path, args):
     examples_cqa = []
     with open(path) as f:
         for line in f:
