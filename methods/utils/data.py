@@ -61,14 +61,16 @@ def copa_loader(path, args):
                 # A. People skated on the pond.
                 # B. People brought boats to the pond.
                 # Answer:
+                hypotheses = ["A", "B"]
                 premise = f"{args.multiple_choice_prompt} {premise}\nA. {a1}\nB. {a2}\nAnswer:"
-
+        else:
+            hypotheses = [' ' + a1, ' ' + a2]
         examples_copa += [{
             'label': int(value)-1,
             'premise': premise,
             'uncond_premise': bridge,
-            'hypothesis0': ' ' + a1,
-            'hypothesis1': ' ' + a2,
+            'hypothesis0': hypotheses[0],
+            'hypothesis1': hypotheses[1],
         }]
     return examples_copa
 
@@ -84,13 +86,13 @@ def cqa_loader(path, args):
             premise = ' ' +d['question']['stem']
             premise = premise[:-1] + '?'  
             options = [option['text'].lower() for option in d['question']['choices']]
-
             # examples += [{'options': [{'premise':premise + '? the answer is:' ,
                         #                 'hypothesis': ' "{}"'.format(c['text'].lower()),
                         #                 'uncond_premise': ' the answer is:',
                         #                 'uncond_hypothesis': ' "{}"'.format(c['text'].lower())} for c in d['question']['choices']], 
                         # 'label':label}]
             if args.multiple_choice_prompt is not None:
+                hypotheses = ["A", "B", "C", "D", "E"]
                 # Question: How does a bishop move from one place to another?
                 # A. chess game
                 # B. church
@@ -100,15 +102,16 @@ def cqa_loader(path, args):
                 # Answer:
                 premise = f"{args.multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
             else:
+                hypotheses = options
                 premise = premise + ' the answer is:'
             examples_cqa += [{
                 'label': label,
                 'premise': premise,
                 'uncond_premise': ' the answer is:',
-                'hypothesis0': options[0],
-                'hypothesis1': options[1],
-                'hypothesis2': options[2],
-                'hypothesis3': options[3],
-                'hypothesis4': options[4],
+                'hypothesis0': hypotheses[0],
+                'hypothesis1': hypotheses[1],
+                'hypothesis2': hypotheses[2],
+                'hypothesis3': hypotheses[3],
+                'hypothesis4': hypotheses[4],
             }]
     return examples_cqa
