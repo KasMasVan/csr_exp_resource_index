@@ -129,3 +129,4 @@ These methods choose the answer in multiple steps, which may involve generation 
 - [Pytorch: CUDA](https://pytorch.org/docs/stable/notes/cuda.html#cuda-semantics)
 - [Pytorch: no_grad() and eval()](https://discuss.pytorch.org/t/model-eval-vs-with-torch-no-grad/19615): I learnt the hard way that `torch.no_grad()` should be used together with `model.eval()` when testing models.
 - [Deep Learning: Tuning Playbook](https://github.com/google-research/tuning_playbook)
+- [Blog: Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/)
