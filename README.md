@@ -8,7 +8,7 @@ This repositoy contains code to prepare data, models and baseline methods for my
 
 ## To Do
 - [ ] Report experiment result for reproducibility?
-- [ ] More language model. Specifically, add support for causal language models.
+- [ ] More language model. Specifically, add support for causal language models. For larger models, you may load with different precisions like FP16 and INT8 (Check [this](https://huggingface.co/docs/transformers/main/en/performance)).
 - [ ] More data. 
 - [ ] **More [methods](#methods)**. 
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
@@ -121,6 +121,7 @@ These methods choose the answer in multiple steps, which may involve generation 
 - [HF: Multiple Choice](https://huggingface.co/docs/transformers/tasks/multiple_choice)
 - [HF: Scripts](https://huggingface.co/docs/transformers/run_scripts)
 - [HF: Fine-tuning](https://huggingface.co/docs/transformers/training#train-in-native-pytorch)
+- [HF: Performance and Scalability](https://huggingface.co/docs/transformers/main/en/performance)
 - [Paper: Surface Form Competition](https://aclanthology.org/2021.emnlp-main.564.pdf): Remember to compare your results with the results in this paper.
 - [My Onenotes on multiple choice]
 - [HF: Using Datasets with Pytorch](https://huggingface.co/docs/datasets/use_with_pytorch#use-with-pytorch): Also check the [Datasets Documentation](https://huggingface.co/docs/datasets/index)
