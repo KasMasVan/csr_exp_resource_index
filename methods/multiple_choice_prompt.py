@@ -94,24 +94,29 @@ def main():
     model, tokenizer = load_model(device, model_path, args)
 
     # step 4: load and preprocess data with multiple choice prompt.
-    logger.info(f"Load data: {args.data}.")
-    ending_names, header_name, dataset = load_data(args)
+    args.datasets = args.datasets.split()
+    logger.info(f"Load data: {args.datasets}.")
 
-    logger.info(f"Preprocess data: {args.data}.")
-    fn_kwargs = {"ending_names": ending_names, 
-                 "header_name": header_name, 
-                 "tokenizer": tokenizer,}
-    tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
-    eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
+    # evaluate on each dataset
+    for dataset in args.datasets:
+        args.dataset = dataset
+        ending_names, header_name, raw_dataset = load_data(args)
 
-    # step 5: (evaluation) inference on data, and compute accuracy.
-    logger.info(f"Start inference (method: {args.method}) on {args.data} using {args.model_family} model: {args.checkpoint}. Multiple choice prompt: {args.multiple_choice_prompt}.")
-    total_accuracy = inference_language_modeling(model, eval_dataloader, device)
- 
-    # step 6: some postprocessing, including saving and displyaing output.
-    save_path = os.path.join("../results", f"{args.method}.csv")
-    logger.info(f"Save results to {save_path}.")
-    write_to_csv(save_path, args, total_accuracy)
+        logger.info(f"Preprocess data: {args.dataset}.")
+        fn_kwargs = {"ending_names": ending_names, 
+                    "header_name": header_name, 
+                    "tokenizer": tokenizer,}
+        tokenized_dataset = raw_dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+        eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
+
+        # step 5: (evaluation) inference on data, and compute accuracy.
+        logger.info(f"Start inference (method: {args.method}) on {args.datasets} using {args.model_family} model: {args.checkpoint}. Multiple choice prompt: {args.multiple_choice_prompt}.")
+        total_accuracy = inference_language_modeling(model, eval_dataloader, device)
+    
+        # step 6: some postprocessing, including saving and displyaing output.
+        save_path = os.path.join("../results", f"{args.method}.csv")
+        logger.info(f"Save results to {save_path}.")
+        write_to_csv(save_path, args, total_accuracy)
 
 if __name__ == "__main__":
     main()

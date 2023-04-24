@@ -65,12 +65,12 @@ def parse_args():
         help="The expert checkpoint, which is usually a large model from the same model family.",
     )
     parser.add_argument(
-        "--data",
+        "--datasets",
         type=str,
-        choices=["copa", "cqa", "winogrande"],
+        # choices=["copa", "cqa", "winogrande"],
         default=None,
         required=True,
-        help="The dataset to inference on.",
+        help="The datasets to inference on. Pass multiple datasets separate by space",
     )
     parser.add_argument(
         "--batch_size",
@@ -125,8 +125,8 @@ def write_to_csv(save_path, args, total_accuracy):
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if not csv_exists:
-            csvwriter.writerow(['model_family', 'amateur_checkpoint', 'expert_checkpoint', 'data', 'batch_size', 'method', "seed", 'accuracy'])
-        csvwriter.writerow([args.model_family, args.amateur_checkpoint, args.expert_checkpoint, args.data, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
+            csvwriter.writerow(['model_family', 'amateur_checkpoint', 'expert_checkpoint', 'dataset', 'batch_size', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.amateur_checkpoint, args.expert_checkpoint, args.dataset, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
 
 def main():
     # import pdb; pdb.set_trace()
@@ -158,24 +158,31 @@ def main():
     expert_model, _ = load_model(device, expert_model_path, args)
 
     # step 4: load and preprocess data.
-    logger.info(f"Load data: {args.data}.")
-    ending_names, header_name, dataset = load_data(args)
+    # ending_names, header_name, dataset = load_data(args)
+    args.datasets = args.datasets.split()
+    logger.info(f"Load data: {args.datasets}.")
+    # evaluate on each dataset
+    for dataset in args.datasets:
+        args.dataset = dataset
+        ending_names, header_name, raw_dataset = load_data(args)
 
-    logger.info(f"Preprocess data: {args.data}.")
-    fn_kwargs = {"ending_names": ending_names, 
-                 "header_name": header_name, 
-                 "tokenizer": tokenizer,}
-    tokenized_dataset = dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
-    eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
+        logger.info(f"Preprocess data: {args.dataset}.")
+        fn_kwargs = {"ending_names": ending_names, 
+                    "header_name": header_name, 
+                    "tokenizer": tokenizer,}
+        tokenized_dataset = raw_dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+        eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 
-    # step 5: (evaluation) inference on data, and compute accuracy.
-    logger.info(f"Start inference (method: {args.method}) on {args.data} using {args.model_family} amateur model: {args.amateur_checkpoint} and expert model: {args.expert_checkpoint}.")
-    total_accuracy = inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader, device)
- 
-    # step 6: some postprocessing, including saving and displyaing output.
-    save_path = os.path.join("../results", f"{args.method}.csv")
-    logger.info(f"Save results to {save_path}.")
-    write_to_csv(save_path, args, total_accuracy)
+        # step 5: (evaluation) inference on data, and compute accuracy.
+        logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} amateur model: {args.amateur_checkpoint} and expert model: {args.expert_checkpoint}.")
+        total_accuracy = inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader, device)
+
+        # step 6: some postprocessing, including saving and displyaing output.
+        save_path = os.path.join("../results", f"{args.method}.csv")
+        logger.info(f"Save results to {save_path}.")
+        write_to_csv(save_path, args, total_accuracy)
+
+    
 
 if __name__ == "__main__":
     main()

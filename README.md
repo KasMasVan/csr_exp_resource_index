@@ -116,7 +116,10 @@ These methods choose the answer in multiple steps, which may involve generation 
 | 2 | [Process of Elimination](https://docs.google.com/document/d/14aRC2C6-fb64hDW5lFTQSjOuOrfK1ItoNJw17VTaEes/edit?usp=sharing) |  1. $score_i= score(y_i)$  <br> 2. $Y^\prime = \{y_i \| score_i > threshold\}$ <br> 3. $\hat{y} = prompting([demonstrations,] x, Y^\prime)$| N/A |
 
 ### Useful Links
-- [Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)
+- [Google Doc: Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)
+- [Repo: Natural Instruction](https://github.com/allenai/natural-instructions): A benchmark that annotate instructions for many tasks.
+- [Repo: Prompt Engineering Guide](https://github.com/dair-ai/Prompt-Engineering-Guide/tree/main): A comprehensive collection.
+- [Repo: PromptSouce](https://github.com/bigscience-workshop/promptsource): A repo for prompts.
 - [HF: Causal Language Modeling](https://huggingface.co/docs/transformers/tasks/language_modeling)
 - [HF: Multiple Choice](https://huggingface.co/docs/transformers/tasks/multiple_choice)
 - [HF: Scripts](https://huggingface.co/docs/transformers/run_scripts)

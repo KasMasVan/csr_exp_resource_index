@@ -56,12 +56,12 @@ def parse_args():
         help="The checkpoint name under a model family, e.g. gpt2, gpt2-medium, gpt2-large, gpt2-xl.",
     )
     parser.add_argument(
-        "--data",
+        "--datasets",
         type=str,
-        choices=["copa", "cqa", "winogrande"],
+        # choices=["copa", "cqa", "winogrande"],
         default=None,
         required=True,
-        help="The dataset to inference on.",
+        help="The datasets to inference on. Pass multiple datasets separate by space",
     )
     parser.add_argument(
         "--batch_size",
@@ -80,19 +80,23 @@ def parse_args():
     return args
 
 def load_data(args):
-    if args.data == "copa":
+    if args.dataset == "copa":
         ending_names = ['hypothesis0', 'hypothesis1']
         header_name = "premise"
-        file_path = os.path.join("../data", args.data, "copa-dev.xml")
+        file_path = os.path.join("../data", args.dataset, "copa-dev.xml")
         loader = copa_loader
-    elif args.data == "cqa":
+    elif args.dataset == "cqa":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
         header_name = "premise"
-        file_path = os.path.join("../data", args.data, "dev.jsonl")
+        file_path = os.path.join("../data", args.dataset, "dev.jsonl")
         loader = cqa_loader
-    elif args.data == "winogrande":
-        file_path = os.path.join("../data", args.data, "dev.jsonl")
+    elif args.dataset == "winogrande":
+        file_path = os.path.join("../data", args.dataset, "dev.jsonl")
         loader = winogrande_loader
+    else:
+        print(f"{args.dataset}: downloader not implemented.")
+        return
+
     
     dev_data = loader(file_path, args)
     dataset = Dataset.from_list(dev_data).with_format("torch")
@@ -119,5 +123,5 @@ def write_to_csv(save_path, args, total_accuracy):
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if not csv_exists:
-            csvwriter.writerow(['model_family', 'checkpoint', 'data', 'batch_size', 'method', "seed", 'accuracy'])
-        csvwriter.writerow([args.model_family, args.checkpoint, args.data, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
+            csvwriter.writerow(['model_family', 'checkpoint', 'dataset', 'batch_size', 'method', "seed", 'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, args.dataset, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])

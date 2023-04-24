@@ -56,7 +56,7 @@ def copa_loader(path, args):
         #                                  'uncond_hypothesis': ' ' + a2}], 
         #           'label':int(value)-1}]
         premise = ' ' + p[:-1] + bridge
-        if args.multiple_choice_prompt is not None:
+        if getattr(args, 'multiple_choice_prompt', None) is not None:
                 # Question: The pond froze over for the winter so
                 # A. People skated on the pond.
                 # B. People brought boats to the pond.
@@ -91,7 +91,8 @@ def cqa_loader(path, args):
                         #                 'uncond_premise': ' the answer is:',
                         #                 'uncond_hypothesis': ' "{}"'.format(c['text'].lower())} for c in d['question']['choices']], 
                         # 'label':label}]
-            if args.multiple_choice_prompt is not None:
+            # if args.multiple_choice_prompt is not None:
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
                 hypotheses = ["A", "B", "C", "D", "E"]
                 # Question: How does a bishop move from one place to another?
                 # A. chess game
