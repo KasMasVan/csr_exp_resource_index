@@ -63,7 +63,7 @@ def inference_process_of_elimination(model, eval_dataloader, device):
         labels = torch.cat((labels, batch_labels))
         
         # poe step 1: get probability of each options
-        batch_log_prob = ce_loss.view(ending_shape).sum(dim=-1)
+        log_prob = ce_loss.view(ending_shape).sum(dim=-1)
         # Tentative solution for step 2: get rid of the least likely option
         # min_val, _ = batch_log_prob.min(dim=1)
         # # Create a mask to identify the indices where the minimum value occurs

@@ -19,12 +19,12 @@ multiple_choice_prompt="Question:"
 #     --method ${method} 
 # done
 
-# language modeling
-# python language_modeling.py \
-#     --model_family ${model_family} \
-#     --checkpoint ${checkpoint} \
-#     --datasets "$datasets" \
-#     --batch_size  ${batch_size} \
+# language modeling and average language modeling
+python language_modeling.py \
+    --model_family ${model_family} \
+    --checkpoint ${checkpoint} \
+    --datasets "$datasets" \
+    --batch_size  ${batch_size} \
 
 # contrastive decoding
 # python contrastive_decoding.py \
@@ -43,8 +43,8 @@ multiple_choice_prompt="Question:"
 #     --multiple_choice_prompt ${multiple_choice_prompt}
 
 # process of elimination
-python process_of_elimination.py \
-    --model_family ${model_family} \
-    --checkpoint ${checkpoint} \
-    --datasets "$datasets" \
-    --batch_size  ${batch_size} \
+# python process_of_elimination.py \
+#     --model_family ${model_family} \
+#     --checkpoint ${checkpoint} \
+#     --datasets "$datasets" \
+#     --batch_size  ${batch_size} \

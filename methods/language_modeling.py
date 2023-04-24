@@ -1,5 +1,6 @@
 # a framework for inference on multiple choice tasks.
 import argparse
+import copy
 import csv
 import logging
 import os
@@ -34,7 +35,8 @@ logger = logging.getLogger(__name__)
 
 def inference_language_modeling(model, eval_dataloader, device):
     model.eval()
-    predictions = torch.zeros(0)
+    lm_predictions = torch.zeros(0)
+    avg_lm_predictions = torch.zeros(0)
     labels = torch.zeros(0)
     torch.cuda.empty_cache()
 
@@ -42,6 +44,7 @@ def inference_language_modeling(model, eval_dataloader, device):
     for batch in pbar:
         # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
         ending_shape = batch["ending_input_ids"].shape 
+        ending_length = batch["ending_attention_mask"].sum(dim=-1)
         # flatten
         header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
         ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
@@ -57,16 +60,21 @@ def inference_language_modeling(model, eval_dataloader, device):
         # ignore padding token: 0
         ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
         # each score is the negative log-likelihood of a ending given a header.
-        batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
+        # batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
+        log_prob = ce_loss.view(ending_shape).sum(dim=-1)
+        batch_predictions = log_prob.argmin(dim=-1)
+        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+
         batch_labels = batch["label"]
-        predictions = torch.cat((predictions, batch_predictions))
+        lm_predictions = torch.cat((lm_predictions, batch_predictions))
+        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
         labels = torch.cat((labels, batch_labels))
     
         # make accuracy accumulative
-        batch_accuracy = (batch_predictions == batch_labels).sum().item() / len(batch_labels)
-        total_accuracy = (predictions == labels).sum().item() / len(labels)
-        pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
-    return total_accuracy
+        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
+        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
+        pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
+    return lm_accuracy, avg_lm_accuracy
 
 def main():
     # import pdb; pdb.set_trace()
@@ -74,6 +82,7 @@ def main():
     # step 1: argument parser, and logger
     args = parse_args()
     args.method = "language_modeling"
+
     # print(args)
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -111,12 +120,16 @@ def main():
 
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
-        total_accuracy = inference_language_modeling(model, eval_dataloader, device)
+        lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device)
     
         # step 6: some postprocessing, including saving and displyaing output.
         save_path = os.path.join("../results", f"{args.method}.csv")
         logger.info(f"Save results to {save_path}.")
-        write_to_csv(save_path, args, total_accuracy)
+        write_to_csv(save_path, args, lm_accuracy)
+        
+        avg_args = copy.deepcopy(args)
+        avg_args.method = "average_language_modeling"
+        write_to_csv(save_path, avg_args, avg_lm_accuracy)
 
 if __name__ == "__main__":
     main()

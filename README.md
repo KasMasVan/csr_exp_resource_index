@@ -102,7 +102,8 @@ Supported methods are organized by hierarchy, which means some methods are more 
 
 | Index | Method      | Scoring Function     | Script |
 | ---   | ----------- | ----------- | ----------- |
-| 0 | Language Modeling |   $P_{LM}(y_i \| x)$   | `./methods/language_modeling.py` |
+| 0.0 | Language Modeling |   $P_{LM}(y_i \| x)$   | `./methods/language_modeling.py` |
+| 0.1 | Average Language Modeling |   $P_{LM}(y_i \| x)^{1/len(y_i)}$   | `./methods/language_modeling.py` |
 | 1.x | [Multiple Choice Prompt](https://openreview.net/forum?id=yKbprarjc5B) |   $P_{LM}(symbol(y_i) \| T_{mcp}(x))$   | `./methods/multiple_choice_prompt.py` |
 | 2.x | [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf) |   $\frac{P_{ExpertLM}(y_i \| x)}{P_{AmateurLM}(y_i \| x)}$  | `./methods/contrastive_decoding.py` |
 
