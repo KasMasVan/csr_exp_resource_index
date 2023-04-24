@@ -13,8 +13,9 @@ This repositoy contains code to prepare data, models and baseline methods for my
 - [ ] **More [methods](#methods)**. 
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
 - [ ] **Consider**: Do I need to rearrange the inference pipeline by starting with the method? Different method may require modifications to data and models. Alternatively, I could create a different pipeline for each method.
-- [ ] **Important**: Enable the script to accept multiple datasets, so you can load the model once and sequentially deal with each dataset. Make sure the disk space is still okay.
+- [x] **Important**: Aggregate datasets in an evaluation pipeline to avoid loading the same model multiple times. Consider aggregating similar methods as well.
 - [ ] Generate requirements.txt automatically?
+- [ ] Add contents for this repo.
 - [ ] TBD.
 
 ## Data 
@@ -113,7 +114,7 @@ These methods choose the answer in multiple steps, which may involve generation 
 | Index | Method      | Prodecure     | Script |
 | ---   | ----------- | ----------- | ----------- |
 | 1 | [SEQA](https://aclanthology.org/2021.acl-long.237) |  1. $\{s_i\} = genenerate(x)$  <br> 2. $\hat{y} = argmax_jsim(y_j, \{s_i\})$ | N/A |
-| 2 | [Process of Elimination](https://docs.google.com/document/d/14aRC2C6-fb64hDW5lFTQSjOuOrfK1ItoNJw17VTaEes/edit?usp=sharing) |  1. $score_i= score(y_i)$  <br> 2. $Y^\prime = \{y_i \| score_i > threshold\}$ <br> 3. $\hat{y} = prompting([demonstrations,] x, Y^\prime)$| N/A |
+| 2 | [Process of Elimination](https://docs.google.com/document/d/14aRC2C6-fb64hDW5lFTQSjOuOrfK1ItoNJw17VTaEes/edit?usp=sharing) |  1. $score_i= score(y_i)$  <br> 2. $Y^\prime = \{y_i \| score_i > threshold\}$ <br> 3. $\hat{y} = prompting([demonstrations,] x, Y^\prime)$| `./methods/process_of_elimination.py` |
 
 ### Useful Links
 - [Google Doc: Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)
