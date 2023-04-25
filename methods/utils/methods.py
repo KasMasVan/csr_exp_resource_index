@@ -109,7 +109,7 @@ def compute_causal_conditional_score(batch, model, device):
     
     # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
     # ending_shape = batch["ending_input_ids"].shape 
-    # flatten. both input_ids has 0 as padding token.
+    # flatten. both input_ids has 50256 as padding token.
     header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
     header_attention_mask = batch["header_attention_mask"].view(-1, batch["header_attention_mask"].shape[-1]).to(device)
     ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)

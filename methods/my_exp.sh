@@ -1,6 +1,6 @@
 seed=0
-model_family="FLAN-T5"
-checkpoint="google/flan-t5-small"
+model_family="GPT2"
+checkpoint="gpt2"
 amateur_checkpoint="google/flan-t5-small"
 expert_checkpoint="google/flan-t5-base"
 datasets="cqa copa"
