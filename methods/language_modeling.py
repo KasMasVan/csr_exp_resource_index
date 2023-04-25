@@ -23,6 +23,10 @@ from datasets import Dataset
 from utils.data import(
     preprocess_function,
 )
+from utils.methods import(
+    compute_seq2seq_conditional_score,
+    compute_causal_conditional_score,
+)
 from utils.utils import(
     load_data,
     load_model,
@@ -33,7 +37,7 @@ from utils.utils import(
 
 logger = logging.getLogger(__name__)
 
-def inference_language_modeling(model, eval_dataloader, device):
+def inference_language_modeling(model, eval_dataloader, device, compute_func):
     model.eval()
     lm_predictions = torch.zeros(0)
     avg_lm_predictions = torch.zeros(0)
@@ -42,29 +46,9 @@ def inference_language_modeling(model, eval_dataloader, device):
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
-        # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
-        ending_shape = batch["ending_input_ids"].shape 
+        log_prob = compute_func(batch, model, device)
+        
         ending_length = batch["ending_attention_mask"].sum(dim=-1)
-        # flatten. both input_ids has 0 as padding token.
-        header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
-        header_attention_mask = batch["header_attention_mask"].view(-1, batch["header_attention_mask"].shape[-1]).to(device)
-        ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
-        
-        # adding this line of code takes me more than an hour.
-        # without adding torch.no_grad, GPU usage will muiltply by 4.
-        with torch.no_grad():
-            outputs = model(input_ids = header_input_ids, 
-                            attention_mask = header_attention_mask,
-                            labels = ending_input_ids)
-        
-        _, logits = outputs.loss, outputs.logits
-        # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
-        logits = logits.view(-1, logits.shape[-1])
-        # ignore padding token: 0
-        ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
-        # each score is the negative log-likelihood of a ending given a header.
-        # batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
-        log_prob = ce_loss.view(ending_shape).sum(dim=-1)
         batch_predictions = log_prob.argmin(dim=-1)
         batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
 
@@ -80,7 +64,7 @@ def inference_language_modeling(model, eval_dataloader, device):
     return lm_accuracy, avg_lm_accuracy
 
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -104,6 +88,12 @@ def main():
     # get model path: ../models/args.model_family/args.checkpoint
     model_path = os.path.join("../models", args.model_family, args.checkpoint)
     model, tokenizer = load_model(device, model_path, args)
+    if args.model_family in ["GPT2"]:
+        compute_func = compute_causal_conditional_score
+    elif args.model_family in ["T5", "FLAN-T5"]:
+        compute_func = compute_seq2seq_conditional_score
+    else:
+        raise NotImplementedError
 
     # step 4: load and preprocess data.
     args.datasets = args.datasets.split()
@@ -123,7 +113,7 @@ def main():
 
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
-        lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device)
+        lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func)
     
         # step 6: some postprocessing, including saving and displyaing output.
         save_path = os.path.join("../results", f"{args.method}.csv")

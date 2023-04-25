@@ -113,6 +113,8 @@ def load_model(device, model_path, args):
         print(f"{args.model_family}: downloader not implemented.")
         return
     tokenizer = tokenizer_func.from_pretrained(model_path)
+    if args.model_family == "GPT2":
+        tokenizer.pad_token = tokenizer.eos_token
     model = model_func.from_pretrained(model_path)
     model.to(device)
     return model, tokenizer
