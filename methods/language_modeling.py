@@ -45,14 +45,17 @@ def inference_language_modeling(model, eval_dataloader, device):
         # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
         ending_shape = batch["ending_input_ids"].shape 
         ending_length = batch["ending_attention_mask"].sum(dim=-1)
-        # flatten
+        # flatten. both input_ids has 0 as padding token.
         header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
+        header_attention_mask = batch["header_attention_mask"].view(-1, batch["header_attention_mask"].shape[-1]).to(device)
         ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
         
         # adding this line of code takes me more than an hour.
         # without adding torch.no_grad, GPU usage will muiltply by 4.
         with torch.no_grad():
-            outputs = model(input_ids = header_input_ids, labels = ending_input_ids)
+            outputs = model(input_ids = header_input_ids, 
+                            attention_mask = header_attention_mask,
+                            labels = ending_input_ids)
         
         _, logits = outputs.loss, outputs.logits
         # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
@@ -77,7 +80,7 @@ def inference_language_modeling(model, eval_dataloader, device):
     return lm_accuracy, avg_lm_accuracy
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
