@@ -21,11 +21,12 @@ from datasets import Dataset
 
 
 from utils.data import(
-    preprocess_function,
+    preprocess_function_seq2seq,
+    preprocess_function_causal,
 )
 from utils.methods import(
-    compute_seq2seq_conditional_score,
-    compute_causal_conditional_score,
+    compute_conditional_score_seq2seq,
+    compute_conditional_score_causal,
 )
 from utils.utils import(
     load_data,
@@ -64,7 +65,7 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
     return lm_accuracy, avg_lm_accuracy
 
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -89,9 +90,12 @@ def main():
     model_path = os.path.join("../models", args.model_family, args.checkpoint)
     model, tokenizer = load_model(device, model_path, args)
     if args.model_family in ["GPT2"]:
-        compute_func = compute_causal_conditional_score
+        compute_func = compute_conditional_score_causal
+        preprocess_func = preprocess_function_causal
+
     elif args.model_family in ["T5", "FLAN-T5"]:
-        compute_func = compute_seq2seq_conditional_score
+        compute_func = compute_conditional_score_seq2seq
+        preprocess_func = preprocess_function_seq2seq
     else:
         raise NotImplementedError
 
@@ -108,7 +112,7 @@ def main():
         fn_kwargs = {"ending_names": ending_names, 
                     "header_name": header_name, 
                     "tokenizer": tokenizer,}
-        tokenized_dataset = raw_dataset.map(preprocess_function, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+        tokenized_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
         eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 
         # step 5: (evaluation) inference on data, and compute accuracy.

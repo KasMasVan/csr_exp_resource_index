@@ -1,10 +1,12 @@
 import json
 import xml.etree.ElementTree as ET
 
+import torch
+
 
 # write my own data loader, or using HF dataloader?
 
-def preprocess_function(examples, **kwargs):
+def preprocess_function_seq2seq(examples, **kwargs):
     ending_names, header_name, tokenizer = kwargs['ending_names'], kwargs['header_name'], kwargs['tokenizer']
     num_choice = len(ending_names)
     question_headers = examples[header_name]
@@ -26,6 +28,41 @@ def preprocess_function(examples, **kwargs):
     header_dict = {f"header_{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_headers.items()}
     ending_dict = {f"ending_{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in tokenized_endings.items()}
     return {**header_dict, **ending_dict}
+
+def preprocess_function_causal(examples, **kwargs):
+    ending_names, header_name, tokenizer = kwargs['ending_names'], kwargs['header_name'], kwargs['tokenizer']
+    num_choice = len(ending_names)
+    question_headers = examples[header_name]
+    # the tokenizer handles multiple spaces.
+    first_sentences = [[context] * len(ending_names) for context in examples[header_name]]
+    # second_sentences = [
+    #     [f"{header} {examples[end][i]}" for end in ending_names] for i, header in enumerate(question_header)
+    # ]
+    second_sentences = [
+        [f"{examples[end][i]}" for end in ending_names] for i, header in enumerate(question_headers)
+    ]
+
+    first_sentences = sum(first_sentences, [])
+    second_sentences = sum(second_sentences, [])
+
+    # tokenized_examples = tokenizer(first_sentences, second_sentences, truncation=True)
+    tokenized_headers = tokenizer(first_sentences, truncation=True)
+    tokenized_endings = tokenizer(second_sentences, truncation=True)
+
+    # reference: https://github.com/peterwestuw/surface-form-competition/blob/main/utils.py#L177
+    max_len = max(len(header + ending) for header, ending in zip(tokenized_headers['input_ids'], tokenized_endings['input_ids']))
+    input_ids = torch.full((len(tokenized_headers['input_ids']), max_len), tokenizer.pad_token_id, dtype=torch.long)
+    labels = tokenizer.pad_token_id * torch.ones((len(tokenized_headers['input_ids']), max_len), dtype=torch.long)
+    ending_attention_mask = torch.zeros((len(tokenized_headers['input_ids']), max_len), dtype=torch.long)
+    for i, (header, ending) in enumerate(zip(tokenized_headers['input_ids'], tokenized_endings['input_ids'])):
+        input_ids[i, :len(header)] = torch.tensor(header)
+        input_ids[i, len(header):len(header)+len(ending)] = torch.tensor(ending)
+        ending_attention_mask[i, len(header):len(header)+len(ending)] = torch.tensor(1)
+        labels[i, len(header):len(header)+len(ending)] = torch.tensor(ending)
+
+    flatten_dict = {"input_ids": input_ids, "labels": labels, "ending_attention_mask": ending_attention_mask}
+    return_dict = {f"{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in flatten_dict.items()}
+    return return_dict
 
 def copa_loader(path, args):
     
@@ -83,9 +120,13 @@ def cqa_loader(path, args):
         for line in f:
             d = json.loads(line)
             label = ['A','B','C','D','E'].index(d['answerKey'])
-            premise = ' ' +d['question']['stem']
+            premise = ' ' + d['question']['stem']
             premise = premise[:-1] + '?'  
-            options = [option['text'].lower() for option in d['question']['choices']]
+            
+            # to ensure identical perforamnce to the PMI paper.
+            # options = [option['text'].lower() for option in d['question']['choices']]
+            options = [f" \"{option['text'].lower()}\"" for option in d['question']['choices']]
+            
             # examples += [{'options': [{'premise':premise + '? the answer is:' ,
                         #                 'hypothesis': ' "{}"'.format(c['text'].lower()),
                         #                 'uncond_premise': ' the answer is:',

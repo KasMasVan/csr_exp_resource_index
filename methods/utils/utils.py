@@ -18,7 +18,6 @@ from datasets import Dataset
 # import data.py, which is located in the same directory
 
 from .data import(
-    preprocess_function,
     copa_loader,
     cqa_loader,
     winogrande_loader,

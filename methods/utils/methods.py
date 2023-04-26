@@ -76,7 +76,7 @@ def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader,
         pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
     return total_accuracy
 
-def compute_seq2seq_conditional_score(batch, model, device):
+def compute_conditional_score_seq2seq(batch, model, device):
     # returns log_prob of p(y|x) for each batch
     
     # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
@@ -103,28 +103,20 @@ def compute_seq2seq_conditional_score(batch, model, device):
     log_prob = ce_loss.view(ending_shape).sum(dim=-1)
     return log_prob
 
-def compute_causal_conditional_score(batch, model, device):
+def compute_conditional_score_causal(batch, model, device):
     # returns log_prob of p(y|x) for each batch
+    # make sure the padding token is aligned with tokenizer.pad_token_id 
+    # and preprocess_function_causal
     padding_token = 50256
     
-    # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
-    # ending_shape = batch["ending_input_ids"].shape 
-    # flatten. both input_ids has 50256 as padding token.
-    header_input_ids = batch["header_input_ids"].view(-1, batch["header_input_ids"].shape[-1]).to(device)
-    header_attention_mask = batch["header_attention_mask"].view(-1, batch["header_attention_mask"].shape[-1]).to(device)
-    ending_input_ids = batch["ending_input_ids"].view(-1, batch["ending_input_ids"].shape[-1]).to(device)
-    ending_attention_mask = batch["ending_attention_mask"].view(-1, batch["ending_attention_mask"].shape[-1]).to(device)
-
-    input_ids = torch.cat((header_input_ids, ending_input_ids), dim=-1)
-    attention_mask = torch.cat((header_attention_mask, ending_attention_mask), dim=-1)
-    padding_tensor = torch.full(header_input_ids.shape, padding_token).to(device)
-    labels = torch.cat((padding_tensor, ending_input_ids), dim=-1)
+    input_ids = batch["input_ids"].view(-1, batch["input_ids"].shape[-1]).to(device)
+    labels = batch["labels"].view(-1, batch["labels"].shape[-1]).to(device)
 
     # adding this line of code takes me more than an hour.
     # without adding torch.no_grad, GPU usage will muiltply by 4.
     with torch.no_grad():
         outputs = model(input_ids = input_ids,
-                        attention_mask = attention_mask,
+                        # attention_mask = attention_mask,
                         labels = labels)
     
     _, logits = outputs.loss, outputs.logits
@@ -136,6 +128,5 @@ def compute_causal_conditional_score(batch, model, device):
     # ignore padding token: 50256
     ce_loss = F.cross_entropy(logits, labels.view(-1), reduction="none", ignore_index=padding_token).detach().cpu()
     # each score is the negative log-likelihood of a ending given a header.
-    # batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
-    log_prob = ce_loss.view(batch["ending_input_ids"].shape[0], batch["ending_input_ids"].shape[1], -1).sum(dim=-1)
+    log_prob = ce_loss.view(batch["input_ids"].shape[0], batch["input_ids"].shape[1], -1).sum(dim=-1)
     return log_prob

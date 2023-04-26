@@ -7,8 +7,9 @@ This repositoy contains code to prepare data, models and baseline methods for my
 
 
 ## To Do
-- [ ] Report experiment result for reproducibility?
-- [ ] More language model. Specifically, add support for causal language models. For larger models, you may load with different precisions like FP16 and INT8 (Check [this](https://huggingface.co/docs/transformers/main/en/performance)).
+- [ ] Reproducibility: Identical performance compared to PMI_DC so far.
+- [ ] **Important**: Consider the form of prompts, especially some nuances like the whitespace between a semicolon and an answer. You may use existing templates instead. 
+- [ ] More language model. For larger models, you may load with different precisions like FP16 and INT8 (Check [this](https://huggingface.co/docs/transformers/main/en/performance)).
 - [ ] More data. 
 - [ ] **More [methods](#methods)**. 
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
