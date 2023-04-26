@@ -69,7 +69,10 @@ def main():
 
     # step 1: argument parser, and logger
     args = parse_args()
-    args.method = "language_modeling"
+    if args.multiple_choice_prompt is not None:
+        args.method = "multiple_choice_prompt"
+    else:
+        args.method = "language_modeling"
 
     # print(args)
     logging.basicConfig(
@@ -123,10 +126,11 @@ def main():
         save_path = os.path.join("../results", f"{args.method}.csv")
         logger.info(f"Save results to {save_path}.")
         write_to_csv(save_path, args, lm_accuracy)
-        
-        avg_args = copy.deepcopy(args)
-        avg_args.method = "average_language_modeling"
-        write_to_csv(save_path, avg_args, avg_lm_accuracy)
+
+        if args.method == "language_modeling":
+            avg_args = copy.deepcopy(args)
+            avg_args.method = "average_language_modeling"
+            write_to_csv(save_path, avg_args, avg_lm_accuracy)
 
 if __name__ == "__main__":
     main()
