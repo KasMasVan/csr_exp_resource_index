@@ -20,11 +20,11 @@ multiple_choice_prompt="Question:"
 # done
 
 # language modeling and average language modeling
-python language_modeling.py \
-    --model_family ${model_family} \
-    --checkpoint ${checkpoint} \
-    --datasets "$datasets" \
-    --batch_size  ${batch_size} \
+# python language_modeling.py \
+#     --model_family ${model_family} \
+#     --checkpoint ${checkpoint} \
+#     --datasets "$datasets" \
+#     --batch_size  ${batch_size} \
 
 # contrastive decoding
 # python contrastive_decoding.py \
@@ -35,12 +35,12 @@ python language_modeling.py \
 #     --batch_size  ${batch_size} \
 
 # multiple choice prompt, using the same script as language modeling
-python language_modeling.py \
-    --model_family ${model_family} \
-    --checkpoint ${checkpoint} \
-    --datasets "$datasets" \
-    --batch_size  ${batch_size} \
-    --multiple_choice_prompt ${multiple_choice_prompt}
+# python language_modeling.py \
+#     --model_family ${model_family} \
+#     --checkpoint ${checkpoint} \
+#     --datasets "$datasets" \
+#     --batch_size  ${batch_size} \
+#     --multiple_choice_prompt ${multiple_choice_prompt}
 
 # process of elimination
 python process_of_elimination.py \

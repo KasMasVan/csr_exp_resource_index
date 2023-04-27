@@ -38,7 +38,7 @@ from utils.utils import(
 
 logger = logging.getLogger(__name__)
 
-def inference_process_of_elimination_mask(model, eval_dataloader, device, compute_func):
+def compute_mask(model, eval_dataloader, device, compute_func):
     model.eval()
     masks = []
     torch.cuda.empty_cache()
@@ -57,7 +57,7 @@ def inference_process_of_elimination_mask(model, eval_dataloader, device, comput
     masks = torch.cat(masks, dim=0)
     return masks
 
-def inference_language_modeling(model, eval_dataloader, device, compute_func):
+def inference_process_of_elimination(model, eval_dataloader, device, compute_func):
     model.eval()
     lm_predictions = torch.zeros(0)
     avg_lm_predictions = torch.zeros(0)
@@ -67,6 +67,8 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
         log_prob = compute_func(batch, model, device)
+        # apply hard masking
+        log_prob[batch["mask"] == 0] = float("inf")
         
         ending_length = batch["ending_attention_mask"].sum(dim=-1)
         batch_predictions = log_prob.argmin(dim=-1)
@@ -130,10 +132,16 @@ def main():
     if args.model_family in ["GPT2"]:
         compute_func = compute_conditional_score_causal
         preprocess_func = preprocess_function_causal
-
+        remove_columns = ['input_ids',
+                          'labels',
+                          'ending_attention_mask']
     elif args.model_family in ["T5", "FLAN-T5"]:
         compute_func = compute_conditional_score_seq2seq
         preprocess_func = preprocess_function_seq2seq
+        remove_columns=['header_input_ids', 
+                        'header_attention_mask', 
+                        'ending_input_ids', 
+                        'ending_attention_mask', ]
     else:
         raise NotImplementedError
 
@@ -158,14 +166,11 @@ def main():
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         logger.info(f"Step 1: Computing masks.")
-        masks = inference_process_of_elimination_mask(model, eval_dataloader, device, compute_func)
+        masks = compute_mask(model, eval_dataloader, device, compute_func)
         masked_dataset = tokenized_dataset.map(lambda example, idx: {"mask": masks[idx]}, 
                                  with_indices=True, 
                                  batched=True,
-                                 remove_columns=['header_input_ids', 
-                                                 'header_attention_mask', 
-                                                 'ending_input_ids', 
-                                                 'ending_attention_mask', ])
+                                 remove_columns=remove_columns)
         
         logger.info(f"Step 2: Creating multiple choice prompt.")
         mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
@@ -174,7 +179,7 @@ def main():
         logger.info(f"Step 3: Final Inference")
         mcp_dataset = mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
         eval_mcp_dataloader = DataLoader(mcp_dataset, batch_size=args.batch_size, shuffle=False)
-        lm_accuracy, _ = inference_language_modeling(model, eval_mcp_dataloader, device, compute_func)
+        lm_accuracy, _ = inference_process_of_elimination(model, eval_mcp_dataloader, device, compute_func)
 
         # step 6: some postprocessing, including saving and displyaing output.
         save_path = os.path.join("../results", f"{args.method}.csv")
