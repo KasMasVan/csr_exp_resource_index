@@ -92,7 +92,8 @@ The following methods are designed for multiple choice tasks. Formally, the task
 
 Usage: 
 ```
-TBD
+cd methods
+bash my_exp.sh
 ```
 
 ### Scoring Methods (Single-Step)

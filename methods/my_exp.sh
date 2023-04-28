@@ -1,6 +1,6 @@
 seed=0
 model_family="FLAN-T5"
-checkpoint="google/flan-t5-small"
+checkpoint="google/flan-t5-xl"
 amateur_checkpoint="google/flan-t5-small"
 expert_checkpoint="google/flan-t5-base"
 datasets="cqa copa"
@@ -35,17 +35,17 @@ multiple_choice_prompt="Question:"
 #     --batch_size  ${batch_size} \
 
 # multiple choice prompt, using the same script as language modeling
-# python language_modeling.py \
-#     --model_family ${model_family} \
-#     --checkpoint ${checkpoint} \
-#     --datasets "$datasets" \
-#     --batch_size  ${batch_size} \
-#     --multiple_choice_prompt ${multiple_choice_prompt}
-
-# process of elimination
-python process_of_elimination.py \
+python language_modeling.py \
     --model_family ${model_family} \
     --checkpoint ${checkpoint} \
     --datasets "$datasets" \
     --batch_size  ${batch_size} \
     --multiple_choice_prompt ${multiple_choice_prompt}
+
+# process of elimination
+# python process_of_elimination.py \
+#     --model_family ${model_family} \
+#     --checkpoint ${checkpoint} \
+#     --datasets "$datasets" \
+#     --batch_size  ${batch_size} \
+#     --multiple_choice_prompt ${multiple_choice_prompt}
