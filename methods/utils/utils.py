@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument(
         "--model_family",
         type=str,
-        choices=["GPT2", "T5", "FLAN-T5"],
+        choices=["GPT2", "T5", "FLAN-T5", "Pythia"],
         default=None,
         required=True,
         help="The moddel family, as checkpoints under the same model family use same codes to download.",
@@ -102,7 +102,7 @@ def load_data(args):
     return ending_names, header_name, dataset
 
 def load_model(device, model_path, args):
-    if args.model_family == "GPT2":
+    if args.model_family in ["GPT2","Pythia"]:
         tokenizer_func = AutoTokenizer
         model_func = AutoModelForCausalLM
     elif args.model_family in ["T5", "FLAN-T5"]:
@@ -112,7 +112,7 @@ def load_model(device, model_path, args):
         print(f"{args.model_family}: downloader not implemented.")
         return
     tokenizer = tokenizer_func.from_pretrained(model_path)
-    if args.model_family == "GPT2":
+    if args.model_family in ["GPT2", "Pythia"]:
         tokenizer.pad_token = tokenizer.eos_token
     model = model_func.from_pretrained(model_path)
     model.to(device)

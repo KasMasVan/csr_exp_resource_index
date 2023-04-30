@@ -61,6 +61,7 @@ bash models/model_downloaders/model_downloaders.sh
 |3 | [StableLM](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`stabilityai/stablelm-base-alpha-3b`<br> `stabilityai/stablelm-tuned-alpha-3b` <br>`stabilityai/stablelm-base-alpha-7b`<br> `stabilityai/stablelm-tuned-alpha-7b` | Check [repo](https://github.com/Stability-AI/StableLM) for newer models. |
 |4 | [Phoenix](https://huggingface.co/docs/transformers/main/en/model_doc/bloom#bloom) |`FreedomIntelligence/phoenix-chat-7b`<br> `FreedomIntelligence/phoenix-inst-chat-7b` | Check [repo](https://github.com/FreedomIntelligence/LLMZoo) for newer models. |
 |5 | MOSS |`fnlp/moss-moon-003-base`<br> `fnlp/moss-moon-003-sft` <br> `fnlp/moss-moon-003-sft-plugin` | Bilingual model: Check [repo](https://github.com/OpenLMLab/MOSS) for newer models. |
+|6 | [Pythia](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`EleutherAI/pythia-size`<br> `EleutherAI/pythia-size-deduped` | Available `size`: `[70m, 160m, 410m, 1b, 1.4b, 2.8b, 6.9b, 12b]` Check [repo](https://github.com/EleutherAI/pythia). |
 
 
 #### Encoder-Decoder Models
