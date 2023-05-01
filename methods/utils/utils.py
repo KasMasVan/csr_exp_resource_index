@@ -20,6 +20,7 @@ from datasets import Dataset
 from .data import(
     copa_loader,
     cqa_loader,
+    obqa_loader,
     winogrande_loader,
 )
 
@@ -89,6 +90,15 @@ def load_data(args):
         header_name = "premise"
         file_path = os.path.join("../data", args.dataset, "dev.jsonl")
         loader = cqa_loader
+    elif args.dataset == "obqa":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
+        header_name = "premise"
+        file_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        loader = obqa_loader
+    elif args.dataset == "piqa":
+        pass
+    elif args.dataset == "siqa":
+        pass
     elif args.dataset == "winogrande":
         file_path = os.path.join("../data", args.dataset, "dev.jsonl")
         loader = winogrande_loader

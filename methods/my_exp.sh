@@ -3,7 +3,7 @@ model_family="FLAN-T5"
 checkpoint="google/flan-t5-small"
 amateur_checkpoint="google/flan-t5-small"
 expert_checkpoint="google/flan-t5-base"
-datasets="cqa copa"
+datasets="cqa copa obqa"
 batch_size=32 
 # method="language_modeling"
 

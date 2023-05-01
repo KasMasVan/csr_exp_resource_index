@@ -5,6 +5,7 @@ import torch
 
 
 # write my own data loader, or using HF dataloader?
+# steps for data loader: label, premise, options, hypothesis.
 
 def preprocess_function_seq2seq(examples, **kwargs):
     ending_names, header_name, tokenizer = kwargs['ending_names'], kwargs['header_name'], kwargs['tokenizer']
@@ -111,11 +112,9 @@ def copa_loader(path, args):
         }]
     return examples_copa
 
-def winogrande_loader():
-    print(f"winogrande loader")
-
 def cqa_loader(path, args):
     examples_cqa = []
+    uncond_premise = ' the answer is:'
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -145,11 +144,11 @@ def cqa_loader(path, args):
                 premise = f"{args.multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
             else:
                 hypotheses = options
-                premise = premise + ' the answer is:'
+                premise = premise + uncond_premise
             examples_cqa += [{
                 'label': label,
                 'premise': premise,
-                'uncond_premise': ' the answer is:',
+                'uncond_premise': uncond_premise,
                 'hypothesis0': hypotheses[0],
                 'hypothesis1': hypotheses[1],
                 'hypothesis2': hypotheses[2],
@@ -157,3 +156,44 @@ def cqa_loader(path, args):
                 'hypothesis4': hypotheses[4],
             }]
     return examples_cqa
+
+def obqa_loader(path, args):
+    uncond_premise = ' the answer is:'
+    with open(path) as lines:
+        abc2idx = { 'A' : 0, 'B' : 1, 'C' : 2, 'D' : 3 }
+
+        examples_obqa = []
+        for line in lines:
+            j = json.loads(line)
+
+            label = abc2idx[j['answerKey']]
+            premise = j['question']['stem']
+            options_text = [f" {option['text']}" for option in j['question']['choices']]
+            options_sym = [option['label'] for option in j['question']['choices']]
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
+                # Question: Greenhouses are great for plants like
+                # A. Pizza
+                # B. Lollipops
+                # C. Candles
+                # D. French beans
+                # Answer:
+                hypotheses = options_sym
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nAnswer:"
+            else:
+                hypotheses = options_text
+                # premise = premise + uncond_premise
+            
+            examples_obqa += [{
+                'label': label,
+                'premise': premise,
+                'uncond_premise': uncond_premise,
+                'hypothesis0': hypotheses[0],
+                'hypothesis1': hypotheses[1],
+                'hypothesis2': hypotheses[2],
+                'hypothesis3': hypotheses[3],
+            }]
+    return examples_obqa
+
+def winogrande_loader():
+    print(f"winogrande loader")
+
