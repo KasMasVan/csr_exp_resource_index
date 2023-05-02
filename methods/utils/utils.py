@@ -21,6 +21,8 @@ from .data import(
     copa_loader,
     cqa_loader,
     obqa_loader,
+    piqa_loader,
+    siqa_loader,
     winogrande_loader,
 )
 
@@ -96,11 +98,25 @@ def load_data(args):
         file_path = os.path.join("../data", args.dataset, "dev.jsonl")
         loader = obqa_loader
     elif args.dataset == "piqa":
-        pass
+        ending_names = ['hypothesis0', 'hypothesis1']
+        header_name = "premise"
+        data_path = os.path.join("../data", args.dataset, "valid.jsonl")
+        label_path = os.path.join("../data", args.dataset, "valid-labels.lst")
+        file_path = [data_path, label_path]
+        loader = piqa_loader
     elif args.dataset == "siqa":
-        pass
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2']
+        header_name = "premise"
+        data_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        label_path = os.path.join("../data", args.dataset, "dev-labels.lst")
+        file_path = [data_path, label_path]
+        loader = siqa_loader
     elif args.dataset == "winogrande":
-        file_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        ending_names = ['hypothesis0', 'hypothesis1']
+        header_name = "premise"
+        data_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        label_path = os.path.join("../data", args.dataset, "dev-labels.lst")
+        file_path = [data_path, label_path]
         loader = winogrande_loader
     else:
         print(f"{args.dataset}: downloader not implemented.")

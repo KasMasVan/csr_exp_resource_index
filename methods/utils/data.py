@@ -194,6 +194,108 @@ def obqa_loader(path, args):
             }]
     return examples_obqa
 
-def winogrande_loader():
-    print(f"winogrande loader")
+def piqa_loader(path, args):
+    uncond_premise = ' the answer is:'
+    examples_piqa = []
+    qa_path, label_path = path[0], path[1]
+
+    with open(qa_path) as lines, open(label_path) as labels:
+        for line, label_sym in zip(lines, labels):
+            label = int(label_sym[0])
+            line = json.loads(line)
+            premise = line['goal']
+            options_text = [line['sol1'], line['sol2']]
+            options_sym = ['A', 'B']
+
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
+                # Question: To clear snot out of your nose,
+                # A. place a tissue over your nose and blow the snot out.
+                # B. place a tissue over your nose and suck the snot in.
+                # Answer:
+                hypotheses = options_sym
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nAnswer:"
+            else:
+                hypotheses = options_text
+                premise = premise + uncond_premise
+            
+            examples_piqa += [{
+                'label': label,
+                'premise': premise,
+                'uncond_premise': uncond_premise,
+                'hypothesis0': hypotheses[0],
+                'hypothesis1': hypotheses[1],
+            }]
+    return examples_piqa
+
+def siqa_loader(path, args):
+    uncond_premise = ' the answer is:'
+    examples_siqa = []
+    qa_path, label_path = path[0], path[1]
+
+    with open(qa_path) as lines, open(label_path) as labels:
+        for line, label_sym in zip(lines, labels):
+            label = int(label_sym[0]) - 1
+            line = json.loads(line)
+            premise = f"{line['context']} {line['question']}"
+            
+            options_text = [line['answerA'], line['answerB'], line['answerC']]
+            options_sym = ['A', 'B', 'C']
+
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
+                # Question: Cameron returned home with a bag of candy to eat all night
+                # long. What will Others want to do next?
+                # A. great
+                # B. buy the candy to eat
+                # C. bored
+                # Answer:
+                hypotheses = options_sym
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nAnswer:"
+            else:
+                hypotheses = options_text
+                premise = premise + uncond_premise
+            
+            examples_siqa += [{
+                'label': label,
+                'premise': premise,
+                'uncond_premise': uncond_premise,
+                'hypothesis0': hypotheses[0],
+                'hypothesis1': hypotheses[1],
+                'hypothesis2': hypotheses[2],
+            }]
+    return examples_siqa
+
+def winogrande_loader(path, args):
+    uncond_premise = ' the answer is:'
+    examples_winogrande = []
+    qa_path, label_path = path[0], path[1]
+
+    with open(qa_path) as lines, open(label_path) as labels:
+        for line, label_sym in zip(lines, labels):
+            label = int(label_sym[0]) - 1
+            line = json.loads(line)
+            premise = line['sentence']
+            
+            options_text = [line['option1'], line['option2']]
+            options_sym = ['A', 'B']
+
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
+                # Question: So _ plays video games because Leslie has a lot of free time
+                # while Nelson has to work all the time.
+                # A. Leslie
+                # B. Nelson
+                # Answer:
+                hypotheses = options_sym
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nAnswer:"
+            else:
+                hypotheses = options_text
+                premise = premise + uncond_premise
+            
+            examples_winogrande += [{
+                'label': label,
+                'premise': premise,
+                'uncond_premise': uncond_premise,
+                'hypothesis0': hypotheses[0],
+                'hypothesis1': hypotheses[1],
+            }]
+    return examples_winogrande
 
