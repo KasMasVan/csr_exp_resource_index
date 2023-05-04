@@ -63,10 +63,10 @@ bash models/model_downloaders/model_downloaders.sh
 
 
 #### Encoder-Decoder Models
-|Index| Model Family| Checkpoints| 
-| --- | ----------- | ----------- | 
+|Index| Model Family| Checkpoints| Notes |
+| --- | ----------- | ----------- | ----- |
 |1 | [T5](https://huggingface.co/docs/transformers/main/en/model_doc/t5#t5) |`t5-small` <br> `t5-base`<br> `t5-large`<br> `t5-3b`<br> `t5-11b` |
-|2 | [FLAN-T5](https://huggingface.co/docs/transformers/main/en/model_doc/t5#t5) |`google/flan-t5-small` <br> `google/flan-t5-base`<br> `google/flan-t5-large`<br> `google/flan-t5-xl`<br> `google/flan-t5-xxl` |
+|2 | [FLAN-T5](https://huggingface.co/docs/transformers/main/en/model_doc/t5#t5) |`google/flan-t5-small` <br> `google/flan-t5-base`<br> `google/flan-t5-large`<br> `google/flan-t5-xl`<br> `google/flan-t5-xxl` | Chcek page 47 of [paper](https://arxiv.org/pdf/2210.11416.pdf) for instruction tuning data |
 
 
 #### Other Models

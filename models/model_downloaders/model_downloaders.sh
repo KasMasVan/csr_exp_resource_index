@@ -2,7 +2,7 @@
 # model_family="FLAN-T5"
 model_families=("Pythia")
 # checkpoint="google/flan-t5-small"
-checkpoints=("EleutherAI/pythia-70m" "EleutherAI/pythia-160m")
+checkpoints=("EleutherAI/pythia-70m-deduped" "EleutherAI/pythia-160m-deduped" "EleutherAI/pythia-410m-deduped" "EleutherAI/pythia-1b-deduped")
 
 for model_family in "${model_families[@]}"
 do

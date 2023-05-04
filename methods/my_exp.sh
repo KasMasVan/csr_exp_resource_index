@@ -1,15 +1,18 @@
 seed=0
-model_family="FLAN-T5"
-checkpoint="google/flan-t5-base"
-amateur_checkpoint="google/flan-t5-small"
-expert_checkpoint="google/flan-t5-base"
+model_family="Pythia"
+# checkpoint="EleutherAI/pythia-70m-deduped"
+checkpoints=("EleutherAI/pythia-160m-deduped" "EleutherAI/pythia-410m-deduped" "EleutherAI/pythia-1b-deduped")
+# amateur_checkpoint="google/flan-t5-small"
+# expert_checkpoint="google/flan-t5-base"
 datasets="cqa copa obqa piqa siqa winogrande"
 batch_size=32 
-# method="language_modeling"
 
 multiple_choice_prompt="Question:"
 
-# language modeling and average language modeling
+
+for checkpoint in "${checkpoints[@]}"
+do
+    # language modeling and average language modeling
 python language_modeling.py \
     --model_family ${model_family} \
     --checkpoint ${checkpoint} \
@@ -33,9 +36,10 @@ python language_modeling.py \
     --multiple_choice_prompt ${multiple_choice_prompt}
 
 # process of elimination
-# python process_of_elimination.py \
-#     --model_family ${model_family} \
-#     --checkpoint ${checkpoint} \
-#     --datasets "$datasets" \
-#     --batch_size  ${batch_size} \
-#     --multiple_choice_prompt ${multiple_choice_prompt}
+python process_of_elimination.py \
+    --model_family ${model_family} \
+    --checkpoint ${checkpoint} \
+    --datasets "$datasets" \
+    --batch_size  ${batch_size} \
+    --multiple_choice_prompt ${multiple_choice_prompt}
+done
