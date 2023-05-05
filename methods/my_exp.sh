@@ -1,7 +1,7 @@
 seed=0
 model_family="Pythia"
 # checkpoints=("EleutherAI/pythia-160m-deduped" "EleutherAI/pythia-410m-deduped" "EleutherAI/pythia-1b-deduped")
-checkpoints=("EleutherAI/pythia-1b-deduped")
+checkpoints=("EleutherAI/pythia-70m-deduped")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
 datasets="cqa copa obqa piqa siqa winogrande"
