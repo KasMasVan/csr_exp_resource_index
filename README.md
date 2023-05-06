@@ -52,7 +52,7 @@ bash models/model_downloaders/model_downloaders.sh
 ```
 
 #### Autoregressive Models
-|Index| Model Family| Checkpoints| Pretraining Data|  Note    |
+|Index| Model Family| Checkpoints| Training Data|  Note    |
 | --- | ----------- | -----------| --- |--------  |
 |1.0 | [GPT2](https://huggingface.co/docs/transformers/main/en/model_doc/gpt2#openai-gpt2) |`gpt2`<br> `gpt2-medium` <br>`gpt2-large`<br> `gpt2-xl` |WebText (Private) | |
 |2.0 | [GPT-Neo](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neo#gpt-neo) |`EleutherAI/gpt-neo-125m`<br> `EleutherAI/gpt-neo-1.3B` <br>`EleutherAI/gpt-neo-2.7B`<br> `EleutherAI/gpt-j-6b` <br> `EleutherAI/gpt-neox-20b` | [Pile](https://pile.eleuther.ai/) |Similar structure to GPT-2 and GPT-3. |
