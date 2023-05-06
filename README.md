@@ -52,14 +52,17 @@ bash models/model_downloaders/model_downloaders.sh
 ```
 
 #### Autoregressive Models
-|Index| Model Family| Checkpoints| Note |
-| --- | ----------- | ----------- | --- |
-|1 | [GPT2](https://huggingface.co/docs/transformers/main/en/model_doc/gpt2#openai-gpt2) |`gpt2`<br> `gpt2-medium` <br>`gpt2-large`<br> `gpt2-xl` | |
+|Index| Model Family| Checkpoints| Pretraining Data|  Note    |
+| --- | ----------- | -----------| --- |--------  |
+|1.0 | [GPT2](https://huggingface.co/docs/transformers/main/en/model_doc/gpt2#openai-gpt2) |`gpt2`<br> `gpt2-medium` <br>`gpt2-large`<br> `gpt2-xl` |WebText (Private) | |
+|2.0 | [GPT-Neo](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neo#gpt-neo) |`EleutherAI/gpt-neo-125m`<br> `EleutherAI/gpt-neo-1.3B` <br>`EleutherAI/gpt-neo-2.7B`<br> `EleutherAI/gpt-j-6b` <br> `EleutherAI/gpt-neox-20b` | [Pile](https://pile.eleuther.ai/) |Similar structure to GPT-2 and GPT-3. |
+|2.1 | [Pythia](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`EleutherAI/pythia-size`<br> `EleutherAI/pythia-size-deduped` | [Pile](https://pile.eleuther.ai/) and its deduplicated version | Available `size`: `[70m, 160m, 410m, 1b, 1.4b, 2.8b, 6.9b, 12b]` Check [repo](https://github.com/EleutherAI/pythia).  *deliberately designed to promote scientific research on large language models, especially interpretability research* |
+|3.0 | [OPT](https://huggingface.co/docs/transformers/main/en/model_doc/opt#opt) |`facebook/opt-size`|BookCorpus, CC-Stories, The Pile, Pushshift.io Reddit dataset, CCNewsV2  | Available `size`: `[125m, 350m, 1.3b, 2.7b, 6.7b, 13b, 30b, 66b]` |
+|3.1 | [OPT-IML](https://huggingface.co/docs/transformers/main/en/model_doc/opt#opt) |`facebook/opt-iml-1.3b` <br> `facebook/opt-iml-30b`<br> `facebook/opt-iml-max-1.3b` <br> `facebook/opt-iml-max-30b` <br> | [OPT-IML Bench](https://arxiv.org/abs/2212.12017)  | *Instruction-tuned versions of OPT on a collection of ~2000 NLP tasks gathered from 8 NLP benchmarks.* |
 |2 | [Dolly](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`databricks/dolly-v1-6b` <br> `databricks/dolly-v2-3b`<br> `databricks/dolly-v2-7b`<br> `databricks/dolly-v2-12b` | Downloader Code Not Yet |
 |3 | [StableLM](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`stabilityai/stablelm-base-alpha-3b`<br> `stabilityai/stablelm-tuned-alpha-3b` <br>`stabilityai/stablelm-base-alpha-7b`<br> `stabilityai/stablelm-tuned-alpha-7b` | Check [repo](https://github.com/Stability-AI/StableLM) for newer models. |
 |4 | [Phoenix](https://huggingface.co/docs/transformers/main/en/model_doc/bloom#bloom) |`FreedomIntelligence/phoenix-chat-7b`<br> `FreedomIntelligence/phoenix-inst-chat-7b` | Check [repo](https://github.com/FreedomIntelligence/LLMZoo) for newer models. |
 |5 | MOSS |`fnlp/moss-moon-003-base`<br> `fnlp/moss-moon-003-sft` <br> `fnlp/moss-moon-003-sft-plugin` | Bilingual model: Check [repo](https://github.com/OpenLMLab/MOSS) for newer models. |
-|6 | [Pythia](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`EleutherAI/pythia-size`<br> `EleutherAI/pythia-size-deduped` | Available `size`: `[70m, 160m, 410m, 1b, 1.4b, 2.8b, 6.9b, 12b]` Check [repo](https://github.com/EleutherAI/pythia). |
 |7 | [MPT](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`mosaicml/mpt-7b`<br> `mosaicml/mpt-7b-chat` <br> `mosaicml/mpt-7b-instruct` <br> `mosaicml/mpt-7b-storywriter` |  Check [repo](https://github.com/mosaicml/llm-foundry). |
 |8 | [RedPajama-INCITE](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`togethercomputer/RedPajama-INCITE-Base-3B-v1`<br> `togethercomputer/RedPajama-INCITE-Base-7B-v0.1` |  Check [blog](https://www.together.xyz/blog/redpajama-models-v1) for more models and other details. |
 |9 | [StarCoder](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`bigcode/starcoderbase`<br> `bigcode/starcoder` |  Check [blog](https://huggingface.co/blog/starcoder) for more models and other details. |
