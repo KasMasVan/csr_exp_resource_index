@@ -1,4 +1,4 @@
-# Resource Index for Zero-Shot and Few-Shot Commonsense Reasoning (CSR) Experiments
+# Zero-Shot and Few-Shot Prompting for Commonsense Reasoning (CSR)
 
 I find that several of my projects use the same data and models. This repository is to provide a unified resource index for these projects. 
 With this repo, I do not need to download specific models and data for each project. Instead, I can simply clone this repo and use the data and models in this repo.
@@ -60,7 +60,9 @@ bash models/model_downloaders/model_downloaders.sh
 |4 | [Phoenix](https://huggingface.co/docs/transformers/main/en/model_doc/bloom#bloom) |`FreedomIntelligence/phoenix-chat-7b`<br> `FreedomIntelligence/phoenix-inst-chat-7b` | Check [repo](https://github.com/FreedomIntelligence/LLMZoo) for newer models. |
 |5 | MOSS |`fnlp/moss-moon-003-base`<br> `fnlp/moss-moon-003-sft` <br> `fnlp/moss-moon-003-sft-plugin` | Bilingual model: Check [repo](https://github.com/OpenLMLab/MOSS) for newer models. |
 |6 | [Pythia](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`EleutherAI/pythia-size`<br> `EleutherAI/pythia-size-deduped` | Available `size`: `[70m, 160m, 410m, 1b, 1.4b, 2.8b, 6.9b, 12b]` Check [repo](https://github.com/EleutherAI/pythia). |
-
+|7 | [MPT](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`mosaicml/mpt-7b`<br> `mosaicml/mpt-7b-chat` <br> `mosaicml/mpt-7b-instruct` <br> `mosaicml/mpt-7b-storywriter` |  Check [repo](https://github.com/mosaicml/llm-foundry). |
+|8 | [RedPajama-INCITE](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`togethercomputer/RedPajama-INCITE-Base-3B-v1`<br> `togethercomputer/RedPajama-INCITE-Base-7B-v0.1` |  Check [blog](https://www.together.xyz/blog/redpajama-models-v1) for more models and other details. |
+|9 | [StarCoder](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`bigcode/starcoderbase`<br> `bigcode/starcoder` |  Check [blog](https://huggingface.co/blog/starcoder) for more models and other details. |
 
 #### Encoder-Decoder Models
 |Index| Model Family| Checkpoints| Notes |
@@ -95,7 +97,7 @@ cd methods
 bash my_exp.sh
 ```
 
-### Scoring Methods (Single-Step)
+### Zero-Shot Scoring Methods (Single-Step)
 
 Scoring methods calculate a score for each option, and then select the option with the highest score: $$ \hat{y}=argmax_i score(y_i) $$
 
