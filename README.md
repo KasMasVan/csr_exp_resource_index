@@ -29,14 +29,24 @@ Usage (at the root directory):
  bash data/data_downloaders/copa.sh
  ```
 
-| Index | Data      | Data Downloader |
-| --- | ----------- | ----------- |
-| 1 | [COPA](https://people.ict.usc.edu/~gordon/copa.html)      | `./data/data_downloaders/copa.sh`       |
-| 2 | [CommonsenseQA](https://aclanthology.org/N19-1421/)   | `./data/data_downloaders/cqa.sh`        |
-| 3 | [OpenBookQA](https://allenai.org/data/open-book-qa)   | `./data/data_downloaders/obqa.sh`        |
-| 4 | [Winogrande](https://leaderboard.allenai.org/winogrande/submissions/get-started)   | `./data/data_downloaders/winogrande.sh`        |
-| 5 | [PIQA](https://yonatanbisk.com/piqa/)   | `./data/data_downloaders/piqa.sh`        |
-| 6 | [Social IQA](https://leaderboard.allenai.org/socialiqa/submissions/get-started)   | `./data/data_downloaders/siqa.sh`        |
+### Multiple-Choice Commonsense Reasoning Benchmarks
+
+| Index | Data      | Number of Options | Data Downloader |
+| --- | ----------- | --- |----------- |
+| 1 | [COPA](https://people.ict.usc.edu/~gordon/copa.html)      | 2 | `./data/data_downloaders/copa.sh`       |
+| 2 | [CommonsenseQA](https://aclanthology.org/N19-1421/)   | 5|`./data/data_downloaders/cqa.sh`        |
+| 3 | [OpenBookQA](https://allenai.org/data/open-book-qa)   | 4|`./data/data_downloaders/obqa.sh`        |
+| 4 | [Winogrande](https://leaderboard.allenai.org/winogrande/submissions/get-started)  | 2 | `./data/data_downloaders/winogrande.sh`        |
+| 5 | [PIQA](https://yonatanbisk.com/piqa/)  |2 | `./data/data_downloaders/piqa.sh`        |
+| 6 | [Social IQA](https://leaderboard.allenai.org/socialiqa/submissions/get-started)  |3 | `./data/data_downloaders/siqa.sh`        |
+| 7 | [ARC](https://allenai.org/data/arc)   | 4 |    |
+| 8 | [QASC]()   | 8 |    |
+| 9 | [HellaSWAG]()   | 4 |    |
+| 10 | [StrategyQA]()   |  2   |    |
+| 11 | [MC-TACO]()   |   2  |    |
+
+
+### Other Multiple-Choice Benchmarks
 
 ## Models
 The language models are listed below. For small language models, I provide the downloaders for the model with the most common head, i.e., language modeling head for GPT2. If you want to download a model with a different head, you may need to tweak the code of the corresponding downloader.
