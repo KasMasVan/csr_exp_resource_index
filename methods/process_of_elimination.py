@@ -50,17 +50,17 @@ def compute_mask(model, eval_dataloader, device, compute_func):
         avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
         
         # soft masking, i.e., get rid of the least likely answer.
-        mask = torch.ones_like(log_prob)
-        mask[torch.arange(avg_log_prob.shape[0]), avg_log_prob.argmax(dim=-1)] = 0
-        masks.append(mask)
+        # mask = torch.ones_like(log_prob)
+        # mask[torch.arange(avg_log_prob.shape[0]), avg_log_prob.argmax(dim=-1)] = 0
+        # masks.append(mask)
 
-        # # soft masking v2, i.e., get rid of the answers that are below the mean.
-        # mask_v2 = torch.ones_like(log_prob)
-        # # Calculate the row-wise mean
-        # row_mean = avg_log_prob.mean(dim=1, keepdim=True)
-        # # Set values below the mean to 0
-        # mask_v2[avg_log_prob > row_mean] = 0
-        # masks.append(mask_v2)
+        # soft masking v2, i.e., get rid of the answers that are below the mean.
+        mask_v2 = torch.ones_like(log_prob)
+        # Calculate the row-wise mean
+        row_mean = avg_log_prob.mean(dim=1, keepdim=True)
+        # Set values below the mean to 0
+        mask_v2[avg_log_prob > row_mean] = 0
+        masks.append(mask_v2)
 
     masks = torch.cat(masks, dim=0)
     return masks

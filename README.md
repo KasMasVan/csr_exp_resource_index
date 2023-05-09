@@ -40,7 +40,7 @@ Usage (at the root directory):
 | 5 | [PIQA](https://yonatanbisk.com/piqa/)  |2 | `./data/data_downloaders/piqa.sh`        |
 | 6 | [Social IQA](https://leaderboard.allenai.org/socialiqa/submissions/get-started)  |3 | `./data/data_downloaders/siqa.sh`        |
 | 7 | [ARC](https://allenai.org/data/arc)   | 4 |    |
-| 8 | [QASC]()   | 8 |    |
+| 8 | [QASC](https://leaderboard.allenai.org/qasc/submissions/get-started)   | 8 |  `bash data/data_downloaders/qasc.sh`  |
 | 9 | [HellaSWAG]()   | 4 |    |
 | 10 | [StrategyQA]()   |  2   |    |
 | 11 | [MC-TACO]()   |   2  |    |
