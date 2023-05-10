@@ -130,8 +130,9 @@ These methods choose the answer in multiple steps, which may involve generation 
 
 | Index | Method      | Prodecure     | Script |
 | ---   | ----------- | ----------- | ----------- |
-| 1 | [SEQA](https://aclanthology.org/2021.acl-long.237) |  1. $\{s_i\} = genenerate(x)$  <br> 2. $\hat{y} = argmax_jsim(y_j, \{s_i\})$ | N/A |
+| 1 | [SEQA](https://aclanthology.org/2021.acl-long.237) |  1. $\{s_i\} = genenerate(x)$  <br> 2. $\hat{y} = argmax_jsim(y_j, \{s_i\})$ | [Official Implementation](https://github.com/heyLinsir/Semantic-based-QA) |
 | 2 | [Process of Elimination](https://docs.google.com/document/d/14aRC2C6-fb64hDW5lFTQSjOuOrfK1ItoNJw17VTaEes/edit?usp=sharing) |  1. $score_i= score(y_i)$  <br> 2. $Y^\prime = \{y_i \| score_i > threshold\}$ <br> 3. $\hat{y} = prompting([demonstrations,] x, Y^\prime)$| `./methods/process_of_elimination.py` |
+| 3 | Generate Similar Text | 1. Generate similar text for an option. <br> 2. Compute probabilities for option as well as similar text. <br> 3. Aggregate, e.g., averaging, to get final score for a option, and choose the best option. | n/a |
 
 ### Useful Links
 - [Google Doc: Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)
@@ -143,6 +144,8 @@ These methods choose the answer in multiple steps, which may involve generation 
 - [HF: Scripts](https://huggingface.co/docs/transformers/run_scripts)
 - [HF: Fine-tuning](https://huggingface.co/docs/transformers/training#train-in-native-pytorch)
 - [HF: Performance and Scalability](https://huggingface.co/docs/transformers/main/en/performance)
+- [HF: Text Generation](https://huggingface.co/docs/transformers/main_classes/text_generation)
+- [HF: Text Generation Startegies](https://huggingface.co/docs/transformers/generation_strategies)
 - [Paper: Surface Form Competition](https://aclanthology.org/2021.emnlp-main.564.pdf): Remember to compare your results with the results in this paper.
 - [My Onenotes on multiple choice]
 - [HF: Using Datasets with Pytorch](https://huggingface.co/docs/datasets/use_with_pytorch#use-with-pytorch): Also check the [Datasets Documentation](https://huggingface.co/docs/datasets/index)
