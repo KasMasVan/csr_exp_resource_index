@@ -96,9 +96,14 @@ Usage:
 TBD
 ```
 
-| Index | Model Family      | Checkpoints |
-| --- | ----------- | ----------- |
-|1| ChatGPT | `gpt-3.5-turbo` <br> `gpt-3.5-turbo-0301` |
+| Index | Provider | Model Family| Checkpoints |
+| ---   | -----    | ----------- | ----------- |
+|1| [OpenAI](https://platform.openai.com/) |ChatGPT | `gpt-3.5-turbo` <br> `gpt-3.5-turbo-0301` |
+|2| [AI21](https://studio.ai21.com/overview)  | J1 |  |
+|3| [Cohere](https://cohere.com/)  | Xlarge |  |
+|4| [ForeFrontAI](https://beta.forefront.ai/create/team/)  | QA |  |
+|5| [Textsynth](https://textsynth.com/)  | Misc | GPT-J FairSeq GPT-NeoX |
+
 
 ## Methods
 
