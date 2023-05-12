@@ -100,10 +100,10 @@ TBD
 | ---   | -----    | ----------- | ----------- | ----  |
 |1| [OpenAI](https://platform.openai.com/) |ChatGPT | `gpt-3.5-turbo` <br> `gpt-3.5-turbo-0301` | |
 |2| [Google](https://developers.generativeai.google/products/palm) |PaLM |  | need to join wiatlist |
-|2| [AI21](https://studio.ai21.com/overview)  | J2 | `j2-jumbo-instruct` <br> `j2-grande-instruct` <br> `j2-jumbo` <br> `j2-grande` <br> `j2-large` |[Free Trial](https://www.ai21.com/studio/pricing): 90$ for 3 months|
-|3| [Cohere](https://cohere.com/)  | Xlarge | `command-light` <br> `command` <br> `base-light` <br> `base` <br> | [Free trial](https://cohere.com/pricing): 5000 generation units per month|
-|4| [ForeFrontAI](https://beta.forefront.ai/create/team/)  | QA | T5, GPT-J, GPT-Neo, etc. | 5 day free trial. |
-|5| [Textsynth](https://textsynth.com/)  | Misc | GPT-J FairSeq GPT-NeoX | [Free plan](https://textsynth.com/pricing.html) with 200 generated tokens per request and rate limit.|
+|3| [AI21](https://studio.ai21.com/overview)  | J2 | `j2-jumbo-instruct` <br> `j2-grande-instruct` <br> `j2-jumbo` <br> `j2-grande` <br> `j2-large` |[Free Trial](https://www.ai21.com/studio/pricing): 90$ for 3 months|
+|4| [Cohere](https://cohere.com/)  | Xlarge | `command-light` <br> `command` <br> `base-light` <br> `base` <br> | [Free trial](https://cohere.com/pricing): 5000 generation units per month|
+|5| [ForeFrontAI](https://beta.forefront.ai/create/team/)  | QA | T5, GPT-J, GPT-Neo, etc. | 5 day free trial. |
+|6| [Textsynth](https://textsynth.com/)  | Misc | GPT-J FairSeq GPT-NeoX | [Free plan](https://textsynth.com/pricing.html) with 200 generated tokens per request and rate limit.|
 
 
 ## Methods
