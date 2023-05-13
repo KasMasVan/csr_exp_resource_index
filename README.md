@@ -75,7 +75,7 @@ bash models/model_downloaders/model_downloaders.sh
 |5 | MOSS |`fnlp/moss-moon-003-base`<br> `fnlp/moss-moon-003-sft` <br> `fnlp/moss-moon-003-sft-plugin` | Bilingual model: Check [repo](https://github.com/OpenLMLab/MOSS) for newer models. |
 |7 | [MPT](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`mosaicml/mpt-7b`<br> `mosaicml/mpt-7b-chat` <br> `mosaicml/mpt-7b-instruct` <br> `mosaicml/mpt-7b-storywriter` |  Check [repo](https://github.com/mosaicml/llm-foundry). |
 |8 | [RedPajama-INCITE](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`togethercomputer/RedPajama-INCITE-Base-3B-v1`<br> `togethercomputer/RedPajama-INCITE-Base-7B-v0.1` |  Check [blog](https://www.together.xyz/blog/redpajama-models-v1) for more models and other details. |
-|9 | [StarCoder](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_neox#gptneox) |`bigcode/starcoderbase`<br> `bigcode/starcoder` |  Check [blog](https://huggingface.co/blog/starcoder) for more models and other details. |
+|9 | [StarCoder](https://huggingface.co/docs/transformers/main/en/model_doc/gpt_bigcode#transformers.GPTBigCodeForCausalLM) |`bigcode/starcoderbase`<br> `bigcode/starcoder` |  Check [blog](https://huggingface.co/blog/starcoder) for more models and other details. |
 
 #### Encoder-Decoder Models
 |Index| Model Family| Checkpoints| Notes |
