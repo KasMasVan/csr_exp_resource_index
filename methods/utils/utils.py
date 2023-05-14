@@ -67,6 +67,12 @@ def parse_args():
         help="The datasets to inference on. Pass multiple datasets separate by space",
     )
     parser.add_argument(
+        "--sample",
+        type=int,
+        default=None,
+        help="The number of samples to inference on. If None, inference on the whole dataset.",
+    )
+    parser.add_argument(
         "--batch_size",
         type=int,
         default=32,
@@ -77,6 +83,11 @@ def parse_args():
         type=str,
         default = None,
         help = "The multiple choice prompt."
+    )
+    parser.add_argument(
+        "--push_data_to_hub",
+        action="store_true",
+        help="Whether to push the data to Hugging Face Hub. This is convienient for LLM experiments.",
     )
 
     args = parser.parse_args()
@@ -156,5 +167,5 @@ def write_to_csv(save_path, args, total_accuracy):
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if not csv_exists:
-            csvwriter.writerow(['model_family', 'checkpoint', 'dataset', 'batch_size', 'method', "seed", 'accuracy'])
-        csvwriter.writerow([args.model_family, args.checkpoint, args.dataset, args.batch_size, args.method, args.seed, f"{total_accuracy:.4f}"])
+            csvwriter.writerow(['model_family', 'checkpoint', 'dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{total_accuracy:.4f}"])

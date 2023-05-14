@@ -1,11 +1,24 @@
 import json
+import os
 import xml.etree.ElementTree as ET
 
 import torch
-
+from huggingface_hub import upload_folder
 
 # write my own data loader, or using HF dataloader?
 # steps for data loader: label, premise, options, hypothesis.
+
+def upload_to_huggingface_hub(dataset, args):
+    suffix = f"{args.dataset}_{args.seed}_{args.sample}_{args.checkpoint.split('/')[-1]}_{args.batch_size}"
+    temp_data_path = os.path.join(f"../temp_data/{args.method}", suffix)
+    dataset.save_to_disk(temp_data_path)
+    _ = upload_folder(
+        folder_path=temp_data_path, 
+        path_in_repo=f"temp_data/{args.method}/{suffix}",
+        repo_id="Vanmas/PoE_data",
+        repo_type="dataset",)
+    # remove the temp data folder
+    os.system(f"rm -rf {temp_data_path}")
 
 def preprocess_function_seq2seq(examples, **kwargs):
     ending_names, header_name, tokenizer = kwargs['ending_names'], kwargs['header_name'], kwargs['tokenizer']

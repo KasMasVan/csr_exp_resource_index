@@ -21,6 +21,7 @@ from datasets import Dataset
 
 
 from utils.data import(
+    upload_to_huggingface_hub,
     preprocess_function_seq2seq,
     preprocess_function_causal,
 )
@@ -163,6 +164,9 @@ def main():
         multiple_choice_prompt = args.multiple_choice_prompt
         args.multiple_choice_prompt = None
         ending_names, header_name, raw_dataset = load_data(args)
+        if args.sample is not None:
+            # sample "sample" amount of data from raw_data
+            raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
 
         logger.info(f"Preprocess data: {args.dataset}.")
         fn_kwargs = {"ending_names": ending_names, 
@@ -193,6 +197,12 @@ def main():
         save_path = os.path.join("../results", f"{args.method}.csv")
         logger.info(f"Save results to {save_path}.")
         write_to_csv(save_path, args, lm_accuracy)
+
+        # step 7: push data to HuggingFace Hub.
+        if args.push_data_to_hub:
+            logger.info(f"Push {args.dataset} to HuggingFace Hub.")
+            # save the mcp dataset, which will be used by LLM.
+            upload_to_huggingface_hub(mcp_dataset, args)
 
 if __name__ == "__main__":
     main()

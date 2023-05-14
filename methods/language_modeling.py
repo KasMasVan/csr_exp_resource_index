@@ -12,15 +12,10 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from transformers import(
-    AutoTokenizer, 
-    AutoModelForCausalLM,
-    AutoModelForSeq2SeqLM,
-)
 from datasets import Dataset
 
-
 from utils.data import(
+    upload_to_huggingface_hub,
     preprocess_function_seq2seq,
     preprocess_function_causal,
 )
@@ -110,6 +105,9 @@ def main():
     for dataset in args.datasets:
         args.dataset = dataset
         ending_names, header_name, raw_dataset = load_data(args)
+        if args.sample is not None:
+            # sample "sample" amount of data from raw_data
+            raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
 
         logger.info(f"Preprocess data: {args.dataset}.")
         fn_kwargs = {"ending_names": ending_names, 
@@ -131,6 +129,12 @@ def main():
             avg_args = copy.deepcopy(args)
             avg_args.method = "average_language_modeling"
             write_to_csv(save_path, avg_args, avg_lm_accuracy)
+        
+        # step 7: push data to HuggingFace Hub.
+        if args.push_data_to_hub:
+            logger.info(f"Push {args.dataset} to HuggingFace Hub.")
+            upload_to_huggingface_hub(tokenized_dataset, args)
+            
 
 if __name__ == "__main__":
     main()
