@@ -60,7 +60,7 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
     return lm_accuracy, avg_lm_accuracy
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -87,7 +87,7 @@ def main():
     # get model path: ../models/args.model_family/args.checkpoint
     model_path = os.path.join("../models", args.model_family, args.checkpoint)
     model, tokenizer = load_model(device, model_path, args)
-    if args.model_family in ["GPT2", "Pythia"]:
+    if args.model_family in ["GPT2", "Pythia", "OPT-IML"]:
         compute_func = compute_conditional_score_causal
         preprocess_func = preprocess_function_causal
 

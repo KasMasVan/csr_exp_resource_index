@@ -1,8 +1,6 @@
 # you may specify model families and checkpoints here
-# model_family="FLAN-T5"
-model_families=("Pythia")
-# checkpoint="google/flan-t5-small"
-checkpoints=("EleutherAI/pythia-70m-deduped" "EleutherAI/pythia-160m-deduped" "EleutherAI/pythia-410m-deduped" "EleutherAI/pythia-1b-deduped")
+model_families=("FLAN-T5")
+checkpoints=("facebook/opt-iml-1.3b" facebook/opt-iml-max-1.3b)
 
 for model_family in "${model_families[@]}"
 do
@@ -11,13 +9,6 @@ do
         python models/model_downloaders/model_downloaders.py \
             --model_family ${model_family} \
             --checkpoint ${checkpoint} \
-            # --download_all_checkpoints 
+            # --download_all_checkpoints  
     done
 done
-
-# for model_family in "${model_families[@]}"
-# do
-#     python models/model_downloaders/model_downloaders.py \
-#         --model_family ${model_family} \
-#         --download_all_checkpoints
-# done

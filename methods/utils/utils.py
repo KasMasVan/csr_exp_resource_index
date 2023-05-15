@@ -46,7 +46,7 @@ def parse_args():
     parser.add_argument(
         "--model_family",
         type=str,
-        choices=["GPT2", "T5", "FLAN-T5", "Pythia"],
+        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML"],
         default=None,
         required=True,
         help="The moddel family, as checkpoints under the same model family use same codes to download.",
@@ -57,6 +57,13 @@ def parse_args():
         default=None,
         required=True,
         help="The checkpoint name under a model family, e.g. gpt2, gpt2-medium, gpt2-large, gpt2-xl.",
+    )
+    parser.add_argument(
+        "--loading_precision",
+        type=str,
+        choices=["FP32", "FP16", "INT8"],
+        default="FP32",
+        help="The precision of the model to be loaded."
     )
     parser.add_argument(
         "--datasets",
@@ -145,7 +152,7 @@ def load_data(args):
     return ending_names, header_name, dataset
 
 def load_model(device, model_path, args):
-    if args.model_family in ["GPT2","Pythia"]:
+    if args.model_family in ["GPT2","Pythia", "OPT-IML"]:
         tokenizer_func = AutoTokenizer
         model_func = AutoModelForCausalLM
     elif args.model_family in ["T5", "FLAN-T5"]:
@@ -157,8 +164,16 @@ def load_model(device, model_path, args):
     tokenizer = tokenizer_func.from_pretrained(model_path)
     if args.model_family in ["GPT2", "Pythia"]:
         tokenizer.pad_token = tokenizer.eos_token
-    model = model_func.from_pretrained(model_path)
-    model.to(device)
+    # load with different precision
+    if args.loading_precision == "FP16":
+        model = model_func.from_pretrained(model_path, device_map="auto", torch_dtype=torch.float16)
+        # model.to(device)
+    elif args.loading_precision == "INT8":
+        model = model_func.from_pretrained(model_path, device_map="auto", load_in_8bit=True)
+    else: # FP32
+        model = model_func.from_pretrained(model_path)
+        model.to(device)
+    print(f"Memory footprint: {model.get_memory_footprint()}")
     return model, tokenizer
 
 def write_to_csv(save_path, args, total_accuracy):

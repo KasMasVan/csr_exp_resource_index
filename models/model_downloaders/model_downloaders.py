@@ -3,6 +3,7 @@ import glob
 import os
 import shutil
 
+import torch
 from transformers import (
     AutoTokenizer, 
     AutoModelForCausalLM,
@@ -13,6 +14,7 @@ all_checkpoints = {
     "GPT2": ["gpt2", "gpt2-medium", "gpt2-large", "gpt2-xl"],
     "Pythia": ["EleutherAI/pythia-70m", "EleutherAI/pythia-160m", "EleutherAI/pythia-410m", "EleutherAI/pythia-1b", "EleutherAI/pythia-1.4b", "EleutherAI/pythia-2.8b", "EleutherAI/pythia-6.9B", "EleutherAI/pythia-12b",
                "EleutherAI/pythia-70m-deduped", "EleutherAI/pythia-160m-deduped", "EleutherAI/pythia-410m-deduped", "EleutherAI/pythia-1b-deduped", "EleutherAI/pythia-1.4b-deduped", "EleutherAI/pythia-2.8b-deduped", "EleutherAI/pythia-6.9B-deduped", "EleutherAI/pythia-12b-deduped"],
+    "OPT-IML":["facebook/opt-iml-1.3b", "facebook/opt-iml-max-1.3b"],               
     "T5": ["t5-small", "t5-base","t5-large", "t5-3b", "t5-11b"],
     "FLAN-T5": ["google/flan-t5-small", "google/flan-t5-base", "google/flan-t5-large", "google/flan-t5-xl", "google/flan-t5-xxl"],
 }
@@ -23,7 +25,7 @@ def parse_args():
     parser.add_argument(
         "--model_family",
         type=str,
-        choices=["GPT2", "T5", "FLAN-T5", "Pythia"],
+        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML"],
         default=None,
         help="The moddel family, as checkpoints under the same model family use same codes to download."
         )
@@ -47,6 +49,14 @@ def parse_args():
         type=str,
         default=f"./models",
     )
+
+    parser.add_argument(
+        "--loading_precision",
+        type=str,
+        choices=["FP32", "FP16", "INT8"],
+        default="FP32",
+        help="The precision of the model to be loaded."
+    )
     
     args = parser.parse_args()
     return args
@@ -57,7 +67,7 @@ def main():
     args = parse_args()
     print(args)
     
-    if args.model_family in ["GPT2", "Pythia"]:
+    if args.model_family in ["GPT2", "Pythia", "OPT-IML"]:
         tokenizer_func = AutoTokenizer
         model_func = AutoModelForCausalLM
     elif args.model_family in ["T5", "FLAN-T5"]:
