@@ -49,14 +49,6 @@ def parse_args():
         type=str,
         default=f"./models",
     )
-
-    parser.add_argument(
-        "--loading_precision",
-        type=str,
-        choices=["FP32", "FP16", "INT8"],
-        default="FP32",
-        help="The precision of the model to be loaded."
-    )
     
     args = parser.parse_args()
     return args

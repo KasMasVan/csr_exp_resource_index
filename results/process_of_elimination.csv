@@ -59,3 +59,11 @@ FLAN-T5,google/flan-t5-small,cqa,16,process_of_elimination,0,100,0.4100
 FLAN-T5,google/flan-t5-small,copa,16,process_of_elimination,0,100,0.6500
 FLAN-T5,google/flan-t5-small,cqa,16,process_of_elimination,0,,0.3612
 FLAN-T5,google/flan-t5-small,copa,16,process_of_elimination,0,,0.6100
+FLAN-T5,google/flan-t5-small,cqa,16,process_of_elimination,0,,0.3612
+FLAN-T5,google/flan-t5-small,copa,16,process_of_elimination,0,,0.6100
+FLAN-T5,google/flan-t5-small,obqa,16,process_of_elimination,0,,0.2320
+FLAN-T5,google/flan-t5-small,piqa,16,process_of_elimination,0,,0.6099
+FLAN-T5,google/flan-t5-small,qasc,16,process_of_elimination,0,,0.2559
+FLAN-T5,google/flan-t5-small,siqa,16,process_of_elimination,0,,0.4560
+FLAN-T5,google/flan-t5-small,winogrande,16,process_of_elimination,0,,0.5249
+OPT-IML,facebook/opt-iml-1.3b,FP32,cqa,16,process_of_elimination,0,,0.2236
