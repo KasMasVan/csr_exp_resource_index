@@ -138,7 +138,7 @@ def main():
     # get model path: ../models/args.model_family/args.checkpoint
     model_path = os.path.join("../models", args.model_family, args.checkpoint)
     model, tokenizer = load_model(device, model_path, args)
-    if args.model_family in ["GPT2", "Pythia"]:
+    if args.model_family in ["GPT2", "Pythia", "OPT-IML"]:
         compute_func = compute_conditional_score_causal
         preprocess_func = preprocess_function_causal
         remove_columns = ['input_ids',

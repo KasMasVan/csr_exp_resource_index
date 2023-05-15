@@ -1,6 +1,6 @@
 seed=0
-model_family="FLAN-T5"
-checkpoints=("google/flan-t5-small")
+model_family="OPT-IML"
+checkpoints=("facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b")
 loading_precision="FP32"
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"

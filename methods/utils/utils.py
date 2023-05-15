@@ -182,5 +182,5 @@ def write_to_csv(save_path, args, total_accuracy):
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if not csv_exists:
-            csvwriter.writerow(['model_family', 'checkpoint', 'dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])
-        csvwriter.writerow([args.model_family, args.checkpoint, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{total_accuracy:.4f}"])
+            csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])
+        csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{total_accuracy:.4f}"])
