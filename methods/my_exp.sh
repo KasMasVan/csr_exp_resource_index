@@ -1,7 +1,7 @@
 seed=0
-model_family="OPT-IML"
-checkpoints=("facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b")
-loading_precision="FP32"
+model_family="FLAN-T5"
+checkpoints=("google/flan-t5-xl")
+loading_precision="FP16"
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
@@ -15,12 +15,12 @@ multiple_choice_prompt="Question:"
 for checkpoint in "${checkpoints[@]}"
 do
     # language modeling and average language modeling
-    python language_modeling.py \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
+    # python language_modeling.py \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
         # --push_data_to_hub \
         # --sample ${sample} \
 
@@ -33,13 +33,13 @@ do
     #     --batch_size  ${batch_size} \
 
     # multiple choice prompt, using the same script as language modeling
-    python language_modeling.py \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        --multiple_choice_prompt ${multiple_choice_prompt} \
+    # python language_modeling.py \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+    #     --multiple_choice_prompt ${multiple_choice_prompt} \
         # --push_data_to_hub \
         # --sample ${sample} \
 

@@ -179,6 +179,7 @@ def main():
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         logger.info(f"Step 1: Computing masks.")
         masks = compute_mask(model, eval_dataloader, device, compute_func)
+        masks = masks.to(torch.float32)
         masked_dataset = tokenized_dataset.map(lambda example, idx: {"mask": masks[idx]}, 
                                  with_indices=True, 
                                  batched=True,

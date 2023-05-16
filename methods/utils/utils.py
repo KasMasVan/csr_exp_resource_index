@@ -173,7 +173,7 @@ def load_model(device, model_path, args):
     else: # FP32
         model = model_func.from_pretrained(model_path)
         model.to(device)
-    print(f"Memory footprint: {model.get_memory_footprint()}")
+    print(f"Memory footprint: {model.get_memory_footprint() / 1024 **3:.2f} GB.")
     return model, tokenizer
 
 def write_to_csv(save_path, args, total_accuracy):
