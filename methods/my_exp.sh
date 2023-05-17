@@ -6,7 +6,7 @@ loading_precision="FP16"
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
-datasets="emoji_movies"
+datasets="emoji_movie"
 batch_size=16
 sample=100
 
