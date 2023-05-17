@@ -6,7 +6,7 @@ loading_precision="FP16"
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
-datasets="emoji_movie"
+datasets="emoji_movies"
 batch_size=16
 sample=100
 
@@ -15,12 +15,12 @@ multiple_choice_prompt="Question:"
 for checkpoint in "${checkpoints[@]}"
 do
     # language modeling and average language modeling
-    # python language_modeling.py \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
+    python language_modeling.py \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
         # --push_data_to_hub \
         # --sample ${sample} \
 

@@ -361,7 +361,6 @@ def emoji_movie_loader(path, args):
     with open(path) as json_file:
         data = json.load(json_file)
         for instance in data['examples']:
-            # need to convert to multiple choice format
             options_text = list(instance['target_scores'].keys())
             options_sym = [chr(ord('A') + i) for i in range(len(options_text))]
             label = options_text.index(instance['target'])
@@ -380,7 +379,7 @@ def emoji_movie_loader(path, args):
             else:
                 hypotheses = options_text
                 premise = premise + uncond_premise
-                
+
             examples += [{
                 'label': label,
                 'premise': premise,
