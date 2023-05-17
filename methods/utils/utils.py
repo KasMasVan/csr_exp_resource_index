@@ -25,6 +25,8 @@ from .data import(
     qasc_loader,
     siqa_loader,
     winogrande_loader,
+
+    emoji_movie_loader,
 )
 
 def set_seed(seed):
@@ -142,6 +144,20 @@ def load_data(args):
         label_path = os.path.join("../data", args.dataset, "dev-labels.lst")
         file_path = [data_path, label_path]
         loader = winogrande_loader
+    # elif args.dataset in ["concepqual_combinations", "emoji_movie", "ruin_names", "strange_stories", "temporal_sequences"]:
+    elif args.dataset == "conceptual_combinations":
+        pass
+    elif args.dataset == "emoji_movie":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
+        header_name = "premise"
+        file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
+        loader = emoji_movie_loader
+    elif args.dataset == "ruin_names":
+        pass
+    elif args.dataset == "strange_stories":
+        pass
+    elif args.dataset == "temporal_sequences":
+        pass
     else:
         print(f"{args.dataset}: downloader not implemented.")
         return

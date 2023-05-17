@@ -354,3 +354,41 @@ def winogrande_loader(path, args):
             }]
     return examples_winogrande
 
+def emoji_movie_loader(path, args):
+    uncond_premise = ' the answer is:'
+    examples = []
+
+    with open(path) as json_file:
+        data = json.load(json_file)
+        for instance in data['examples']:
+            # need to convert to multiple choice format
+            options_text = list(instance['target_scores'].keys())
+            options_sym = [chr(ord('A') + i) for i in range(len(options_text))]
+            label = options_text.index(instance['target'])
+            premise = instance['input']
+
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
+                # Question: What movie does this emoji describe? 👧🐟🐠🐡
+                # A. finding nemo
+                # B. the wolf of wall street
+                # C. ...
+                # D. ...
+                # E. ...
+                # Answer:
+                hypotheses = options_sym
+                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+            else:
+                hypotheses = options_text
+                premise = premise + uncond_premise
+                
+            examples += [{
+                'label': label,
+                'premise': premise,
+                'uncond_premise': uncond_premise,
+                'hypothesis0': hypotheses[0],
+                'hypothesis1': hypotheses[1],
+                'hypothesis2': hypotheses[2],
+                'hypothesis3': hypotheses[3],
+                'hypothesis4': hypotheses[4],
+            }]
+    return examples

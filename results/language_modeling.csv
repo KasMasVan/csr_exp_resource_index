@@ -41,3 +41,5 @@ OPT-IML,facebook/opt-iml-max-1.3b,FP16,siqa,16,language_modeling,0,,0.3613
 OPT-IML,facebook/opt-iml-max-1.3b,FP16,siqa,16,average_language_modeling,0,,0.3598
 OPT-IML,facebook/opt-iml-max-1.3b,FP16,winogrande,16,language_modeling,0,,0.5075
 OPT-IML,facebook/opt-iml-max-1.3b,FP16,winogrande,16,average_language_modeling,0,,0.5130
+FLAN-T5,google/flan-t5-small,FP16,emoji_movie,16,language_modeling,0,,0.3000
+FLAN-T5,google/flan-t5-small,FP16,emoji_movie,16,average_language_modeling,0,,0.2600

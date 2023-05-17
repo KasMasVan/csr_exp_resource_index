@@ -60,7 +60,7 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
     return lm_accuracy, avg_lm_accuracy
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
