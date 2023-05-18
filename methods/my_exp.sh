@@ -1,8 +1,8 @@
 #!/bin/bash
 
 seeds=(0 1 2 3 4)
-model_family="FLAN-T5"
-checkpoints=("google/flan-t5-large" "google/flan-t5-xl")
+model_family="OPT-IML"
+checkpoints=("facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b")
 loading_precision="FP16"
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
