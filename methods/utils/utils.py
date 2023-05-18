@@ -29,6 +29,8 @@ from .data import(
     conceptual_combinations_loader,
     emoji_movie_loader,
     ruin_names_loader,
+
+    anli_loader
 )
 
 def set_seed(seed):
@@ -170,6 +172,14 @@ def load_data(args):
         header_name = "premise"
         file_path = os.path.join("../data", "big_bench", f"{args.dataset}_multiple_choice.json")
         loader = ruin_names_loader
+    elif args.dataset == "anli":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2']
+        header_name = "premise"
+        file_path = []
+        file_prefixes = ["R1", "R2", "R3"]
+        for prefix in file_prefixes:
+            file_path.append(os.path.join("../data", f"{args.dataset}", f"{prefix}_dev.jsonl"))
+        loader = anli_loader
     else:
         print(f"{args.dataset}: downloader not implemented.")
         return

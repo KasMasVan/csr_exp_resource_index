@@ -1,28 +1,32 @@
-seed=0
+#!/bin/bash
+
+seeds=(0 1 2 3 4)
 model_family="FLAN-T5"
-checkpoints=("google/flan-t5-small")
+checkpoints=("google/flan-t5-large" "google/flan-t5-xl")
 loading_precision="FP16"
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-datasets="cqa copa obqa piqa qasc siqa winogrande"
-# datasets="conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences"
+datasets="anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences"
+# datasets="cqa copa obqa piqa qasc siqa winogrande"
 batch_size=16
 sample=100
 
 multiple_choice_prompt="Question:"
 
-for checkpoint in "${checkpoints[@]}"
-do
+for seed in "${seeds[@]}"; do
+    for checkpoint in "${checkpoints[@]}"; do
     # language modeling and average language modeling
     python language_modeling.py \
+        --seed ${seed} \
         --model_family ${model_family} \
         --checkpoint ${checkpoint} \
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
+        --sample ${sample} \
         # --push_data_to_hub \
-        # --sample ${sample} \
+        
 
     # contrastive decoding
     # python contrastive_decoding.py \
@@ -34,23 +38,27 @@ do
 
     # multiple choice prompt, using the same script as language modeling
     python language_modeling.py \
+        --seed ${seed} \
         --model_family ${model_family} \
         --checkpoint ${checkpoint} \
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --multiple_choice_prompt ${multiple_choice_prompt} \
+        --sample ${sample} \
         # --push_data_to_hub \
-        # --sample ${sample} \
+        
 
     # process of elimination
     python process_of_elimination.py \
+        --seed ${seed} \
         --model_family ${model_family} \
         --checkpoint ${checkpoint} \
         --loading_precision ${loading_precision} \
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --multiple_choice_prompt ${multiple_choice_prompt} \
+        --sample ${sample} 
         # --push_data_to_hub 
-        # --sample ${sample} 
+    done
 done

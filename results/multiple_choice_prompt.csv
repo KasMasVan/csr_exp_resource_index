@@ -41,3 +41,11 @@ FLAN-T5,google/flan-t5-small,FP16,piqa,16,multiple_choice_prompt,0,,0.5229
 FLAN-T5,google/flan-t5-small,FP16,qasc,16,multiple_choice_prompt,0,,0.2311
 FLAN-T5,google/flan-t5-small,FP16,siqa,16,multiple_choice_prompt,0,,0.4672
 FLAN-T5,google/flan-t5-small,FP16,winogrande,16,multiple_choice_prompt,0,,0.4988
+FLAN-T5,google/flan-t5-large,FP16,cqa,16,multiple_choice_prompt,0,100,0.8700
+FLAN-T5,google/flan-t5-large,FP16,copa,16,multiple_choice_prompt,0,100,0.9000
+FLAN-T5,google/flan-t5-large,FP16,obqa,16,multiple_choice_prompt,0,100,0.6000
+FLAN-T5,google/flan-t5-large,FP16,piqa,16,multiple_choice_prompt,0,100,0.7300
+FLAN-T5,google/flan-t5-large,FP16,qasc,16,multiple_choice_prompt,0,100,0.5500
+FLAN-T5,google/flan-t5-large,FP16,siqa,16,multiple_choice_prompt,0,100,0.7300
+FLAN-T5,google/flan-t5-large,FP16,winogrande,16,multiple_choice_prompt,0,100,0.6500
+FLAN-T5,google/flan-t5-small,FP16,anli,16,multiple_choice_prompt,0,,0.3325

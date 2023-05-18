@@ -478,3 +478,43 @@ def conceptual_combinations_loader(path, args):
 
                 examples += example
     return examples
+
+def anli_loader(path, args):
+    uncond_premise = ' the answer is:'
+    examples = []
+    options_text = ["entailment", "neutral", "contradiction"]
+    options_sym = ["A", "B", "C"]
+    num_options = 3
+
+    for one_path in path:
+        with open(one_path) as lines:
+            for line in lines:
+                line = json.loads(line)
+                label = ['e', 'n', 'c'].index(line['label'])       
+                premise = f"{line['context']} {line['hypothesis']}"
+                
+                if getattr(args, 'multiple_choice_prompt', None) is not None:
+                    # Question: "Which of the following is a humorous edit of this artist or movie name: 'star wars'?"
+                    # A. entailment
+                    # B. neutral
+                    # C. contradiction
+                    # Answer:
+                    hypotheses = options_sym
+                    # premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+                    premise = f"{args.multiple_choice_prompt} {premise}\n"
+                    for idx in range(num_options):
+                        premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
+                    premise += "Answer:"                
+                else:
+                    hypotheses = options_text
+                    premise = premise + uncond_premise
+                example = [{
+                    'label': label,
+                    'premise': premise,
+                    'uncond_premise': uncond_premise,
+                }]
+                for idx in range(num_options):
+                    example[0][f'hypothesis{idx}'] = hypotheses[idx]
+                examples += example
+
+    return examples
