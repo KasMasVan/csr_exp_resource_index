@@ -5,8 +5,8 @@ loading_precision="FP16"
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-# datasets="cqa copa obqa piqa qasc siqa winogrande"
-datasets="emoji_movie"
+datasets="cqa copa obqa piqa qasc siqa winogrande"
+# datasets="conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences"
 batch_size=16
 sample=100
 
@@ -44,13 +44,13 @@ do
         # --sample ${sample} \
 
     # process of elimination
-    # python process_of_elimination.py \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --loading_precision ${loading_precision} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --multiple_choice_prompt ${multiple_choice_prompt} \
+    python process_of_elimination.py \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --loading_precision ${loading_precision} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --multiple_choice_prompt ${multiple_choice_prompt} \
         # --push_data_to_hub 
         # --sample ${sample} 
 done

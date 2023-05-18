@@ -20,3 +20,15 @@ OPT-IML,facebook/opt-iml-max-1.3b,FP16,piqa,16,process_of_elimination,0,,0.5473
 OPT-IML,facebook/opt-iml-max-1.3b,FP16,qasc,16,process_of_elimination,0,,0.1328
 OPT-IML,facebook/opt-iml-max-1.3b,FP16,siqa,16,process_of_elimination,0,,0.3485
 OPT-IML,facebook/opt-iml-max-1.3b,FP16,winogrande,16,process_of_elimination,0,,0.5067
+FLAN-T5,google/flan-t5-small,FP16,conceptual_combinations,16,process_of_elimination,0,,0.1748
+FLAN-T5,google/flan-t5-small,FP16,emoji_movie,16,process_of_elimination,0,,0.0500
+FLAN-T5,google/flan-t5-small,FP16,ruin_names,16,process_of_elimination,0,,0.2411
+FLAN-T5,google/flan-t5-small,FP16,strange_stories,16,process_of_elimination,0,,0.2314
+FLAN-T5,google/flan-t5-small,FP16,temporal_sequences,16,process_of_elimination,0,,0.0010
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,process_of_elimination,0,,0.3620
+FLAN-T5,google/flan-t5-small,FP16,copa,16,process_of_elimination,0,,0.6120
+FLAN-T5,google/flan-t5-small,FP16,obqa,16,process_of_elimination,0,,0.2320
+FLAN-T5,google/flan-t5-small,FP16,piqa,16,process_of_elimination,0,,0.6121
+FLAN-T5,google/flan-t5-small,FP16,qasc,16,process_of_elimination,0,,0.2559
+FLAN-T5,google/flan-t5-small,FP16,siqa,16,process_of_elimination,0,,0.4565
+FLAN-T5,google/flan-t5-small,FP16,winogrande,16,process_of_elimination,0,,0.5264
