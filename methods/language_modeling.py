@@ -59,13 +59,41 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
         pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
     return lm_accuracy, avg_lm_accuracy
 
+def inference_calibration(model, eval_dataloader, device, compute_func):
+    model.eval()
+    lm_predictions = torch.zeros(0)
+    avg_lm_predictions = torch.zeros(0)
+    labels = torch.zeros(0)
+    torch.cuda.empty_cache()
+
+    pbar = tqdm(eval_dataloader, desc="Inference")
+    for batch in pbar:
+        log_prob = compute_func(batch, model, device)
+        
+        ending_length = batch["ending_attention_mask"].sum(dim=-1)
+        batch_predictions = log_prob.argmin(dim=-1)
+        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+
+        batch_labels = batch["label"]
+        lm_predictions = torch.cat((lm_predictions, batch_predictions))
+        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
+        labels = torch.cat((labels, batch_labels))
+    
+        # make accuracy accumulative
+        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
+        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
+        pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
+    return lm_accuracy, avg_lm_accuracy
+
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
     if args.multiple_choice_prompt is not None:
         args.method = "multiple_choice_prompt"
+    elif args.calibration_prompt is not None:
+        args.method = "calibration"
     else:
         args.method = "language_modeling"
 
@@ -119,12 +147,17 @@ def main():
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func)
+        if args.method in ["language_modeling", "multiple_choice_prompt"]:
+            lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func)
+        elif args.method == "calibration":
+            lm_accuracy, avg_lm_accuracy = inference_calibration(model, eval_dataloader, device, compute_func)
     
         # step 6: some postprocessing, including saving and displyaing output.
         save_path = os.path.join("../results", f"{args.method}.csv")
         logger.info(f"Save results to {save_path}.")
         write_to_csv(save_path, args, lm_accuracy)
 
+        # does calibration needs copying as well?
         if args.method == "language_modeling":
             avg_args = copy.deepcopy(args)
             avg_args.method = "average_language_modeling"

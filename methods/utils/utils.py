@@ -98,6 +98,12 @@ def parse_args():
         help = "The multiple choice prompt."
     )
     parser.add_argument(
+        "--calibration_prompt",
+        type=str,
+        default=" the answer is:",
+        help="Calibration prompt, as in P(y|x)/P(y|calibration_prompt).",
+    )
+    parser.add_argument(
         "--push_data_to_hub",
         action="store_true",
         help="Whether to push the data to Hugging Face Hub. This is convienient for LLM experiments.",

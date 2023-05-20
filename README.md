@@ -9,13 +9,10 @@ This repositoy contains code to prepare data, models and baseline methods for my
 ## To Do
 - [x] Reproducibility to PMI_DC and my other projects.
 - [ ] **Important**: Consider the form of prompts, especially some nuances like the whitespace between a semicolon and an answer. You may use existing templates instead. 
-- [ ] More language model. For larger models, you may load with different precisions like FP16 and INT8 (Check [this](https://huggingface.co/docs/transformers/main/en/performance)).
-- [ ] More data. 
 - [ ] **More [methods](#methods)**. 
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.
 - [x] **Important**: Aggregate datasets in an evaluation pipeline to avoid loading the same model multiple times. Consider aggregating similar methods as well.
 - [ ] Generate requirements.txt automatically?
-- [ ] TBD.
 
 ## Data 
 
