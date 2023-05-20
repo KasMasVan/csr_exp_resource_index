@@ -215,3 +215,9 @@ OPT-IML,facebook/opt-iml-1.3b,FP16,conceptual_combinations,16,multiple_choice_pr
 OPT-IML,facebook/opt-iml-1.3b,FP16,emoji_movie,16,multiple_choice_prompt,0,100,0.0600
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,copa,16,multiple_choice_prompt,0,,0.4840
+FLAN-T5,google/flan-t5-small,FP16,obqa,16,multiple_choice_prompt,0,,0.3360
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,copa,16,multiple_choice_prompt,0,,0.4840
+FLAN-T5,google/flan-t5-small,FP16,obqa,16,multiple_choice_prompt,0,,0.3360

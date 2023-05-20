@@ -22,6 +22,8 @@ from utils.data import(
 from utils.methods import(
     compute_conditional_score_seq2seq,
     compute_conditional_score_causal,
+    inference_language_modeling,
+    inference_calibration,
 )
 from utils.utils import(
     load_data,
@@ -32,60 +34,6 @@ from utils.utils import(
 )
 
 logger = logging.getLogger(__name__)
-
-def inference_language_modeling(model, eval_dataloader, device, compute_func):
-    model.eval()
-    lm_predictions = torch.zeros(0)
-    avg_lm_predictions = torch.zeros(0)
-    labels = torch.zeros(0)
-    torch.cuda.empty_cache()
-
-    pbar = tqdm(eval_dataloader, desc="Inference")
-    for batch in pbar:
-        log_prob = compute_func(batch, model, device)
-        
-        ending_length = batch["ending_attention_mask"].sum(dim=-1)
-        batch_predictions = log_prob.argmin(dim=-1)
-        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
-
-        batch_labels = batch["label"]
-        lm_predictions = torch.cat((lm_predictions, batch_predictions))
-        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
-        labels = torch.cat((labels, batch_labels))
-    
-        # make accuracy accumulative
-        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
-        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
-        pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
-    return lm_accuracy, avg_lm_accuracy
-
-def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, device, compute_func):
-    model.eval()
-    lm_predictions = torch.zeros(0)
-    avg_lm_predictions = torch.zeros(0)
-    labels = torch.zeros(0)
-    torch.cuda.empty_cache()
-
-    pbar = tqdm(zip(eval_dataloader, eval_calibration_dataloader), desc="Inference", total=len(eval_dataloader))
-    for batch, batch_calibration in pbar:
-        log_prob = compute_func(batch, model, device)
-        log_prob_calibration = compute_func(batch_calibration, model, device)
-        log_prob = log_prob - log_prob_calibration
-        
-        ending_length = batch["ending_attention_mask"].sum(dim=-1)
-        batch_predictions = log_prob.argmin(dim=-1)
-        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
-
-        batch_labels = batch["label"]
-        lm_predictions = torch.cat((lm_predictions, batch_predictions))
-        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
-        labels = torch.cat((labels, batch_labels))
-    
-        # make accuracy accumulative
-        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
-        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
-        pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
-    return lm_accuracy, avg_lm_accuracy
 
 def main():
     # import pdb; pdb.set_trace()

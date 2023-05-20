@@ -3,7 +3,7 @@ from tqdm import tqdm
 import torch
 import torch.nn.functional as F
 
-def inference_language_modeling(model, eval_dataloader, device):
+def inference_language_modeling_old(model, eval_dataloader, device):
     model.eval()
     predictions = torch.zeros(0)
     labels = torch.zeros(0)
@@ -39,7 +39,7 @@ def inference_language_modeling(model, eval_dataloader, device):
         pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
     return total_accuracy
 
-def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader, device):
+def inference_contrastive_decoding_old(amateur_model, expert_model, eval_dataloader, device):
     amateur_model.eval()
     expert_model.eval()
     predictions = torch.zeros(0)
@@ -75,6 +75,115 @@ def inference_contrastive_decoding(amateur_model, expert_model, eval_dataloader,
         total_accuracy = (predictions == labels).sum().item() / len(labels)
         pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
     return total_accuracy
+
+def inference_language_modeling(model, eval_dataloader, device, compute_func):
+    model.eval()
+    lm_predictions = torch.zeros(0)
+    avg_lm_predictions = torch.zeros(0)
+    labels = torch.zeros(0)
+    torch.cuda.empty_cache()
+
+    pbar = tqdm(eval_dataloader, desc="Inference")
+    for batch in pbar:
+        log_prob = compute_func(batch, model, device)
+        
+        ending_length = batch["ending_attention_mask"].sum(dim=-1)
+        batch_predictions = log_prob.argmin(dim=-1)
+        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+
+        batch_labels = batch["label"]
+        lm_predictions = torch.cat((lm_predictions, batch_predictions))
+        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
+        labels = torch.cat((labels, batch_labels))
+    
+        # make accuracy accumulative
+        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
+        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
+        pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
+    return lm_accuracy, avg_lm_accuracy
+
+def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, device, compute_func):
+    model.eval()
+    lm_predictions = torch.zeros(0)
+    avg_lm_predictions = torch.zeros(0)
+    labels = torch.zeros(0)
+    torch.cuda.empty_cache()
+
+    pbar = tqdm(zip(eval_dataloader, eval_calibration_dataloader), desc="Inference", total=len(eval_dataloader))
+    for batch, batch_calibration in pbar:
+        log_prob = compute_func(batch, model, device)
+        log_prob_calibration = compute_func(batch_calibration, model, device)
+        log_prob = log_prob - log_prob_calibration
+        
+        ending_length = batch["ending_attention_mask"].sum(dim=-1)
+        batch_predictions = log_prob.argmin(dim=-1)
+        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+
+        batch_labels = batch["label"]
+        lm_predictions = torch.cat((lm_predictions, batch_predictions))
+        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
+        labels = torch.cat((labels, batch_labels))
+    
+        # make accuracy accumulative
+        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
+        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
+        pbar.set_description(f"Calibration accuracy: {lm_accuracy:.4f}, Average calibration accuracy: {avg_lm_accuracy:.4f}")
+    return lm_accuracy, avg_lm_accuracy
+
+def compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func):
+    model.eval()
+    masks = []
+    torch.cuda.empty_cache()
+
+    pbar = tqdm(eval_dataloader, desc="Computing masks")
+    for batch in pbar:
+        # -logP(ending|header)
+        log_prob = compute_func(batch, model, device)
+        avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
+        
+        # soft masking, i.e., get rid of the least likely answer.
+        # mask = torch.ones_like(log_prob)
+        # mask[torch.arange(avg_log_prob.shape[0]), avg_log_prob.argmax(dim=-1)] = 0
+        # masks.append(mask)
+
+        # soft masking v2, i.e., get rid of the answers that are below the mean.
+        mask_v2 = torch.ones_like(log_prob)
+        # Calculate the row-wise mean
+        row_mean = avg_log_prob.mean(dim=1, keepdim=True)
+        # Set values below the mean to 0
+        mask_v2[avg_log_prob > row_mean] = 0
+        masks.append(mask_v2)
+
+    masks = torch.cat(masks, dim=0)
+    return masks
+
+def inference_process_of_elimination(model, eval_dataloader, device, compute_func):
+    model.eval()
+    lm_predictions = torch.zeros(0)
+    avg_lm_predictions = torch.zeros(0)
+    labels = torch.zeros(0)
+    torch.cuda.empty_cache()
+
+    pbar = tqdm(eval_dataloader, desc="Inference")
+    for batch in pbar:
+        log_prob = compute_func(batch, model, device)
+        # apply hard masking
+        log_prob[batch["mask"] == 0] = float("inf")
+        
+        ending_length = batch["ending_attention_mask"].sum(dim=-1)
+        batch_predictions = log_prob.argmin(dim=-1)
+        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+
+        batch_labels = batch["label"]
+        lm_predictions = torch.cat((lm_predictions, batch_predictions))
+        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
+        labels = torch.cat((labels, batch_labels))
+    
+        # make accuracy accumulative
+        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
+        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
+        pbar.set_description(f"Process of elimination accuracy: {lm_accuracy:.4f}, Average process of elimination accuracy: {avg_lm_accuracy:.4f}")
+    return lm_accuracy, avg_lm_accuracy
 
 def compute_conditional_score_seq2seq(batch, model, device):
     # returns log_prob of p(y|x) for each batch

@@ -8,6 +8,7 @@ This repositoy contains code to prepare data, models and baseline methods for my
 
 ## To Do
 - [x] Reproducibility to PMI_DC and my other projects.
+- [ ] Calibration: Try to get close results to PMI_DC.
 - [ ] **Important**: Consider the form of prompts, especially some nuances like the whitespace between a semicolon and an answer. You may use existing templates instead. 
 - [ ] **More [methods](#methods)**. 
 - [ ] Use relative path in your python scripts (for models and data, etc.), so that running them from different location would be okay.

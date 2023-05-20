@@ -8,7 +8,7 @@ loading_precision="FP16" # FP32 FP16 INT8
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-datasets="cqa" #anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences
+datasets="cqa copa obqa" #anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
 batch_size=16
 sample=100
@@ -63,14 +63,14 @@ for seed in "${seeds[@]}"; do
         # --push_data_to_hub \
 
     # process of elimination
-    # python process_of_elimination.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --loading_precision ${loading_precision} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --multiple_choice_prompt ${multiple_choice_prompt} \
+    python process_of_elimination.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --loading_precision ${loading_precision} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --multiple_choice_prompt ${multiple_choice_prompt} \
     #     --sample ${sample} 
         # --push_data_to_hub 
     done
