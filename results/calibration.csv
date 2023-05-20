@@ -1,0 +1,17 @@
+model_family,checkpoint,loading_precision,dataset,batch_size,method,seed,sample,accuracy
+FLAN-T5,google/flan-t5-small,FP16,anli,16,calibration,0,100,0.3200
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,obqa,16,calibration,0,,0.3200
+FLAN-T5,google/flan-t5-small,FP16,obqa,16,calibration,0,,0.3200
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3825
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3874
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+OPT-IML,facebook/opt-iml-1.3b,FP16,qasc,16,calibration,0,,0.1091
+OPT-IML,facebook/opt-iml-1.3b,FP16,conceptual_combinations,16,calibration,0,,0.3204
+OPT-IML,facebook/opt-iml-1.3b,FP16,emoji_movie,16,calibration,0,,0.2500
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956

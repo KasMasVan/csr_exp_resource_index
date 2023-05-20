@@ -4,11 +4,11 @@
 seeds=(0)
 model_family="FLAN-T5" # "OPT-IML"
 checkpoints=("google/flan-t5-small") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b"
-loading_precision="FP16"
+loading_precision="FP16" # FP32 FP16 INT8
 # checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-datasets="anli" # cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences
+datasets="cqa" #anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
 batch_size=16
 sample=100
@@ -19,14 +19,14 @@ calibration_prompt=" the answer is:"
 for seed in "${seeds[@]}"; do
     for checkpoint in "${checkpoints[@]}"; do
     # language modeling and average language modeling
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --sample ${sample} \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        # --sample ${sample} \
         # --push_data_to_hub \
         
 
@@ -39,15 +39,15 @@ for seed in "${seeds[@]}"; do
     #     --batch_size  ${batch_size} \
 
     # multiple choice prompt, using the same script as language modeling
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --multiple_choice_prompt ${multiple_choice_prompt} \
-    #     --sample ${sample} \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --multiple_choice_prompt ${multiple_choice_prompt} \
+        # --sample ${sample} \
         # --push_data_to_hub \
     
     # calibration, i.e., PMI and PMI_DC.
@@ -59,7 +59,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --calibration_prompt "${calibration_prompt}" \
-        --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
 
     # process of elimination

@@ -7,6 +7,7 @@ from huggingface_hub import upload_folder
 
 # write my own data loader, or using HF dataloader?
 # steps for data loader: label, premise, options, hypothesis.
+# uncond_premise = " the answer is:"
 
 def upload_to_huggingface_hub(dataset, args):
     suffix = f"{args.dataset}_{args.seed}_{args.sample}_{args.checkpoint.split('/')[-1]}_{args.batch_size}"
@@ -127,7 +128,10 @@ def copa_loader(path, args):
 
 def cqa_loader(path, args):
     examples_cqa = []
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     with open(path) as f:
         for line in f:
             d = json.loads(line)
@@ -171,7 +175,10 @@ def cqa_loader(path, args):
     return examples_cqa
 
 def obqa_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     with open(path) as lines:
         abc2idx = { 'A' : 0, 'B' : 1, 'C' : 2, 'D' : 3 }
 
@@ -208,7 +215,10 @@ def obqa_loader(path, args):
     return examples_obqa
 
 def piqa_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples_piqa = []
     qa_path, label_path = path[0], path[1]
 
@@ -241,7 +251,10 @@ def piqa_loader(path, args):
     return examples_piqa
 
 def qasc_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples_qasc = []
 
     with open(path) as lines:
@@ -283,7 +296,10 @@ def qasc_loader(path, args):
     return examples_qasc
 
 def siqa_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples_siqa = []
     qa_path, label_path = path[0], path[1]
 
@@ -320,7 +336,10 @@ def siqa_loader(path, args):
     return examples_siqa
 
 def winogrande_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples_winogrande = []
     qa_path, label_path = path[0], path[1]
 
@@ -355,7 +374,10 @@ def winogrande_loader(path, args):
     return examples_winogrande
 
 def emoji_movie_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples = []
 
     with open(path) as json_file:
@@ -393,7 +415,10 @@ def emoji_movie_loader(path, args):
     return examples
 
 def ruin_names_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples = []
 
     with open(path) as json_file:
@@ -436,7 +461,10 @@ def ruin_names_loader(path, args):
     return examples
 
 def conceptual_combinations_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples = []
 
     for one_path in path:
@@ -480,7 +508,10 @@ def conceptual_combinations_loader(path, args):
     return examples
 
 def anli_loader(path, args):
-    uncond_premise = ' the answer is:'
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
     examples = []
     options_text = ["entailment", "neutral", "contradiction"]
     options_sym = ["A", "B", "C"]

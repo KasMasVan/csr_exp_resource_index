@@ -100,7 +100,7 @@ def parse_args():
     parser.add_argument(
         "--calibration_prompt",
         type=str,
-        default=" the answer is:",
+        default=None,
         help="Calibration prompt, as in P(y|x)/P(y|calibration_prompt).",
     )
     parser.add_argument(
