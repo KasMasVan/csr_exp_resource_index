@@ -104,6 +104,11 @@ def parse_args():
         help="Calibration prompt, as in P(y|x)/P(y|calibration_prompt).",
     )
     parser.add_argument(
+        "--do_channel",
+        action="store_true",
+        help="Whether to do channel, i.e., P(x|y_i).",
+    )
+    parser.add_argument(
         "--push_data_to_hub",
         action="store_true",
         help="Whether to push the data to Hugging Face Hub. This is convienient for LLM experiments.",

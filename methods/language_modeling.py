@@ -18,6 +18,8 @@ from utils.data import(
     upload_to_huggingface_hub,
     preprocess_function_seq2seq,
     preprocess_function_causal,
+    preprocess_function_causal_channel,
+    preprocess_function_seq2seq_channel,
 )
 from utils.methods import(
     compute_conditional_score_seq2seq,
@@ -44,6 +46,8 @@ def main():
         args.method = "multiple_choice_prompt"
     elif args.calibration_prompt is not None:
         args.method = "calibration"
+    elif args.do_channel == True:
+        args.method = "channel"
     else:
         args.method = "language_modeling"
 
@@ -68,10 +72,11 @@ def main():
     if args.model_family in ["GPT2", "Pythia", "OPT-IML"]:
         compute_func = compute_conditional_score_causal
         preprocess_func = preprocess_function_causal
-
+        preprocess_func_channel = preprocess_function_causal_channel
     elif args.model_family in ["T5", "FLAN-T5"]:
         compute_func = compute_conditional_score_seq2seq
         preprocess_func = preprocess_function_seq2seq
+        preprocess_func_channel = preprocess_function_seq2seq_channel
     else:
         raise NotImplementedError
 
@@ -96,16 +101,20 @@ def main():
 
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
-        # lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func)
         if args.method in ["language_modeling", "multiple_choice_prompt"]:
-            lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func)
+            lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
         elif args.method == "calibration":
             fn_kwargs = {"ending_names": ending_names, 
                         "header_name": "uncond_premise", # the difference is here
                         "tokenizer": tokenizer,}
             tokenized_calibration_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
             eval_calibration_dataloader = DataLoader(tokenized_calibration_dataset, batch_size=args.batch_size, shuffle=False)    
-            lm_accuracy, avg_lm_accuracy = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func)
+            lm_accuracy, avg_lm_accuracy = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func, tokenizer.pad_token_id)
+        elif args.method == "channel":
+            # simple solution: swap first sentence and second sentence in both preprocessing functions
+            tokenized_channel_dataset = raw_dataset.map(preprocess_func_channel, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+            eval_channel_dataloader = DataLoader(tokenized_channel_dataset, batch_size=args.batch_size, shuffle=False)
+            lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_channel_dataloader, device, compute_func, tokenizer.pad_token_id)
         else:
             raise NotImplementedError
 

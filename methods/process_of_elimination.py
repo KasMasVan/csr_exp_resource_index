@@ -125,7 +125,7 @@ def main():
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         logger.info(f"Step 1: Computing masks.")
-        masks = compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func)
+        masks = compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
         masks = masks.to(torch.float32)
         masked_dataset = tokenized_dataset.map(lambda example, idx: {"mask": masks[idx]}, 
                                  with_indices=True, 
@@ -139,7 +139,7 @@ def main():
         logger.info(f"Step 3: Final Inference")
         mcp_dataset = mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
         eval_mcp_dataloader = DataLoader(mcp_dataset, batch_size=args.batch_size, shuffle=False)
-        lm_accuracy, _ = inference_process_of_elimination(model, eval_mcp_dataloader, device, compute_func)
+        lm_accuracy, _ = inference_process_of_elimination(model, eval_mcp_dataloader, device, compute_func, tokenizer.pad_token_id)
 
         # step 6: some postprocessing, including saving and displyaing output.
         save_path = os.path.join("../results", f"{args.method}.csv")

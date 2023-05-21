@@ -45,6 +45,9 @@ Usage (at the root directory):
 
 
 ### Other Multiple-Choice Benchmarks
+| Index | Data      | Number of Options | Data Downloader |
+| --- | ----------- | --- |----------- |
+| 1 | [BIG-Bench](https://github.com/google/BIG-bench)      | - | `./data/data_downloaders/big_bench.sh`      |
 
 ## Models
 The language models are listed below. For small language models, I provide the downloaders for the model with the most common head, i.e., language modeling head for GPT2. If you want to download a model with a different head, you may need to tweak the code of the corresponding downloader.
@@ -120,16 +123,20 @@ bash my_exp.sh
 
 ### Zero-Shot Scoring Methods (Single-Step)
 
-Scoring methods calculate a score for each option, and then select the option with the highest score: $$ \hat{y}=argmax_i score(y_i) $$
+Scoring methods calculate a score for each option, and then select the option with the highest score: $$ \hat{y}=\argmax_i score(y_i) $$
 
 Supported methods are organized by hierarchy, which means some methods are more fundamental than others. For example, language modeling is the most fundamental method, and it is used by other methods.
 
+$T()$ represents a template.
+
 | Index | Method      | Scoring Function     | Script |
 | ---   | ----------- | ----------- | ----------- |
-| 0.0 | Language Modeling |   $P_{LM}(y_i \| x)$   | `./methods/language_modeling.py` |
-| 0.1 | Average Language Modeling |   $P_{LM}(y_i \| x)^{1/len(y_i)}$   | `./methods/language_modeling.py` |
-| 1.x | [Multiple Choice Prompt](https://openreview.net/forum?id=yKbprarjc5B) |   $P_{LM}(symbol(y_i) \| T_{mcp}(x))$   | `./methods/language_modeling.py` |
-| 2.x | [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf) |   $\frac{P_{ExpertLM}(y_i \| x)}{P_{AmateurLM}(y_i \| x)}$  | `./methods/contrastive_decoding.py` |
+| 1.0 | [Language Modeling](https://arxiv.org/pdf/2102.09690.pdf) |   $\log P_{LM}(y_i \| T(x))$   | `./methods/language_modeling.py` |
+| 1.1 | [Average Language Modeling](https://arxiv.org/pdf/2005.14165.pdf) |   $\frac{1}{len(y_i)} \log P_{LM}(y_i \| T(x))$   | `./methods/language_modeling.py` |
+| 1.2 | [Multiple Choice Prompt](https://openreview.net/forum?id=yKbprarjc5B) |   $\log P_{LM}(symbol(y_i) \| T_{mcp}(x))$   | `./methods/language_modeling.py` |
+| 1.3 | [Calibration](https://arxiv.org/pdf/2104.08315.pdf) |   $\log \frac{P_{LM}(y_i \| T(x))}{P_{LM}(y_i \| T_{task})}$   | `./methods/language_modeling.py` |
+| 1.4 | [Channel](https://aclanthology.org/2022.acl-long.365.pdf) |   $\log P_{LM}(x \| y_i)$   | `./methods/language_modeling.py` |
+| 1.5 | [Contrastive Decoding](https://arxiv.org/pdf/2210.15097.pdf) |   $\log \frac{P_{ExpertLM}(y_i \| T(x))}{P_{AmateurLM}(y_i \| T(x))}$  | `./methods/contrastive_decoding.py` |
 
 
 ### Other Methods (Multi-Step)
@@ -138,9 +145,9 @@ These methods choose the answer in multiple steps, which may involve generation 
 
 | Index | Method      | Prodecure     | Script |
 | ---   | ----------- | ----------- | ----------- |
-| 1 | [SEQA](https://aclanthology.org/2021.acl-long.237) |  1. $\{s_i\} = genenerate(x)$  <br> 2. $\hat{y} = argmax_jsim(y_j, \{s_i\})$ | [Official Implementation](https://github.com/heyLinsir/Semantic-based-QA) |
-| 2 | [Process of Elimination](https://docs.google.com/document/d/14aRC2C6-fb64hDW5lFTQSjOuOrfK1ItoNJw17VTaEes/edit?usp=sharing) |  1. $score_i= score(y_i)$  <br> 2. $Y^\prime = \{y_i \| score_i > threshold\}$ <br> 3. $\hat{y} = prompting([demonstrations,] x, Y^\prime)$| `./methods/process_of_elimination.py` |
-| 3 | Generate Similar Text | 1. Generate similar text for an option. <br> 2. Compute probabilities for option as well as similar text. <br> 3. Aggregate, e.g., averaging, to get final score for a option, and choose the best option. | n/a |
+| 2.1 | [SEQA](https://aclanthology.org/2021.acl-long.237) |  1. $\{s_i\} = genenerate(x)$  <br> 2. $\hat{y} = argmax_jsim(y_j, \{s_i\})$ | [Official Implementation](https://github.com/heyLinsir/Semantic-based-QA) |
+| 2.2 | [Process of Elimination](https://docs.google.com/document/d/14aRC2C6-fb64hDW5lFTQSjOuOrfK1ItoNJw17VTaEes/edit?usp=sharing) |  1. $score_i= score(y_i)$  <br> 2. $Y^\prime = \{y_i \| score_i > threshold\}$ <br> 3. $\hat{y} = prompting([demonstrations,] x, Y^\prime)$| `./methods/process_of_elimination.py` |
+| 2.3 | Generate Similar Text | 1. Generate similar text for an option. <br> 2. Compute probabilities for option as well as similar text. <br> 3. Aggregate, e.g., averaging, to get final score for a option, and choose the best option. | n/a |
 
 ### Useful Links
 - [Google Doc: Ideas for zero-shot and few-shot commonsense reasoning](https://docs.google.com/document/d/1J8CmrKwgmApjZlp-HPDqHALPSvDYI30zihY-vXdExYY/edit?usp=sharing)

@@ -76,7 +76,7 @@ def inference_contrastive_decoding_old(amateur_model, expert_model, eval_dataloa
         pbar.set_description(f"Total Accuracy: {total_accuracy:.4f}, Batch Accuracy: {batch_accuracy:.4f}")
     return total_accuracy
 
-def inference_language_modeling(model, eval_dataloader, device, compute_func):
+def inference_language_modeling(model, eval_dataloader, device, compute_func, pad_token_id):
     model.eval()
     lm_predictions = torch.zeros(0)
     avg_lm_predictions = torch.zeros(0)
@@ -85,7 +85,7 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
-        log_prob = compute_func(batch, model, device)
+        log_prob = compute_func(batch, model, device, pad_token_id)
         
         ending_length = batch["ending_attention_mask"].sum(dim=-1)
         batch_predictions = log_prob.argmin(dim=-1)
@@ -102,7 +102,7 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func):
         pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
     return lm_accuracy, avg_lm_accuracy
 
-def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, device, compute_func):
+def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, device, compute_func, pad_token_id):
     model.eval()
     lm_predictions = torch.zeros(0)
     avg_lm_predictions = torch.zeros(0)
@@ -111,8 +111,8 @@ def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, d
 
     pbar = tqdm(zip(eval_dataloader, eval_calibration_dataloader), desc="Inference", total=len(eval_dataloader))
     for batch, batch_calibration in pbar:
-        log_prob = compute_func(batch, model, device)
-        log_prob_calibration = compute_func(batch_calibration, model, device)
+        log_prob = compute_func(batch, model, device, pad_token_id)
+        log_prob_calibration = compute_func(batch_calibration, model, device, pad_token_id)
         log_prob = log_prob - log_prob_calibration
         
         ending_length = batch["ending_attention_mask"].sum(dim=-1)
@@ -130,7 +130,7 @@ def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, d
         pbar.set_description(f"Calibration accuracy: {lm_accuracy:.4f}, Average calibration accuracy: {avg_lm_accuracy:.4f}")
     return lm_accuracy, avg_lm_accuracy
 
-def compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func):
+def compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func, pad_token_id):
     model.eval()
     masks = []
     torch.cuda.empty_cache()
@@ -138,7 +138,7 @@ def compute_mask_process_of_elimination(model, eval_dataloader, device, compute_
     pbar = tqdm(eval_dataloader, desc="Computing masks")
     for batch in pbar:
         # -logP(ending|header)
-        log_prob = compute_func(batch, model, device)
+        log_prob = compute_func(batch, model, device, pad_token_id)
         avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
         
         # soft masking, i.e., get rid of the least likely answer.
@@ -157,7 +157,7 @@ def compute_mask_process_of_elimination(model, eval_dataloader, device, compute_
     masks = torch.cat(masks, dim=0)
     return masks
 
-def inference_process_of_elimination(model, eval_dataloader, device, compute_func):
+def inference_process_of_elimination(model, eval_dataloader, device, compute_func, pad_token_id):
     model.eval()
     lm_predictions = torch.zeros(0)
     avg_lm_predictions = torch.zeros(0)
@@ -166,7 +166,7 @@ def inference_process_of_elimination(model, eval_dataloader, device, compute_fun
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
-        log_prob = compute_func(batch, model, device)
+        log_prob = compute_func(batch, model, device, pad_token_id)
         # apply hard masking
         log_prob[batch["mask"] == 0] = float("inf")
         
@@ -185,7 +185,7 @@ def inference_process_of_elimination(model, eval_dataloader, device, compute_fun
         pbar.set_description(f"Process of elimination accuracy: {lm_accuracy:.4f}, Average process of elimination accuracy: {avg_lm_accuracy:.4f}")
     return lm_accuracy, avg_lm_accuracy
 
-def compute_conditional_score_seq2seq(batch, model, device):
+def compute_conditional_score_seq2seq(batch, model, device, pad_token_id):
     # returns log_prob of p(y|x) for each batch
     
     # e.g., (batch_size, #option, ending_seq_len): (32, 2, 18)
@@ -206,17 +206,17 @@ def compute_conditional_score_seq2seq(batch, model, device):
     # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
     logits = logits.view(-1, logits.shape[-1])
     # ignore padding token: 0
-    ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=0).detach().cpu()
+    ce_loss = F.cross_entropy(logits, ending_input_ids.view(-1), reduction="none", ignore_index=pad_token_id).detach().cpu()
     # each score is the negative log-likelihood of a ending given a header.
     # batch_predictions = ce_loss.view(ending_shape).sum(dim=-1).argmin(dim=-1)
     log_prob = ce_loss.view(ending_shape).sum(dim=-1)
     return log_prob
 
-def compute_conditional_score_causal(batch, model, device):
+def compute_conditional_score_causal(batch, model, device, pad_token_id):
     # returns log_prob of p(y|x) for each batch
     # make sure the padding token is aligned with tokenizer.pad_token_id 
     # and preprocess_function_causal
-    padding_token = 50256
+    # padding_token = 50256
     
     input_ids = batch["input_ids"].view(-1, batch["input_ids"].shape[-1]).to(device)
     labels = batch["labels"].view(-1, batch["labels"].shape[-1]).to(device)
@@ -235,7 +235,7 @@ def compute_conditional_score_causal(batch, model, device):
     # e.g., (batch_size * #option, ending_seq_len, #vocab): (64, 18, 32128)
     logits = logits.view(-1, logits.shape[-1])
     # ignore padding token: 50256
-    ce_loss = F.cross_entropy(logits, labels.view(-1), reduction="none", ignore_index=padding_token).detach().cpu()
+    ce_loss = F.cross_entropy(logits, labels.view(-1), reduction="none", ignore_index=pad_token_id).detach().cpu()
     # each score is the negative log-likelihood of a ending given a header.
     log_prob = ce_loss.view(batch["input_ids"].shape[0], batch["input_ids"].shape[1], -1).sum(dim=-1)
     return log_prob
