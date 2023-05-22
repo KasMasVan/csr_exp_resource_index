@@ -109,6 +109,20 @@ def parse_args():
         help="Whether to do channel, i.e., P(x|y_i).",
     )
     parser.add_argument(
+        "--scoring_method_for_process_of_elimination",
+        type=str,
+        choices=["language_modeling", "calibration", "channel"],
+        default="language_modeling",
+        help="The scoring method for process of elimination.",
+    )
+    parser.add_argument(
+        "--prompting_method_for_process_of_elimination",
+        type=str,
+        choices=["multiple_choice_prompt"],
+        default="multiple_choice_prompt",
+        help="The prompting method for process of elimination.",
+    )
+    parser.add_argument(
         "--push_data_to_hub",
         action="store_true",
         help="Whether to push the data to Hugging Face Hub. This is convienient for LLM experiments.",

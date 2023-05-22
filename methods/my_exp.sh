@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# seeds=(0 1 2 3 4)
-seeds=(0)
-model_family="OPT-IML" # "OPT-IML"
-checkpoints=("facebook/opt-iml-1.3b") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b"
+seeds=(0 1 2 3 4)
+model_family="FLAN-T5" # "OPT-IML"
+checkpoints=("google/flan-t5-large" "google/flan-t5-large") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
 loading_precision="FP16" # FP32 FP16 INT8
-# checkpoints=("google/flan-t5-small" "google/flan-t5-base" "google/flan-t5-large")
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-datasets="cqa" #anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences
+datasets="anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences" #
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
 batch_size=16
 sample=100
@@ -19,13 +17,13 @@ calibration_prompt=" the answer is:"
 for seed in "${seeds[@]}"; do
     for checkpoint in "${checkpoints[@]}"; do
     # language modeling and average language modeling
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
         # --sample ${sample} \
         # --push_data_to_hub \
         
@@ -51,14 +49,14 @@ for seed in "${seeds[@]}"; do
         # --push_data_to_hub \
 
     # multiple choice prompt, using the same script as language modeling
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        --multiple_choice_prompt ${multiple_choice_prompt} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+    #     --multiple_choice_prompt ${multiple_choice_prompt} \
         # --sample ${sample} \
         # --push_data_to_hub \
     
@@ -75,14 +73,14 @@ for seed in "${seeds[@]}"; do
         # --push_data_to_hub \
 
     # process of elimination
-    python process_of_elimination.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --loading_precision ${loading_precision} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --multiple_choice_prompt ${multiple_choice_prompt} \
+    # python process_of_elimination.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --loading_precision ${loading_precision} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --multiple_choice_prompt ${multiple_choice_prompt} \
     #     --sample ${sample} 
         # --push_data_to_hub 
     done

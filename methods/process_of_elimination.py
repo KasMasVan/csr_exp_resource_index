@@ -125,6 +125,7 @@ def main():
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         logger.info(f"Step 1: Computing masks.")
+        # if args.scoring_method_for_process_of_elimination
         masks = compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
         masks = masks.to(torch.float32)
         masked_dataset = tokenized_dataset.map(lambda example, idx: {"mask": masks[idx]}, 
@@ -133,6 +134,7 @@ def main():
                                  remove_columns=remove_columns)
         
         logger.info(f"Step 2: Creating multiple choice prompt.")
+        # if args.prompting_method_for_process_of_elimination
         mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
         mcp_dataset = masked_dataset.map(create_multiple_choice_prompt, fn_kwargs=mcp_kwargs)
         
