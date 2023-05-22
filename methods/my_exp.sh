@@ -2,7 +2,7 @@
 
 seeds=(0 1 2 3 4)
 model_family="FLAN-T5" # "OPT-IML"
-checkpoints=("google/flan-t5-large" "google/flan-t5-large") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
+checkpoints=("google/flan-t5-xl") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
 loading_precision="FP16" # FP32 FP16 INT8
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
@@ -69,7 +69,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --calibration_prompt "${calibration_prompt}" \
-    #     # --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
 
     # process of elimination
