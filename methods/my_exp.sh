@@ -13,7 +13,8 @@ datasets="cqa"
 batch_size=16
 sample=100
 
-multiple_choice_prompt="Question:"
+multiple_choice_prompt=""
+# multiple_choice_prompt="Select the most suitable option to answer the question. Ignore [MASK] options:\n"
 calibration_prompt=" the answer is:"
 
 for seed in "${seeds[@]}"; do
@@ -46,7 +47,7 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
-        --do_channel \
+        # --do_channel \
         # --sample ${sample} \
         # --push_data_to_hub \
 
@@ -58,7 +59,7 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
-        --multiple_choice_prompt ${multiple_choice_prompt} \
+        --multiple_choice_prompt "$multiple_choice_prompt" \
         # --sample ${sample} \
         # --push_data_to_hub \
     
@@ -82,8 +83,8 @@ for seed in "${seeds[@]}"; do
         --loading_precision ${loading_precision} \
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
-        --multiple_choice_prompt ${multiple_choice_prompt} \
-        # --scoring_method_for_process_of_elimination "language_modeling" \
+        --multiple_choice_prompt "$multiple_choice_prompt" \
+        --scoring_method_for_process_of_elimination "language_modeling" \
         # --sample ${sample} 
         # --push_data_to_hub 
     done

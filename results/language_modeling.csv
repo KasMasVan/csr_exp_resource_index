@@ -529,3 +529,9 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145

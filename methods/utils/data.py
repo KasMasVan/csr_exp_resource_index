@@ -178,7 +178,7 @@ def copa_loader(path, args):
                 # B. People brought boats to the pond.
                 # Answer:
                 hypotheses = ["A", "B"]
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {a1}\nB. {a2}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {a1}\nB. {a2}\nAnswer:"
         else:
             hypotheses = [' ' + a1, ' ' + a2]
         examples_copa += [{
@@ -222,7 +222,7 @@ def cqa_loader(path, args):
                 # D. queen
                 # E. cathedral
                 # Answer:
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
             else:
                 hypotheses = options
                 premise = premise + uncond_premise
@@ -262,7 +262,7 @@ def obqa_loader(path, args):
                 # D. French beans
                 # Answer:
                 hypotheses = options_sym
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nAnswer:"
             else:
                 hypotheses = options_text
                 # premise = premise + uncond_premise
@@ -300,7 +300,7 @@ def piqa_loader(path, args):
                 # B. place a tissue over your nose and suck the snot in.
                 # Answer:
                 hypotheses = options_sym
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nAnswer:"
             else:
                 hypotheses = options_text
                 premise = premise + uncond_premise
@@ -339,7 +339,7 @@ def qasc_loader(path, args):
                 # E. ...
                 # Answer:
                 hypotheses = options_sym
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nF. {options_text[5]}\nG. {options_text[6]}\nH. {options_text[7]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nF. {options_text[5]}\nG. {options_text[6]}\nH. {options_text[7]}\nAnswer:"
             else:
                 hypotheses = options_text
                 premise = premise + uncond_premise
@@ -384,7 +384,7 @@ def siqa_loader(path, args):
                 # C. bored
                 # Answer:
                 hypotheses = options_sym
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nAnswer:"
             else:
                 hypotheses = options_text
                 premise = premise + uncond_premise
@@ -423,7 +423,7 @@ def winogrande_loader(path, args):
                 # B. Nelson
                 # Answer:
                 hypotheses = options_sym
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nAnswer:"
             else:
                 hypotheses = options_text
                 premise = premise + uncond_premise
@@ -461,7 +461,7 @@ def emoji_movie_loader(path, args):
                 # E. ...
                 # Answer:
                 hypotheses = options_sym
-                premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
             else:
                 hypotheses = options_text
                 premise = premise + uncond_premise
@@ -505,8 +505,8 @@ def ruin_names_loader(path, args):
                 # D. ...
                 # Answer:
                 hypotheses = options_sym
-                # premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
-                premise = f"{args.multiple_choice_prompt} {premise}\n"
+                # premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\n"
                 for idx in range(num_options):
                     premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
                 premise += "Answer:"                
@@ -552,8 +552,8 @@ def conceptual_combinations_loader(path, args):
                     # D. ...
                     # Answer:
                     hypotheses = options_sym
-                    # premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
-                    premise = f"{args.multiple_choice_prompt} {premise}\n"
+                    # premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+                    premise = f"{args.multiple_choice_prompt} Question: {premise}\n"
                     for idx in range(num_options):
                         premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
                     premise += "Answer:"                
@@ -595,8 +595,8 @@ def anli_loader(path, args):
                     # C. contradiction
                     # Answer:
                     hypotheses = options_sym
-                    # premise = f"{args.multiple_choice_prompt} {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
-                    premise = f"{args.multiple_choice_prompt} {premise}\n"
+                    # premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+                    premise = f"{args.multiple_choice_prompt} Question: {premise}\n"
                     for idx in range(num_options):
                         premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
                     premise += "Answer:"                

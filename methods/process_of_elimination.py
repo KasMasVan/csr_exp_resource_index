@@ -51,7 +51,7 @@ def create_multiple_choice_prompt(example, **kwargs):
     mask = example['mask']
     mcp_example = {}
     # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
-    premise = f"{multiple_choice_prompt} {example['premise']}\n"
+    premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
     for idx, single_mask in enumerate(mask):
         mcp_example[f'hypothesis{idx}'] = alphabets[idx]
         if single_mask == 1:
