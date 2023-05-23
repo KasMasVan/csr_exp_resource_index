@@ -82,14 +82,16 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func, pa
     avg_lm_predictions = torch.zeros(0)
     labels = torch.zeros(0)
     torch.cuda.empty_cache()
+    avg_log_probs = []
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
         log_prob = compute_func(batch, model, device, pad_token_id)
+        avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
+        avg_log_probs.append(avg_log_prob)
         
-        ending_length = batch["ending_attention_mask"].sum(dim=-1)
         batch_predictions = log_prob.argmin(dim=-1)
-        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+        batch_avg_predictions = avg_log_prob.argmin(dim=-1)
 
         batch_labels = batch["label"]
         lm_predictions = torch.cat((lm_predictions, batch_predictions))
@@ -100,7 +102,8 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func, pa
         lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
         avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
         pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
-    return lm_accuracy, avg_lm_accuracy
+    avg_log_probs = torch.cat(avg_log_probs, dim=0)
+    return avg_log_probs, lm_accuracy, avg_lm_accuracy
 
 def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, device, compute_func, pad_token_id):
     model.eval()
@@ -108,16 +111,18 @@ def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, d
     avg_lm_predictions = torch.zeros(0)
     labels = torch.zeros(0)
     torch.cuda.empty_cache()
+    avg_log_probs = []
 
     pbar = tqdm(zip(eval_dataloader, eval_calibration_dataloader), desc="Inference", total=len(eval_dataloader))
     for batch, batch_calibration in pbar:
         log_prob = compute_func(batch, model, device, pad_token_id)
         log_prob_calibration = compute_func(batch_calibration, model, device, pad_token_id)
         log_prob = log_prob - log_prob_calibration
-        
-        ending_length = batch["ending_attention_mask"].sum(dim=-1)
+        avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
+        avg_log_probs.append(avg_log_prob)
+
         batch_predictions = log_prob.argmin(dim=-1)
-        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+        batch_avg_predictions = avg_log_prob.argmin(dim=-1)
 
         batch_labels = batch["label"]
         lm_predictions = torch.cat((lm_predictions, batch_predictions))
@@ -128,33 +133,19 @@ def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, d
         lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
         avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
         pbar.set_description(f"Calibration accuracy: {lm_accuracy:.4f}, Average calibration accuracy: {avg_lm_accuracy:.4f}")
-    return lm_accuracy, avg_lm_accuracy
+    avg_log_probs = torch.cat(avg_log_probs, dim=0)
+    return avg_log_probs, lm_accuracy, avg_lm_accuracy
 
-def compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func, pad_token_id):
-    model.eval()
-    masks = []
-    torch.cuda.empty_cache()
+def compute_mask_process_of_elimination(avg_log_probs):
+    masks = torch.ones_like(avg_log_probs)
+    # # soft masking (v1), i.e., get rid of the least likely answer.
+    # masks[torch.arange(avg_log_probs.shape[0]), avg_log_probs.argmin(dim=-1)] = 0
+    
+    # v2: Calculate the row-wise mean
+    row_mean = avg_log_probs.mean(dim=1, keepdim=True)
+    # Set values below the mean to 0
+    masks[avg_log_probs > row_mean] = 0
 
-    pbar = tqdm(eval_dataloader, desc="Computing masks")
-    for batch in pbar:
-        # -logP(ending|header)
-        log_prob = compute_func(batch, model, device, pad_token_id)
-        avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
-        
-        # soft masking, i.e., get rid of the least likely answer.
-        # mask = torch.ones_like(log_prob)
-        # mask[torch.arange(avg_log_prob.shape[0]), avg_log_prob.argmax(dim=-1)] = 0
-        # masks.append(mask)
-
-        # soft masking v2, i.e., get rid of the answers that are below the mean.
-        mask_v2 = torch.ones_like(log_prob)
-        # Calculate the row-wise mean
-        row_mean = avg_log_prob.mean(dim=1, keepdim=True)
-        # Set values below the mean to 0
-        mask_v2[avg_log_prob > row_mean] = 0
-        masks.append(mask_v2)
-
-    masks = torch.cat(masks, dim=0)
     return masks
 
 def inference_process_of_elimination(model, eval_dataloader, device, compute_func, pad_token_id):

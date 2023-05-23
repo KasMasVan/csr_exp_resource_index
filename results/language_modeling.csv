@@ -517,3 +517,15 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
 OPT-IML,facebook/opt-iml-1.3b,FP16,cqa,16,language_modeling,0,,0.1835
 OPT-IML,facebook/opt-iml-1.3b,FP16,cqa,16,average_language_modeling,0,,0.2359
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,100,0.3000
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,100,0.2900
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,language_modeling,0,100,0.6500
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,average_language_modeling,0,100,0.5300
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145

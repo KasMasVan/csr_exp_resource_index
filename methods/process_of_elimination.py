@@ -24,12 +24,16 @@ from utils.data import(
     upload_to_huggingface_hub,
     preprocess_function_seq2seq,
     preprocess_function_causal,
+    preprocess_function_causal_channel,
+    preprocess_function_seq2seq_channel,
 )
 from utils.methods import(
     compute_conditional_score_seq2seq,
     compute_conditional_score_causal,
     compute_mask_process_of_elimination,
     inference_process_of_elimination,
+    inference_language_modeling,
+    inference_calibration,
 )
 from utils.utils import(
     load_data,
@@ -88,12 +92,14 @@ def main():
     if args.model_family in ["GPT2", "Pythia", "OPT-IML"]:
         compute_func = compute_conditional_score_causal
         preprocess_func = preprocess_function_causal
+        preprocess_func_channel = preprocess_function_causal_channel
         remove_columns = ['input_ids',
                           'labels',
                           'ending_attention_mask']
     elif args.model_family in ["T5", "FLAN-T5"]:
         compute_func = compute_conditional_score_seq2seq
         preprocess_func = preprocess_function_seq2seq
+        preprocess_func_channel = preprocess_function_seq2seq_channel
         remove_columns=['header_input_ids', 
                         'header_attention_mask', 
                         'ending_input_ids', 
@@ -124,16 +130,33 @@ def main():
 
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
-        logger.info(f"Step 1: Computing masks.")
-        # if args.scoring_method_for_process_of_elimination
-        masks = compute_mask_process_of_elimination(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+        scoring_method = args.scoring_method_for_process_of_elimination
+        logger.info(f"Step 1: Computing masks. Scoring method: {scoring_method}.")
+        if scoring_method == "channel":
+            tokenized_channel_dataset = raw_dataset.map(preprocess_func_channel, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+            eval_channel_dataloader = DataLoader(tokenized_channel_dataset, batch_size=args.batch_size, shuffle=False)
+            avg_log_probs, _, _ = inference_language_modeling(model, eval_channel_dataloader, device, compute_func, tokenizer.pad_token_id)
+        elif scoring_method == "calibration":
+            fn_kwargs = {"ending_names": ending_names, 
+                        "header_name": "uncond_premise", # the difference is here
+                        "tokenizer": tokenizer,}
+            tokenized_calibration_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+            eval_calibration_dataloader = DataLoader(tokenized_calibration_dataset, batch_size=args.batch_size, shuffle=False)    
+            avg_log_probs, _, _ = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func, tokenizer.pad_token_id)
+        elif scoring_method == "language_modeling":
+            avg_log_probs, _, _ = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+        else:
+            raise NotImplementedError # unlikely to happen.
+        
+        masks = compute_mask_process_of_elimination(avg_log_probs)
         masks = masks.to(torch.float32)
         masked_dataset = tokenized_dataset.map(lambda example, idx: {"mask": masks[idx]}, 
                                  with_indices=True, 
                                  batched=True,
                                  remove_columns=remove_columns)
         
-        logger.info(f"Step 2: Creating multiple choice prompt.")
+        prompting_method = args.prompting_method_for_process_of_elimination
+        logger.info(f"Step 2: Creating multiple choice prompt. Prompting method: {prompting_method}.")
         # if args.prompting_method_for_process_of_elimination
         mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
         mcp_dataset = masked_dataset.map(create_multiple_choice_prompt, fn_kwargs=mcp_kwargs)

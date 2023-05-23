@@ -102,19 +102,19 @@ def main():
         # step 5: (evaluation) inference on data, and compute accuracy.
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         if args.method in ["language_modeling", "multiple_choice_prompt"]:
-            lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+            _, lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
         elif args.method == "calibration":
             fn_kwargs = {"ending_names": ending_names, 
                         "header_name": "uncond_premise", # the difference is here
                         "tokenizer": tokenizer,}
             tokenized_calibration_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
             eval_calibration_dataloader = DataLoader(tokenized_calibration_dataset, batch_size=args.batch_size, shuffle=False)    
-            lm_accuracy, avg_lm_accuracy = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func, tokenizer.pad_token_id)
+            _, lm_accuracy, avg_lm_accuracy = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func, tokenizer.pad_token_id)
         elif args.method == "channel":
             # simple solution: swap first sentence and second sentence in both preprocessing functions
             tokenized_channel_dataset = raw_dataset.map(preprocess_func_channel, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
             eval_channel_dataloader = DataLoader(tokenized_channel_dataset, batch_size=args.batch_size, shuffle=False)
-            lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_channel_dataloader, device, compute_func, tokenizer.pad_token_id)
+            _, lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_channel_dataloader, device, compute_func, tokenizer.pad_token_id)
         else:
             raise NotImplementedError
 

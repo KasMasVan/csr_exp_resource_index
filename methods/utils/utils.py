@@ -244,6 +244,11 @@ def write_to_csv(save_path, args, total_accuracy):
     csv_exists = os.path.isfile(save_path)
     with open(save_path, 'a+', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
-        if not csv_exists:
-            csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])
-        csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{total_accuracy:.4f}"])
+        if args.method == "process_of_elimination":
+            if not csv_exists:
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "seed", "sample",'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.seed, args.sample, f"{total_accuracy:.4f}"])
+        else:
+            if not csv_exists:
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{total_accuracy:.4f}"])
