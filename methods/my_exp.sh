@@ -14,8 +14,9 @@ batch_size=16
 sample=100
 
 multiple_choice_prompt=""
-# multiple_choice_prompt="Select the most suitable option to answer the question. Ignore [MASK] options:\n"
+# multiple_choice_prompt="Select the most suitable option to answer the question."
 calibration_prompt=" the answer is:"
+process_of_elimination_prompt="Select the most suitable option to answer the question. Ignore [MASK] options.\n"
 
 for seed in "${seeds[@]}"; do
     for checkpoint in "${checkpoints[@]}"; do
@@ -27,7 +28,7 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
-    #     --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
         
 
@@ -47,7 +48,7 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
-        # --do_channel \
+        --do_channel \
         # --sample ${sample} \
         # --push_data_to_hub \
 
@@ -84,7 +85,9 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --multiple_choice_prompt "$multiple_choice_prompt" \
-        --scoring_method_for_process_of_elimination "language_modeling" \
+        --process_of_elimination_prompt "${process_of_elimination_prompt}" \
+        --scoring_method_for_process_of_elimination "multiple_choice_prompt" \
+        --mask_strategy_for_process_of_elimination "below_average" \
         # --sample ${sample} 
         # --push_data_to_hub 
     done

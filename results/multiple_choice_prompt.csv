@@ -252,3 +252,14 @@ FLAN-T5,google/flan-t5-xl,FP16,cqa,16,multiple_choice_prompt,0,,0.8894
 FLAN-T5,google/flan-t5-xl,FP16,cqa,16,multiple_choice_prompt,0,,0.8919
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,multiple_choice_prompt,0,100,0.8800
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,multiple_choice_prompt,1,100,0.8400
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,multiple_choice_prompt,2,100,0.8500
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,multiple_choice_prompt,3,100,0.9000
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
+FLAN-T5,google/flan-t5-small,FP16,anli,16,multiple_choice_prompt,0,100,0.3100
+FLAN-T5,google/flan-t5-small,FP16,anli,16,multiple_choice_prompt,0,100,0.3100
+FLAN-T5,google/flan-t5-small,FP16,qasc,16,multiple_choice_prompt,0,100,0.1900
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628

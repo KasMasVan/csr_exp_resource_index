@@ -109,9 +109,15 @@ def parse_args():
         help="Whether to do channel, i.e., P(x|y_i).",
     )
     parser.add_argument(
+        "--process_of_elimination_prompt",
+        type=str,
+        default=None,
+        help="The process of elimination prompt. It asks the model to ignore masked options.",
+    )
+    parser.add_argument(
         "--scoring_method_for_process_of_elimination",
         type=str,
-        choices=["language_modeling", "calibration", "channel"],
+        choices=["language_modeling", "calibration", "channel", "multiple_choice_prompt"],
         default="language_modeling",
         help="The scoring method for process of elimination.",
     )
@@ -121,6 +127,13 @@ def parse_args():
         choices=["multiple_choice_prompt"],
         default="multiple_choice_prompt",
         help="The prompting method for process of elimination.",
+    )
+    parser.add_argument(
+        "--mask_strategy_for_process_of_elimination",
+        type=str,
+        choices=["lowest", "below_average"],
+        default="lowest",
+        help="The mask strategy for process of elimination.",
     )
     parser.add_argument(
         "--push_data_to_hub",
@@ -246,8 +259,8 @@ def write_to_csv(save_path, args, total_accuracy):
         csvwriter = csv.writer(csvfile)
         if args.method == "process_of_elimination":
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "seed", "sample",'accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.seed, args.sample, f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "mask_strategy", "seed", "sample", "mask_accuracy", 'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.seed, args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
         else:
             if not csv_exists:
                 csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])

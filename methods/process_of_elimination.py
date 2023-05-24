@@ -112,9 +112,10 @@ def main():
     logger.info(f"Load data: {args.datasets}.")
     
     # evaluate on each dataset
+    multiple_choice_prompt = args.multiple_choice_prompt
     for dataset in args.datasets:
         args.dataset = dataset
-        multiple_choice_prompt = args.multiple_choice_prompt
+        # multiple_choice_prompt = args.multiple_choice_prompt
         args.multiple_choice_prompt = None
         ending_names, header_name, raw_dataset = load_data(args)
         if args.sample is not None:
@@ -145,11 +146,29 @@ def main():
             avg_log_probs, _, _ = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func, tokenizer.pad_token_id)
         elif scoring_method == "language_modeling":
             avg_log_probs, _, _ = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+        elif scoring_method == "multiple_choice_prompt":
+            mcp_args = copy.deepcopy(args)
+            mcp_args.multiple_choice_prompt = multiple_choice_prompt
+            _, _, raw_mcp_dataset = load_data(mcp_args)
+            if args.sample is not None:
+                # sample "sample" amount of data from raw_data
+                raw_mcp_dataset = raw_mcp_dataset.shuffle(seed=args.seed).select(range(args.sample))
+            tokenized_mcp_dataset = raw_mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+            eval_mcp_dataloader = DataLoader(tokenized_mcp_dataset, batch_size=args.batch_size, shuffle=False)
+            avg_log_probs, _, _ = inference_language_modeling(model, eval_mcp_dataloader, device, compute_func, tokenizer.pad_token_id)
         else:
             raise NotImplementedError # unlikely to happen.
         
-        masks = compute_mask_process_of_elimination(avg_log_probs)
+        masks = compute_mask_process_of_elimination(avg_log_probs, args.mask_strategy_for_process_of_elimination)
+        # construct an oracle mask that only keeps the correct lable to 1, and other options to 0
+        # oracle_masks = torch.zeros_like(avg_log_probs)
+        # oracle_masks[torch.arange(oracle_masks.size(0)), tokenized_dataset["label"]] = 1
         masks = masks.to(torch.float32)
+        # compute mask accuracy, i.e., check whether mask that correspond to labels is 1
+        mask_result = masks[torch.arange(masks.size(0)), tokenized_dataset["label"]]
+        mask_accuracy = torch.sum(mask_result) / mask_result.size(0)
+        logger.info(f"Mask accuracy: {mask_accuracy}")
+        args.mask_accuracy = mask_accuracy.item()
         masked_dataset = tokenized_dataset.map(lambda example, idx: {"mask": masks[idx]}, 
                                  with_indices=True, 
                                  batched=True,
@@ -158,7 +177,8 @@ def main():
         prompting_method = args.prompting_method_for_process_of_elimination
         logger.info(f"Step 2: Creating multiple choice prompt. Prompting method: {prompting_method}.")
         # if args.prompting_method_for_process_of_elimination
-        mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
+        # mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
+        mcp_kwargs = {"multiple_choice_prompt": args.process_of_elimination_prompt,}
         mcp_dataset = masked_dataset.map(create_multiple_choice_prompt, fn_kwargs=mcp_kwargs)
         
         logger.info(f"Step 3: Final Inference")

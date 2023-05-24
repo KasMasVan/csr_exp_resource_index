@@ -133,6 +133,9 @@ def main():
         if args.push_data_to_hub:
             logger.info(f"Push {args.dataset} to HuggingFace Hub.")
             upload_to_huggingface_hub(tokenized_dataset, args)
+        
+        # step 8: delete tokenized_dataset to save memory.
+        # del tokenized_dataset
             
 
 if __name__ == "__main__":

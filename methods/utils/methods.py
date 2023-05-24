@@ -136,16 +136,18 @@ def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, d
     avg_log_probs = torch.cat(avg_log_probs, dim=0)
     return avg_log_probs, lm_accuracy, avg_lm_accuracy
 
-def compute_mask_process_of_elimination(avg_log_probs):
+def compute_mask_process_of_elimination(avg_log_probs, mask_strategy):
     masks = torch.ones_like(avg_log_probs)
-    # # soft masking (v1), i.e., get rid of the least likely answer.
-    # masks[torch.arange(avg_log_probs.shape[0]), avg_log_probs.argmin(dim=-1)] = 0
-    
-    # v2: Calculate the row-wise mean
-    row_mean = avg_log_probs.mean(dim=1, keepdim=True)
-    # Set values below the mean to 0
-    masks[avg_log_probs > row_mean] = 0
-
+    if mask_strategy == "lowest":
+        # soft masking (v1), i.e., get rid of the least likely answer.
+        masks[torch.arange(avg_log_probs.shape[0]), avg_log_probs.argmax(dim=-1)] = 0
+    elif mask_strategy == "below_average":
+        # v2: Calculate the row-wise mean
+        row_mean = avg_log_probs.mean(dim=1, keepdim=True)
+        # Set values below the mean to 0
+        masks[avg_log_probs > row_mean] = 0
+    else:
+        raise NotImplementedError
     return masks
 
 def inference_process_of_elimination(model, eval_dataloader, device, compute_func, pad_token_id):
