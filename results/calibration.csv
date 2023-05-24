@@ -298,3 +298,5 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,100,0.3900
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956

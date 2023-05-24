@@ -252,3 +252,5 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,channel,0,,0.3235
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,channel,0,,0.3235
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,channel,0,100,0.3000
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,channel,0,,0.3235
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,channel,0,,0.3235
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,channel,0,,0.3235

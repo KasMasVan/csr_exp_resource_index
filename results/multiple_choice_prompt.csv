@@ -263,3 +263,5 @@ FLAN-T5,google/flan-t5-small,FP16,qasc,16,multiple_choice_prompt,0,100,0.1900
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
