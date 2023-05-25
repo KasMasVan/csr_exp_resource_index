@@ -94,3 +94,4 @@ FLAN-T5,google/flan-t5-xl,FP16,cqa,16,process_of_elimination,multiple_choice_pro
 FLAN-T5,google/flan-t5-xl,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,1,100,0.9800,0.9000
 FLAN-T5,google/flan-t5-xl,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,2,100,0.9500,0.8500
 FLAN-T5,google/flan-t5-xl,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,3,100,0.9900,0.9200
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,,0.6708,0.3612

@@ -4,6 +4,7 @@ import os
 import shutil
 
 import torch
+import transformers
 from transformers import (
     AutoTokenizer, 
     AutoModelForCausalLM,
@@ -17,6 +18,7 @@ all_checkpoints = {
     "OPT-IML":["facebook/opt-iml-1.3b", "facebook/opt-iml-max-1.3b"],               
     "T5": ["t5-small", "t5-base","t5-large", "t5-3b", "t5-11b"],
     "FLAN-T5": ["google/flan-t5-small", "google/flan-t5-base", "google/flan-t5-large", "google/flan-t5-xl", "google/flan-t5-xxl"],
+    "MPT": ["mosaicml/mpt-7b", "mosaicml/mpt-7b-instruct", "mosaicml/mpt-7b-chat", "mosaicml/mpt-7b-storywriter"]
 }
 
 def parse_args():
@@ -25,7 +27,7 @@ def parse_args():
     parser.add_argument(
         "--model_family",
         type=str,
-        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML"],
+        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML", "MPT"],
         default=None,
         help="The moddel family, as checkpoints under the same model family use same codes to download."
         )
@@ -59,7 +61,7 @@ def main():
     args = parse_args()
     print(args)
     
-    if args.model_family in ["GPT2", "Pythia", "OPT-IML"]:
+    if args.model_family in ["GPT2", "Pythia", "OPT-IML", "MPT"]:
         tokenizer_func = AutoTokenizer
         model_func = AutoModelForCausalLM
     elif args.model_family in ["T5", "FLAN-T5"]:
@@ -85,14 +87,27 @@ def main():
         print(f"Downloading {checkpoint}\t under model family {args.model_family}...")
         
         # download the model
-        tokneizer = tokenizer_func.from_pretrained(checkpoint)
-        model = model_func.from_pretrained(checkpoint)
+        # tokenizer = tokenizer_func.from_pretrained(checkpoint)
+        # model = model_func.from_pretrained(checkpoint)
+        if args.model_family == "MPT":
+            tokenizer = tokenizer_func.from_pretrained("EleutherAI/gpt-neox-20b")
+            config = transformers.AutoConfig.from_pretrained(checkpoint,trust_remote_code=True)
+            config.attn_config['attn_impl'] = 'triton'
+            model = transformers.AutoModelForCausalLM.from_pretrained(
+                checkpoint,
+                config=config,
+                torch_dtype=torch.bfloat16,
+                trust_remote_code=True
+            )
+        else:
+            model = model_func.from_pretrained(checkpoint)
+            tokenizer = tokenizer_func.from_pretrained(checkpoint)
 
         # save the model
         save_dir = os.path.join(args.output_dir, args.model_family, checkpoint)
         os.makedirs(os.path.dirname(save_dir), exist_ok=True)
         model.save_pretrained(save_dir)
-        tokneizer.save_pretrained(save_dir)
+        tokenizer.save_pretrained(save_dir)
 
         # delete cached files
         # https://huggingface.co/docs/transformers/installation#cache-setup

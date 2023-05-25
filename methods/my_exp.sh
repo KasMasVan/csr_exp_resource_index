@@ -1,13 +1,13 @@
 #!/bin/bash
-
-seeds=(0 1 2 3 4)
+# seeds=(0 1 2 3 4)
+seeds=(0)
 model_family="FLAN-T5" # "OPT-IML"
-checkpoints=("google/flan-t5-xl") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
+checkpoints=("google/flan-t5-small") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
 loading_precision="FP16" # FP32 FP16 INT8
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
 datasets="cqa"
-# datasets="anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences" #
+# datasets="anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences" 
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
 batch_size=16
 sample=100
@@ -20,13 +20,13 @@ process_of_elimination_prompt="Select the most suitable option to answer the que
 for seed in "${seeds[@]}"; do
     for checkpoint in "${checkpoints[@]}"; do
     # language modeling and average language modeling
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
         # --sample ${sample} \
         # --push_data_to_hub \
         
@@ -40,38 +40,38 @@ for seed in "${seeds[@]}"; do
     #     --batch_size  ${batch_size} \
 
     # channel
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --do_channel \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --do_channel \
         # --sample ${sample} \
         # --push_data_to_hub \
 
     # multiple choice prompt, using the same script as language modeling
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --multiple_choice_prompt "$multiple_choice_prompt" \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --multiple_choice_prompt "$multiple_choice_prompt" \
         # --sample ${sample} \
         # --push_data_to_hub \
     
     # calibration, i.e., PMI and PMI_DC.
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --calibration_prompt "${calibration_prompt}" \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --calibration_prompt "${calibration_prompt}" \
         # --sample ${sample} \
         # --push_data_to_hub \
 
@@ -87,7 +87,7 @@ for seed in "${seeds[@]}"; do
         --process_of_elimination_prompt "${process_of_elimination_prompt}" \
         --scoring_method_for_process_of_elimination "multiple_choice_prompt" \
         --mask_strategy_for_process_of_elimination "below_average" \
-        --sample ${sample} 
+        # --sample ${sample} 
         # --push_data_to_hub 
     done
 done

@@ -300,3 +300,12 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,100,0.3900
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,anli,16,calibration,0,,0.3350
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,qasc,16,calibration,0,,0.3110
+FLAN-T5,google/flan-t5-small,FP16,conceptual_combinations,16,calibration,0,,0.3301
+FLAN-T5,google/flan-t5-small,FP16,emoji_movie,16,calibration,0,,0.2500
+FLAN-T5,google/flan-t5-small,FP16,ruin_names,16,calibration,0,,0.1629
+FLAN-T5,google/flan-t5-small,FP16,strange_stories,16,calibration,0,,0.2810
+FLAN-T5,google/flan-t5-small,FP16,temporal_sequences,16,calibration,0,,0.0010
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956

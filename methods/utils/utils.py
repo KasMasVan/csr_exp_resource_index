@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 import numpy as np
 import torch
+import transformers
 from transformers import(
     AutoTokenizer, 
     AutoModelForCausalLM,
@@ -52,7 +53,7 @@ def parse_args():
     parser.add_argument(
         "--model_family",
         type=str,
-        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML"],
+        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML", "MPT"],
         default=None,
         required=True,
         help="The moddel family, as checkpoints under the same model family use same codes to download.",
@@ -228,7 +229,7 @@ def load_data(args):
     return ending_names, header_name, dataset
 
 def load_model(device, model_path, args):
-    if args.model_family in ["GPT2","Pythia", "OPT-IML"]:
+    if args.model_family in ["GPT2","Pythia", "OPT-IML", "MPT"]:
         tokenizer_func = AutoTokenizer
         model_func = AutoModelForCausalLM
     elif args.model_family in ["T5", "FLAN-T5"]:
@@ -237,6 +238,21 @@ def load_model(device, model_path, args):
     else:
         print(f"{args.model_family}: downloader not implemented.")
         return
+    # special treatment for MPT
+    if args.model_family == "MPT":
+        tokenizer = tokenizer_func.from_pretrained("EleutherAI/gpt-neox-20b")
+        tokenizer.pad_token = tokenizer.eos_token
+        config = transformers.AutoConfig.from_pretrained(model_path,trust_remote_code=True)
+        config.attn_config['attn_impl'] = 'triton'
+        model = transformers.AutoModelForCausalLM.from_pretrained(
+            model_path,
+            config=config,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True
+        )
+        print(f"Memory footprint: {model.get_memory_footprint() / 1024 **3:.2f} GB.")
+        model.to(device)
+        return model, tokenizer
     tokenizer = tokenizer_func.from_pretrained(model_path)
     if args.model_family in ["GPT2", "Pythia"]:
         tokenizer.pad_token = tokenizer.eos_token

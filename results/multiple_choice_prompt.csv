@@ -265,3 +265,12 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,100,0.3600
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,anli,16,multiple_choice_prompt,0,,0.3325
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,qasc,16,multiple_choice_prompt,0,,0.2311
+FLAN-T5,google/flan-t5-small,FP16,conceptual_combinations,16,multiple_choice_prompt,0,,0.1942
+FLAN-T5,google/flan-t5-small,FP16,emoji_movie,16,multiple_choice_prompt,0,,0.3300
+FLAN-T5,google/flan-t5-small,FP16,ruin_names,16,multiple_choice_prompt,0,,0.1339
+FLAN-T5,google/flan-t5-small,FP16,strange_stories,16,multiple_choice_prompt,0,,0.2645
+FLAN-T5,google/flan-t5-small,FP16,temporal_sequences,16,multiple_choice_prompt,0,,0.2330
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628

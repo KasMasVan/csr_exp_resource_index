@@ -1,6 +1,6 @@
 # you may specify model families and checkpoints here
-model_families=("GPT2")
-checkpoints=("gpt2")
+model_families=("MPT")
+checkpoints=("mosaicml/mpt-7b-instruct")
 
 for model_family in "${model_families[@]}"
 do
