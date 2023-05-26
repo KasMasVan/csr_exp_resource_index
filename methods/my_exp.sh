@@ -20,14 +20,14 @@ process_of_elimination_prompt="Select the most suitable option to answer the que
 for seed in "${seeds[@]}"; do
     for checkpoint in "${checkpoints[@]}"; do
     # language modeling and average language modeling
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        # --sample ${sample} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+    #     --sample ${sample} \
         # --push_data_to_hub \
         
 
@@ -40,39 +40,39 @@ for seed in "${seeds[@]}"; do
     #     --batch_size  ${batch_size} \
 
     # channel
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        --do_channel \
-        # --sample ${sample} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+        # --do_channel \
+    #     --sample ${sample} \
         # --push_data_to_hub \
 
     # multiple choice prompt, using the same script as language modeling
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        --multiple_choice_prompt "$multiple_choice_prompt" \
-        # --sample ${sample} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+    #     --multiple_choice_prompt "$multiple_choice_prompt" \
+    #     --sample ${sample} \
         # --push_data_to_hub \
     
     # calibration, i.e., PMI and PMI_DC.
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        --calibration_prompt "${calibration_prompt}" \
-        # --sample ${sample} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+    #     --calibration_prompt "${calibration_prompt}" \
+    #     --sample ${sample} \
         # --push_data_to_hub \
 
     # process of elimination
