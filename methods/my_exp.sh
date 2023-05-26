@@ -1,9 +1,9 @@
 #!/bin/bash
 # seeds=(0 1 2 3 4)
 seeds=(0)
-model_family="FLAN-T5" # "OPT-IML"
-checkpoints=("google/flan-t5-small") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
-loading_precision="FP16" # FP32 FP16 INT8
+model_family="FLAN-T5" # "OPT-IML" "Dolly"
+checkpoints=("google/flan-t5-small") # "databricks/dolly-v2-7b" "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
+loading_precision="FP16" # FP32 FP16 BF16(for 7b models) INT8
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
 datasets="cqa"

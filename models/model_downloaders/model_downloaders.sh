@@ -1,6 +1,6 @@
 # you may specify model families and checkpoints here
-model_families=("MPT")
-checkpoints=("mosaicml/mpt-7b-instruct")
+model_families=("Dolly")
+checkpoints=("databricks/dolly-v2-7b")
 
 for model_family in "${model_families[@]}"
 do

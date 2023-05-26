@@ -53,7 +53,7 @@ def parse_args():
     parser.add_argument(
         "--model_family",
         type=str,
-        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML", "MPT"],
+        choices=["GPT2", "T5", "FLAN-T5", "Pythia", "OPT-IML", "Dolly"],
         default=None,
         required=True,
         help="The moddel family, as checkpoints under the same model family use same codes to download.",
@@ -68,7 +68,7 @@ def parse_args():
     parser.add_argument(
         "--loading_precision",
         type=str,
-        choices=["FP32", "FP16", "INT8"],
+        choices=["FP32", "FP16", "BF16", "INT8"],
         default="FP32",
         help="The precision of the model to be loaded."
     )
@@ -229,7 +229,7 @@ def load_data(args):
     return ending_names, header_name, dataset
 
 def load_model(device, model_path, args):
-    if args.model_family in ["GPT2","Pythia", "OPT-IML", "MPT"]:
+    if args.model_family in ["GPT2","Pythia", "OPT-IML", "Dolly"]:
         tokenizer_func = AutoTokenizer
         model_func = AutoModelForCausalLM
     elif args.model_family in ["T5", "FLAN-T5"]:
@@ -238,28 +238,17 @@ def load_model(device, model_path, args):
     else:
         print(f"{args.model_family}: downloader not implemented.")
         return
-    # special treatment for MPT
-    if args.model_family == "MPT":
-        tokenizer = tokenizer_func.from_pretrained("EleutherAI/gpt-neox-20b")
-        tokenizer.pad_token = tokenizer.eos_token
-        config = transformers.AutoConfig.from_pretrained(model_path,trust_remote_code=True)
-        config.attn_config['attn_impl'] = 'triton'
-        model = transformers.AutoModelForCausalLM.from_pretrained(
-            model_path,
-            config=config,
-            torch_dtype=torch.bfloat16,
-            trust_remote_code=True
-        )
-        print(f"Memory footprint: {model.get_memory_footprint() / 1024 **3:.2f} GB.")
-        model.to(device)
-        return model, tokenizer
-    tokenizer = tokenizer_func.from_pretrained(model_path)
-    if args.model_family in ["GPT2", "Pythia"]:
+    if args.model_family == "Dolly":
+        tokenizer = tokenizer_func.from_pretrained(model_path, padding_side="left")
+    else:
+        tokenizer = tokenizer_func.from_pretrained(model_path)
+    if args.model_family in ["GPT2", "Pythia", "Dolly"]:
         tokenizer.pad_token = tokenizer.eos_token
     # load with different precision
     if args.loading_precision == "FP16":
         model = model_func.from_pretrained(model_path, device_map="auto", torch_dtype=torch.float16)
-        # model.to(device)
+    elif args.loading_precision == "BF16":
+        model = model_func.from_pretrained(model_path, device_map="auto", torch_dtype=torch.bfloat16)
     elif args.loading_precision == "INT8":
         model = model_func.from_pretrained(model_path, device_map="auto", load_in_8bit=True)
     else: # FP32

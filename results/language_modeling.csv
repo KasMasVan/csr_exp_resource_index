@@ -561,3 +561,11 @@ FLAN-T5,google/flan-t5-small,FP16,temporal_sequences,16,language_modeling,0,,0.0
 FLAN-T5,google/flan-t5-small,FP16,temporal_sequences,16,average_language_modeling,0,,0.0000
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+Dolly,databricks/dolly-v2-7b,FP16,cqa,16,language_modeling,0,,0.5143
+Dolly,databricks/dolly-v2-7b,FP16,cqa,16,average_language_modeling,0,,0.5004
+Dolly,databricks/dolly-v2-7b,FP16,cqa,16,language_modeling,0,,0.5143
+Dolly,databricks/dolly-v2-7b,FP16,cqa,16,average_language_modeling,0,,0.5004
+Dolly,databricks/dolly-v2-7b,INT8,cqa,16,language_modeling,0,,0.5143
+Dolly,databricks/dolly-v2-7b,INT8,cqa,16,average_language_modeling,0,,0.5004
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
