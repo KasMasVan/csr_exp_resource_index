@@ -41,20 +41,19 @@ from utils.utils import(
 logger = logging.getLogger(__name__)
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
-    if args.multiple_choice_prompt is not None:
-        args.method = "multiple_choice_prompt"
-    elif args.calibration_prompt is not None:
-        args.method = "calibration"
-    elif args.do_channel == True:
-        args.method = "channel"
-    elif args.do_synonym == True:
-        args.method = "generate_synonyms"
-    else:
-        args.method = "language_modeling"
+    # if args.multiple_choice_prompt is not None:
+    #     args.method = "multiple_choice_prompt"
+    # elif args.calibration_prompt is not None:
+    #     args.method = "calibration"
+    # elif args.do_channel == True:
+    #     args.method = "channel"
+    # else:
+    #     args.method = "language_modeling"
+    args.method = "generate_synonyms"
 
     # print(args)
     logging.basicConfig(

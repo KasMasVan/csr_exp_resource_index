@@ -137,6 +137,23 @@ def parse_args():
         help="The mask strategy for process of elimination.",
     )
     parser.add_argument(
+        "--do_synonym",
+        action="store_true",
+        help="Whether to generate synonyms for options.",
+    )
+    parser.add_argument(
+        "--number_of_synonyms",
+        type=int,
+        default=5,
+        help="The number of synonyms to be used in the generative method.",
+    )
+    parser.add_argument(
+        "--generate_synonyms_prompt",
+        type=str,
+        default=None,
+        help="The prompt template for generating synonyms. 'option is replaced with actual options'",
+    )
+    parser.add_argument(
         "--push_data_to_hub",
         action="store_true",
         help="Whether to push the data to Hugging Face Hub. This is convienient for LLM experiments.",
@@ -266,6 +283,10 @@ def write_to_csv(save_path, args, total_accuracy):
             if not csv_exists:
                 csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "mask_strategy", "seed", "sample", "mask_accuracy", 'accuracy'])
             csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.seed, args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
+        elif args.method == "generate_synonyms":
+            if not csv_exists:
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "number_of_synonyms", "seed", "sample",'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.number_of_synonyms, args.seed, args.sample, f"{total_accuracy:.4f}"])
         else:
             if not csv_exists:
                 csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])

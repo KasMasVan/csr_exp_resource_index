@@ -143,6 +143,35 @@ def preprocess_function_causal_channel(examples, **kwargs):
     return_dict = {f"{k}": [v[i : i + num_choice] for i in range(0, len(v), num_choice)] for k, v in flatten_dict.items()}
     return return_dict
 
+def create_multiple_choice_prompt(example, **kwargs):
+    alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    multiple_choice_prompt = kwargs["multiple_choice_prompt"]
+    mask = example['mask']
+    mcp_example = {}
+    # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
+    premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
+    for idx, single_mask in enumerate(mask):
+        mcp_example[f'hypothesis{idx}'] = alphabets[idx]
+        if single_mask == 1:
+            premise += f"{alphabets[idx]}. {example[f'hypothesis{idx}']}\n"
+        else:
+            # consider other null strings.
+            premise += f"{alphabets[idx]}. [MASK]\n"
+    premise += "Answer:"
+    mcp_example['premise'] = premise
+    return mcp_example
+
+def create_synonym_dataset(examples, **kwargs):
+    # for hypothesis0, create synonyms00, synonyms01, etc.
+    args, synonyms_dict = kwargs['args'], kwargs["synonyms_dict"]
+    number_of_synonyms = args.number_of_synonyms
+    # get the hypothesis columns
+    hypothesis_columns = [col for col in examples.keys() if "hypothesis" in col]
+    for hypothesis_column in hypothesis_columns:
+        for i in range(number_of_synonyms):
+            examples[f"{hypothesis_column}_synonyms_{i}"] = [synonyms_dict[hypothesis][i] for hypothesis in examples[hypothesis_column]]
+    return examples
+
 def copa_loader(path, args):
     
     root = ET.parse(path).getroot()

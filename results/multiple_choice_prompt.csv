@@ -278,3 +278,4 @@ FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
 Dolly,databricks/dolly-v2-7b,INT8,anli,16,multiple_choice_prompt,1,100,0.3500
 Dolly,databricks/dolly-v2-7b,INT8,cqa,16,multiple_choice_prompt,1,100,0.2900
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,multiple_choice_prompt,0,,0.3628

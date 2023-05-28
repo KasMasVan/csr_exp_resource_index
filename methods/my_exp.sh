@@ -16,17 +16,19 @@ multiple_choice_prompt=""
 # multiple_choice_prompt="Select the most suitable option to answer the question."
 calibration_prompt=" the answer is:"
 process_of_elimination_prompt="Select the most suitable option to answer the question. Ignore [MASK] options.\n"
+number_of_synonyms=3
+generate_synonyms_prompt="Generate a synonym to '{option}':"
 
 for seed in "${seeds[@]}"; do
     for checkpoint in "${checkpoints[@]}"; do
     # language modeling and average language modeling
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
     #     --sample ${sample} \
         # --push_data_to_hub \
         
@@ -40,38 +42,38 @@ for seed in "${seeds[@]}"; do
     #     --batch_size  ${batch_size} \
 
     # channel
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-        # --do_channel \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --do_channel \
     #     --sample ${sample} \
         # --push_data_to_hub \
 
     # multiple choice prompt, using the same script as language modeling
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --multiple_choice_prompt "$multiple_choice_prompt" \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --multiple_choice_prompt "$multiple_choice_prompt" \
     #     --sample ${sample} \
         # --push_data_to_hub \
     
     # calibration, i.e., PMI and PMI_DC.
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --calibration_prompt "${calibration_prompt}" \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --calibration_prompt "${calibration_prompt}" \
     #     --sample ${sample} \
         # --push_data_to_hub \
 
@@ -89,5 +91,19 @@ for seed in "${seeds[@]}"; do
         --mask_strategy_for_process_of_elimination "below_average" \
         # --sample ${sample} 
         # --push_data_to_hub 
+
+    # generate synonyms
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --do_synonym \
+        --number_of_synonyms ${number_of_synonyms} \
+        --generate_synonyms_prompt "${generate_synonyms_prompt}" \
+        --sample ${sample} \
+        # --push_data_to_hub \
     done
 done

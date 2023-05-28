@@ -26,6 +26,7 @@ from utils.data import(
     preprocess_function_causal,
     preprocess_function_causal_channel,
     preprocess_function_seq2seq_channel,
+    create_multiple_choice_prompt,
 )
 from utils.methods import(
     compute_conditional_score_seq2seq,
@@ -45,23 +46,23 @@ from utils.utils import(
 
 logger = logging.getLogger(__name__)
 
-def create_multiple_choice_prompt(example, **kwargs):
-    alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    multiple_choice_prompt = kwargs["multiple_choice_prompt"]
-    mask = example['mask']
-    mcp_example = {}
-    # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
-    premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
-    for idx, single_mask in enumerate(mask):
-        mcp_example[f'hypothesis{idx}'] = alphabets[idx]
-        if single_mask == 1:
-            premise += f"{alphabets[idx]}. {example[f'hypothesis{idx}']}\n"
-        else:
-            # consider other null strings.
-            premise += f"{alphabets[idx]}. [MASK]\n"
-    premise += "Answer:"
-    mcp_example['premise'] = premise
-    return mcp_example
+# def create_multiple_choice_prompt(example, **kwargs):
+#     alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#     multiple_choice_prompt = kwargs["multiple_choice_prompt"]
+#     mask = example['mask']
+#     mcp_example = {}
+#     # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
+#     premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
+#     for idx, single_mask in enumerate(mask):
+#         mcp_example[f'hypothesis{idx}'] = alphabets[idx]
+#         if single_mask == 1:
+#             premise += f"{alphabets[idx]}. {example[f'hypothesis{idx}']}\n"
+#         else:
+#             # consider other null strings.
+#             premise += f"{alphabets[idx]}. [MASK]\n"
+#     premise += "Answer:"
+#     mcp_example['premise'] = premise
+#     return mcp_example
     
 
 def main():

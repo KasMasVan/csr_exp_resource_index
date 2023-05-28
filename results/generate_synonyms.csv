@@ -1,0 +1,6 @@
+model_family,checkpoint,loading_precision,dataset,batch_size,method,number_of_synonyms,seed,sample,accuracy
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,generate_synonyms,3,0,3,0.6667
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,generate_synonyms,3,0,3,0.6667
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,generate_synonyms,3,0,100,0.3600
+FLAN-T5,google/flan-t5-xl,FP16,cqa,16,generate_synonyms,3,0,100,0.6300
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,generate_synonyms,3,0,100,0.3600

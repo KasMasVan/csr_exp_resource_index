@@ -2,6 +2,7 @@ from tqdm import tqdm
 
 import torch
 import torch.nn.functional as F
+from transformers import GenerationConfig
 
 def inference_language_modeling_old(model, eval_dataloader, device):
     model.eval()
@@ -104,6 +105,47 @@ def inference_language_modeling(model, eval_dataloader, device, compute_func, pa
         pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
     avg_log_probs = torch.cat(avg_log_probs, dim=0)
     return avg_log_probs, lm_accuracy, avg_lm_accuracy
+
+def inference_generate_synonyms(model, eval_dataloader, device, compute_func, pad_token_id, num_of_options, num_of_synonyms):
+    model.eval()
+    lm_predictions = torch.zeros(0)
+    avg_lm_predictions = torch.zeros(0)
+    labels = torch.zeros(0)
+    torch.cuda.empty_cache()
+    avg_log_probs = []
+
+    pbar = tqdm(eval_dataloader, desc="Inference")
+    for batch in pbar:
+        log_prob = compute_func(batch, model, device, pad_token_id)
+        avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
+        avg_log_probs.append(avg_log_prob)
+
+        # need to aggregate according to original options.
+        # each row in log_prob correspond to: h0, h1, ..., hn, h0s0, h0s1, ..., h1s0, ..., 
+        
+        # indexing log_prob to rearrange rows by keeping options with corresponding synonyms together.  
+        log_prob = aggregate_optionw_with_synonyms(log_prob, num_of_options, num_of_synonyms)
+        avg_log_prob = aggregate_optionw_with_synonyms(avg_log_prob, num_of_options, num_of_synonyms)
+        # then reshape, and then aggregate options and synonyms by averaging.
+        log_prob = log_prob.view(-1, num_of_options, num_of_synonyms + 1).mean(dim=-1)
+        avg_log_prob = avg_log_prob.view(-1, num_of_options, num_of_synonyms + 1).mean(dim=-1)
+
+        batch_predictions = log_prob.argmin(dim=-1)
+        batch_avg_predictions = avg_log_prob.argmin(dim=-1)
+
+        batch_labels = batch["label"]
+        lm_predictions = torch.cat((lm_predictions, batch_predictions))
+        avg_lm_predictions = torch.cat((avg_lm_predictions, batch_avg_predictions))
+        labels = torch.cat((labels, batch_labels))
+    
+        # make accuracy accumulative
+        lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
+        avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
+        pbar.set_description(f"Language modeling accuracy: {lm_accuracy:.4f}, Average language modeling accuracy: {avg_lm_accuracy:.4f}")
+    avg_log_probs = torch.cat(avg_log_probs, dim=0)
+    return avg_log_probs, lm_accuracy, avg_lm_accuracy
+
+
 
 def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, device, compute_func, pad_token_id):
     model.eval()
@@ -232,3 +274,50 @@ def compute_conditional_score_causal(batch, model, device, pad_token_id):
     # each score is the negative log-likelihood of a ending given a header.
     log_prob = ce_loss.view(batch["input_ids"].shape[0], batch["input_ids"].shape[1], -1).sum(dim=-1)
     return log_prob
+
+def generate_synonyms(args, model, tokenizer, tokenized_dataset):
+    
+    generation_config = GenerationConfig(
+    max_new_tokens=50,
+    do_sample=True,
+    temperature=0.7,
+    num_return_sequences=args.number_of_synonyms,
+    )
+
+    # get all columns of tokenized_dataset that starts with "hypothesis"
+    hypothesis_columns = [col for col in tokenized_dataset.column_names if col.startswith("hypothesis")]
+    # batch inference? May check SEQA code or HF doc.
+    synonyms_dict = {}
+    for col in tqdm(hypothesis_columns, desc="Generate synonyms"):
+        for option in tqdm(tokenized_dataset[col], desc=f"Generate synonyms for {col}"):
+            # prompt = f"Generate a synonym to '{option}':"
+            prompt = args.generate_synonyms_prompt.replace("'{option}'", option)
+            inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+            outputs = model.generate(**inputs, generation_config=generation_config)
+            synonyms = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+            # store the synonyms, so map() is easy.
+            # directly mapping here? All I need to do is to create duplicates of the instance with synonyms.
+            synonyms_dict[option] = synonyms
+
+    return synonyms_dict
+
+def aggregate_optionw_with_synonyms(tensor, num_of_options, num_of_synonyms):
+    # this function changes the column order.
+    # tensor: (batch_size, num_of_options * (num_of_synonyms + 1))
+    old_index = list(range(tensor.shape[1]))
+    aggregated_index = [-1] * len(old_index)
+    # exapmle: commonsenseqa 5 options with 3 synonyms: 0, 4, 8, 12, 16
+    options_index_old = list(range(num_of_options)) # e.g., 0..4
+    options_index_new = [i * (num_of_synonyms + 1) for i in options_index_old] # e.g., 0, 4, 8, 12, 16
+    remain_index = [i for i in old_index if i not in options_index_old] # e.g., 5..19 
+    for i, _ in enumerate(aggregated_index):
+        if i in options_index_new: # 0, 4, 8, 12, 16
+            aggregated_index[i] = options_index_old.pop(0)
+        else:
+            aggregated_index[i] = remain_index.pop(0)
+
+
+    # aggregated_index = options_index + [i for i in old_index if i not in options_index]
+    tensor[:, old_index] = tensor[:, aggregated_index]
+    return tensor
+
