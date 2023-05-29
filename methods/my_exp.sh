@@ -6,7 +6,7 @@ checkpoints=("google/flan-t5-small") # "databricks/dolly-v2-7b" "facebook/opt-im
 loading_precision="FP16" # FP32 FP16 BF16(for 7b models) INT8
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-datasets="cqa"
+datasets=(cqa)
 # datasets="anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences" 
 # datasets="cqa copa obqa piqa qasc siqa winogrande"
 batch_size=16
@@ -29,7 +29,7 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
-    #     --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
         
 
@@ -50,7 +50,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --do_channel \
-    #     --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
 
     # multiple choice prompt, using the same script as language modeling
@@ -93,17 +93,17 @@ for seed in "${seeds[@]}"; do
         # --push_data_to_hub 
 
     # generate synonyms
-    python language_modeling.py \
-        --seed ${seed} \
-        --model_family ${model_family} \
-        --checkpoint ${checkpoint} \
-        --datasets "$datasets" \
-        --batch_size  ${batch_size} \
-        --loading_precision ${loading_precision} \
-        --do_synonym \
-        --number_of_synonyms ${number_of_synonyms} \
-        --generate_synonyms_prompt "${generate_synonyms_prompt}" \
-        --sample ${sample} \
+    # python language_modeling.py \
+    #     --seed ${seed} \
+    #     --model_family ${model_family} \
+    #     --checkpoint ${checkpoint} \
+    #     --datasets "$datasets" \
+    #     --batch_size  ${batch_size} \
+    #     --loading_precision ${loading_precision} \
+    #     --do_synonym \
+    #     --number_of_synonyms ${number_of_synonyms} \
+    #     --generate_synonyms_prompt "${generate_synonyms_prompt}" \
+    #     --sample ${sample} \
         # --push_data_to_hub \
     done
 done

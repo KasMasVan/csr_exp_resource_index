@@ -163,10 +163,12 @@ def parse_args():
     return args
 
 def load_data(args):
+    # load test data for final performance.
+    # load dev data to tune hyperparameters.
     if args.dataset == "copa":
         ending_names = ['hypothesis0', 'hypothesis1']
         header_name = "premise"
-        file_path = os.path.join("../data", args.dataset, "copa-dev.xml")
+        file_path = os.path.join("../data", args.dataset, "copa-test.xml")
         loader = copa_loader
     elif args.dataset == "cqa":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
@@ -176,7 +178,7 @@ def load_data(args):
     elif args.dataset == "obqa":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
         header_name = "premise"
-        file_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        file_path = os.path.join("../data", args.dataset, "test.jsonl")
         loader = obqa_loader
     elif args.dataset == "piqa":
         ending_names = ['hypothesis0', 'hypothesis1']

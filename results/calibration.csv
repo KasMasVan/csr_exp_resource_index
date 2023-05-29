@@ -336,3 +336,4 @@ Dolly,databricks/dolly-v2-7b,INT8,emoji_movie,16,calibration,3,100,0.1900
 Dolly,databricks/dolly-v2-7b,INT8,ruin_names,16,calibration,3,100,0.0900
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
