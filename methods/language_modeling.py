@@ -93,7 +93,7 @@ def main():
     for dataset in args.datasets:
         args.dataset = dataset
         ending_names, header_name, raw_dataset = load_data(args)
-        if args.sample is not None:
+        if args.sample is not None and args.sample <= len(raw_dataset):
             # sample "sample" amount of data from raw_data
             raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
 

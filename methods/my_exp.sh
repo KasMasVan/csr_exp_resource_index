@@ -6,9 +6,9 @@ checkpoints=("google/flan-t5-small") # "databricks/dolly-v2-7b" "facebook/opt-im
 loading_precision="FP16" # FP32 FP16 BF16(for 7b models) INT8
 # amateur_checkpoint="google/flan-t5-small"
 # expert_checkpoint="google/flan-t5-base"
-datasets=(cqa)
-# datasets="anli cqa qasc conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences" 
-# datasets="cqa copa obqa piqa qasc siqa winogrande"
+# datasets="anli cqa siqa logical_deduction_five_objects disambiguation_qa conceptual_combinations strange_stories symbol_interpretation"
+# datasets="conceptual_combinations emoji_movie ruin_names strange_stories temporal_sequences" 
+datasets="cqa"
 batch_size=16
 sample=100
 
@@ -62,7 +62,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --multiple_choice_prompt "$multiple_choice_prompt" \
-    #     --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
     
     # calibration, i.e., PMI and PMI_DC.
@@ -74,7 +74,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --calibration_prompt "${calibration_prompt}" \
-    #     --sample ${sample} \
+        # --sample ${sample} \
         # --push_data_to_hub \
 
     # process of elimination

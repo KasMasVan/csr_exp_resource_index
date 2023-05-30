@@ -475,11 +475,13 @@ def emoji_movie_loader(path, args):
 
     with open(path) as json_file:
         data = json.load(json_file)
+        task_prefix = data.get("task_prefix", "")
         for instance in data['examples']:
             options_text = list(instance['target_scores'].keys())
             options_sym = [chr(ord('A') + i) for i in range(len(options_text))]
             label = options_text.index(instance['target'])
             premise = instance['input']
+            premise = task_prefix + premise
 
             if getattr(args, 'multiple_choice_prompt', None) is not None:
                 # Question: What movie does this emoji describe? 👧🐟🐠🐡
@@ -516,6 +518,7 @@ def ruin_names_loader(path, args):
 
     with open(path) as json_file:
         data = json.load(json_file)
+        task_prefix = data.get("task_prefix", "")
         for instance in data['examples']:
             options_text = list(instance['target_scores'].keys())
             num_options = len(options_text)
@@ -525,6 +528,57 @@ def ruin_names_loader(path, args):
                     raw_label = target # e.g., stare wars
             label = options_text.index(raw_label)             
             premise = instance['input']
+            premise = task_prefix + premise
+
+            if getattr(args, 'multiple_choice_prompt', None) is not None:
+                # Question: "Which of the following is a humorous edit of this artist or movie name: 'star wars'?"
+                # A. stare wars
+                # B. stariwars
+                # C. ...
+                # D. ...
+                # Answer:
+                hypotheses = options_sym
+                # premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
+                premise = f"{args.multiple_choice_prompt} Question: {premise}\n"
+                for idx in range(num_options):
+                    premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
+                premise += "Answer:"                
+            else:
+                hypotheses = options_text
+                premise = premise + uncond_premise
+            example = [{
+                'label': label,
+                'premise': premise,
+                'uncond_premise': uncond_premise,
+            }]
+            for idx in range(num_options):
+                example[0][f'hypothesis{idx}'] = hypotheses[idx]
+
+            examples += example
+    return examples
+
+def date_understanding_loader(path, args):
+    if args.calibration_prompt is not None:
+        uncond_premise = args.calibration_prompt
+    else:
+        uncond_premise = " the answer is:"
+    examples = []
+
+    with open(path) as json_file:
+        data = json.load(json_file)
+        task_prefix = data.get("task_prefix", "")
+        for instance in data['examples']:
+            options_text = list(instance['target_scores'].keys())
+            num_options = len(options_text)
+            if num_options != args.num_options:
+                continue
+            options_sym = [chr(ord('A') + i) for i in range(num_options)]
+            for target, score in instance['target_scores'].items():
+                if score == 1:
+                    raw_label = target # e.g., stare wars
+            label = options_text.index(raw_label)             
+            premise = instance['input']
+            premise = task_prefix + premise
 
             if getattr(args, 'multiple_choice_prompt', None) is not None:
                 # Question: "Which of the following is a humorous edit of this artist or movie name: 'star wars'?"
@@ -563,6 +617,7 @@ def conceptual_combinations_loader(path, args):
     for one_path in path:
         with open(one_path) as json_file:
             data = json.load(json_file)
+            task_prefix = data.get("task_prefix", "")
             for instance in data['examples']:
                 options_text = list(instance['target_scores'].keys())
                 num_options = len(options_text)
@@ -572,6 +627,7 @@ def conceptual_combinations_loader(path, args):
                         raw_label = target # e.g., stare wars
                 label = options_text.index(raw_label)             
                 premise = instance['input']
+                premise = task_prefix + premise
 
                 if getattr(args, 'multiple_choice_prompt', None) is not None:
                     # Question: "Which of the following is a humorous edit of this artist or movie name: 'star wars'?"

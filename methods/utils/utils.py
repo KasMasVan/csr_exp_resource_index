@@ -30,6 +30,7 @@ from .data import(
     conceptual_combinations_loader,
     emoji_movie_loader,
     ruin_names_loader,
+    date_understanding_loader,
 
     anli_loader
 )
@@ -207,6 +208,11 @@ def load_data(args):
         file_path = [data_path, label_path]
         loader = winogrande_loader
     # BIG-Bench tasks
+    elif args.dataset == "disambiguation_qa":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2']
+        header_name = "premise"
+        file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
+        loader = ruin_names_loader
     elif args.dataset == "conceptual_combinations":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
         header_name = "premise"
@@ -215,13 +221,25 @@ def load_data(args):
         for suffix in file_suffixes:
             file_path.append(os.path.join("../data", "big_bench", f"{args.dataset}_{suffix}.json"))
         loader = conceptual_combinations_loader
+    elif args.dataset == "date_understanding":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4', 'hypothesis5']
+        header_name = "premise"
+        file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
+        loader = date_understanding_loader
+        args.num_options = 6
     elif args.dataset == "emoji_movie":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
         header_name = "premise"
         file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
         loader = emoji_movie_loader
-    elif args.dataset in ["ruin_names", "temporal_sequences"]:
+    elif args.dataset in ["ruin_names", "temporal_sequences", "code_line_description"]:
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
+        header_name = "premise"
+        file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
+        loader = ruin_names_loader
+    elif args.dataset == "penguins_in_a_table":
+         # use the five object subtask
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
         header_name = "premise"
         file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
         loader = ruin_names_loader
@@ -230,6 +248,33 @@ def load_data(args):
         header_name = "premise"
         file_path = os.path.join("../data", "big_bench", f"{args.dataset}_multiple_choice.json")
         loader = ruin_names_loader
+    elif args.dataset == "symbol_interpretation":
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4'] 
+        header_name = "premise"
+        file_path = []
+        file_suffixes = ["adversarial", "emoji_agnostic", "name_agnostic", "plain", "tricky"]
+        for suffix in file_suffixes:
+            file_path.append(os.path.join("../data", "big_bench", f"{args.dataset}_{suffix}.json"))
+        loader = conceptual_combinations_loader
+    elif args.dataset == "tracking_shuffled_objects":
+        # use the five object subtask
+        ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
+        header_name = "premise"
+        file_suffix= "five_objects"
+        file_path = os.path.join("../data", "big_bench", f"{args.dataset}_{file_suffix}.json")
+        loader = ruin_names_loader
+    elif args.dataset in ["logical_deduction_three_objects", "logical_deduction_five_objects", "logical_deduction_seven_objects"]:
+        if "three" in args.dataset:
+            args.num_options = 3
+        elif "five" in args.dataset:
+            args.num_options = 5
+        else:
+            args.num_options = 7
+        ending_names = [f"hypothesis{i}" for i in range(args.num_options)]
+        header_name = "premise"
+        file_path = os.path.join("../data", "big_bench", f"{args.dataset}.json")
+        loader = date_understanding_loader
+    # other datasets
     elif args.dataset == "anli":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2']
         header_name = "premise"

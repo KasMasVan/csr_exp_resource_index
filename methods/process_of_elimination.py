@@ -46,25 +46,6 @@ from utils.utils import(
 
 logger = logging.getLogger(__name__)
 
-# def create_multiple_choice_prompt(example, **kwargs):
-#     alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#     multiple_choice_prompt = kwargs["multiple_choice_prompt"]
-#     mask = example['mask']
-#     mcp_example = {}
-#     # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
-#     premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
-#     for idx, single_mask in enumerate(mask):
-#         mcp_example[f'hypothesis{idx}'] = alphabets[idx]
-#         if single_mask == 1:
-#             premise += f"{alphabets[idx]}. {example[f'hypothesis{idx}']}\n"
-#         else:
-#             # consider other null strings.
-#             premise += f"{alphabets[idx]}. [MASK]\n"
-#     premise += "Answer:"
-#     mcp_example['premise'] = premise
-#     return mcp_example
-    
-
 def main():
     # import pdb; pdb.set_trace()
 
@@ -119,7 +100,7 @@ def main():
         # multiple_choice_prompt = args.multiple_choice_prompt
         args.multiple_choice_prompt = None
         ending_names, header_name, raw_dataset = load_data(args)
-        if args.sample is not None:
+        if args.sample is not None and args.sample <= len(raw_dataset):
             # sample "sample" amount of data from raw_data
             raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
 
@@ -151,7 +132,7 @@ def main():
             mcp_args = copy.deepcopy(args)
             mcp_args.multiple_choice_prompt = multiple_choice_prompt
             _, _, raw_mcp_dataset = load_data(mcp_args)
-            if args.sample is not None:
+            if args.sample is not None and args.sample <= len(raw_dataset):
                 # sample "sample" amount of data from raw_data
                 raw_mcp_dataset = raw_mcp_dataset.shuffle(seed=args.seed).select(range(args.sample))
             tokenized_mcp_dataset = raw_mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
