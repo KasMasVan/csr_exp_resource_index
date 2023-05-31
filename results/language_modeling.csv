@@ -841,3 +841,5 @@ FLAN-T5,google/flan-t5-xl,FP16,temporal_sequences,16,language_modeling,0,100,0.2
 FLAN-T5,google/flan-t5-xl,FP16,temporal_sequences,16,average_language_modeling,0,100,0.2200
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,language_modeling,0,,0.2916
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,average_language_modeling,0,,0.3145
+FLAN-T5,google/flan-t5-xl,FP16,disambiguation_qa,16,language_modeling,0,100,0.4900
+FLAN-T5,google/flan-t5-xl,FP16,disambiguation_qa,16,average_language_modeling,0,100,0.5300
