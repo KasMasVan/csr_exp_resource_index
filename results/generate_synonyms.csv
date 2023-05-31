@@ -46,3 +46,10 @@ FLAN-T5,google/flan-t5-xl,FP16,siqa,16,generate_synonyms,5,4,100,0.5200
 FLAN-T5,google/flan-t5-xl,FP16,winogrande,16,generate_synonyms,5,4,100,0.5500
 FLAN-T5,google/flan-t5-xl,FP16,obqa,16,generate_synonyms,5,4,100,0.3900
 FLAN-T5,google/flan-t5-xl,FP16,qasc,16,generate_synonyms,5,4,100,0.4500
+FLAN-T5,google/flan-t5-xl,FP16,disambiguation_qa,16,generate_synonyms,5,0,100,0.3300
+FLAN-T5,google/flan-t5-xl,FP16,conceptual_combinations,16,generate_synonyms,5,0,100,0.3700
+FLAN-T5,google/flan-t5-xl,FP16,disambiguation_qa,16,generate_synonyms,5,1,100,0.3500
+FLAN-T5,google/flan-t5-xl,FP16,conceptual_combinations,16,generate_synonyms,5,1,100,0.4400
+FLAN-T5,google/flan-t5-xl,FP16,disambiguation_qa,16,generate_synonyms,5,2,100,0.4300
+FLAN-T5,google/flan-t5-xl,FP16,conceptual_combinations,16,generate_synonyms,5,2,100,0.4500
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,generate_synonyms,3,0,100,0.3600

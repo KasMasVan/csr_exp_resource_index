@@ -407,3 +407,4 @@ FLAN-T5,google/flan-t5-xl,FP16,logical_deduction_seven_objects,16,calibration,3,
 FLAN-T5,google/flan-t5-xl,FP16,logical_deduction_three_objects,16,calibration,4,100,0.4100
 FLAN-T5,google/flan-t5-xl,FP16,logical_deduction_seven_objects,16,calibration,4,100,0.3800
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,calibration,0,,0.3956

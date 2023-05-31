@@ -195,3 +195,6 @@ FLAN-T5,google/flan-t5-xl,FP16,strange_stories,16,process_of_elimination,multipl
 FLAN-T5,google/flan-t5-xl,FP16,temporal_sequences,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,100,0.3000,0.1800
 FLAN-T5,google/flan-t5-small,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,,0.6708,0.3612
 FLAN-T5,google/flan-t5-xl,FP16,disambiguation_qa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,100,0.6700,0.6700
+FLAN-T5,google/flan-t5-xl,FP16,conceptual_combinations,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,100,0.8400,0.7500
+FLAN-T5,google/flan-t5-xl,FP16,conceptual_combinations,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,100,0.8400,0.7500
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,,0.6708,0.3612

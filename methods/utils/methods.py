@@ -198,16 +198,18 @@ def inference_process_of_elimination(model, eval_dataloader, device, compute_fun
     avg_lm_predictions = torch.zeros(0)
     labels = torch.zeros(0)
     torch.cuda.empty_cache()
+    avg_log_probs = []
 
     pbar = tqdm(eval_dataloader, desc="Inference")
     for batch in pbar:
         log_prob = compute_func(batch, model, device, pad_token_id)
         # apply hard masking
         log_prob[batch["mask"] == 0] = float("inf")
+        avg_log_prob = log_prob / batch["ending_attention_mask"].sum(dim=-1)
+        avg_log_probs.append(avg_log_prob)
         
-        ending_length = batch["ending_attention_mask"].sum(dim=-1)
         batch_predictions = log_prob.argmin(dim=-1)
-        batch_avg_predictions = (log_prob / ending_length).argmin(dim=-1)
+        batch_avg_predictions = avg_log_prob.argmin(dim=-1)
 
         batch_labels = batch["label"]
         lm_predictions = torch.cat((lm_predictions, batch_predictions))
@@ -218,7 +220,8 @@ def inference_process_of_elimination(model, eval_dataloader, device, compute_fun
         lm_accuracy = (lm_predictions == labels).sum().item() / len(labels)
         avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
         pbar.set_description(f"Process of elimination accuracy: {lm_accuracy:.4f}, Average process of elimination accuracy: {avg_lm_accuracy:.4f}")
-    return lm_accuracy, avg_lm_accuracy
+    avg_log_probs = torch.cat(avg_log_probs, dim=0)
+    return avg_log_probs, lm_accuracy, avg_lm_accuracy
 
 def compute_conditional_score_seq2seq(batch, model, device, pad_token_id):
     # returns log_prob of p(y|x) for each batch
