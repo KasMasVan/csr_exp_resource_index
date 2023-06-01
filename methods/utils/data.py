@@ -571,8 +571,8 @@ def date_understanding_loader(path, args):
             for instance in data['examples']:
                 options_text = list(instance['target_scores'].keys())
                 num_options = len(options_text)
-                # if args.num_options is not None and num_options != args.num_options:
-                #     continue
+                if args.num_options is not None and num_options != args.num_options:
+                    continue
                 options_sym = [chr(ord('A') + i) for i in range(num_options)]
                 for target, score in instance['target_scores'].items():
                     if score == 1:

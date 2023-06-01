@@ -47,6 +47,8 @@ def main():
     args = parse_args()
     if args.multiple_choice_prompt is not None:
         args.method = "multiple_choice_prompt"
+    elif args.amateur_checkpoint is not None:
+        args.method = "contrastive_decoding"
     elif args.calibration_prompt is not None:
         args.method = "calibration"
     elif args.do_channel == True:
@@ -109,6 +111,23 @@ def main():
         logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
         if args.method in ["language_modeling", "multiple_choice_prompt"]:
             _, lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+        elif args.method == "contrastive_decoding":
+            logger.info(f"Load {args.model_family} amateur model: {args.amateur_checkpoint}.")
+            # get model path: ../models/args.model_family/args.checkpoint
+            amateur_model_path = os.path.join("../models", args.model_family, args.amateur_checkpoint)
+            amateur_model, _ = load_model(device, amateur_model_path, args)
+            # we want to integrate contrastive decoding with other methods, so we need separate output from each model.
+            # compute log probs on each model        
+            exp_avg_log_probs, exp_lm_accuracy, exp_avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+            ama_avg_log_probs, ama_lm_accuracy, ama_avg_lm_accuracy = inference_language_modeling(amateur_model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+            # calculate difference, and may introduce extra parameters.
+            avg_log_probs = exp_avg_log_probs - ama_avg_log_probs
+            labels = raw_dataset['label']
+            # currently, I use average language modeling accuracy. I will add language modeling and other methods shortly.
+            lm_accuracy = (avg_log_probs.argmin(dim=-1) == labels).sum().item() / len(labels)
+            logger.info(f"Contrastive decoding accuracy: {lm_accuracy:.4f}.")
+            args.amateur_accuracy = ama_avg_lm_accuracy
+            args.expert_accuracy = exp_avg_lm_accuracy
         elif args.method == "calibration":
             fn_kwargs = {"ending_names": ending_names, 
                         "header_name": "uncond_premise", # the difference is here
