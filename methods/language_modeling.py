@@ -21,6 +21,8 @@ from utils.data import(
     preprocess_function_causal_channel,
     preprocess_function_seq2seq_channel,
     create_synonym_dataset,
+    generate_n_shot_demonstrations,
+    create_n_shot_splits,
 )
 from utils.methods import(
     compute_conditional_score_seq2seq,
@@ -94,10 +96,8 @@ def main():
     # evaluate on each dataset
     for dataset in args.datasets:
         args.dataset = dataset
-        ending_names, header_name, raw_dataset = load_data(args)
-        if args.sample is not None and args.sample <= len(raw_dataset):
-            # sample "sample" amount of data from raw_data
-            raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
+        ending_names, header_name, raw_dataset, n_shot_dataset = load_data(args)
+        raw_dataset, n_shot_dataset = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
 
         logger.info(f"Preprocess data: {args.dataset}.")
         fn_kwargs = {"ending_names": ending_names, 

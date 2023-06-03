@@ -1,6 +1,7 @@
 import json
 import os
 import xml.etree.ElementTree as ET
+import random
 
 import torch
 from huggingface_hub import upload_folder
@@ -146,18 +147,40 @@ def preprocess_function_causal_channel(examples, **kwargs):
 def create_multiple_choice_prompt(example, **kwargs):
     alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     multiple_choice_prompt = kwargs["multiple_choice_prompt"]
+    scoring_method = kwargs["scoring_method"]
+    num_of_options = kwargs["num_of_options"]
     mask = example['mask']
+    null_string = f"[MASK]"
     mcp_example = {}
     # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
-    premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
-    for idx, single_mask in enumerate(mask):
-        mcp_example[f'hypothesis{idx}'] = alphabets[idx]
-        if single_mask == 1:
-            premise += f"{alphabets[idx]}. {example[f'hypothesis{idx}']}\n"
-        else:
-            # consider other null strings.
-            premise += f"{alphabets[idx]}. [MASK]\n"
-    premise += "Answer:"
+    # premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
+    
+    if scoring_method != "multiple_choice_prompt":
+        premise = f"{multiple_choice_prompt}\n Question: {example['premise']}\n"
+        premise = premise.replace(f"{example['uncond_premise']}", "")
+        for idx, single_mask in enumerate(mask):
+            mcp_example[f'hypothesis{idx}'] = alphabets[idx]
+            if single_mask == 1:
+                premise += f"{alphabets[idx]}. {example[f'hypothesis{idx}']}\n"
+            else:
+                # consider other null strings.
+                premise += f"{alphabets[idx]}. {null_string}\n"
+        premise += "Answer:"
+    else: # for multiple choice prompt, options are already presented in the premise.
+        premise = f"{multiple_choice_prompt}\n{example['premise']}"
+        premise = premise.replace(f"{example['uncond_premise']}", "")
+        for idx, single_mask in enumerate(mask):
+            option_start_index = premise.rfind(f"{alphabets[idx]}. ")
+            if idx == num_of_options - 1:
+                option_end_index = premise.rfind(f"Answer:")
+            else:
+                option_end_index = premise.rfind(f"{alphabets[idx + 1]}. ")
+            option = premise[option_start_index:option_end_index]
+            if single_mask == 1:
+                pass
+            else:
+                # consider other null strings.
+                premise = premise.replace(option, f"{alphabets[idx]}. {null_string}\n")
     mcp_example['premise'] = premise
     return mcp_example
 
@@ -466,97 +489,6 @@ def winogrande_loader(path, args):
             }]
     return examples_winogrande
 
-# def emoji_movie_loader(path, args):
-#     if args.calibration_prompt is not None:
-#         uncond_premise = args.calibration_prompt
-#     else:
-#         uncond_premise = " the answer is:"
-#     examples = []
-
-#     with open(path) as json_file:
-#         data = json.load(json_file)
-#         task_prefix = data.get("task_prefix", "")
-#         for instance in data['examples']:
-#             options_text = list(instance['target_scores'].keys())
-#             options_sym = [chr(ord('A') + i) for i in range(len(options_text))]
-#             label = options_text.index(instance['target'])
-#             premise = instance['input']
-#             premise = task_prefix + premise
-
-#             if getattr(args, 'multiple_choice_prompt', None) is not None:
-#                 # Question: What movie does this emoji describe? 👧🐟🐠🐡
-#                 # A. finding nemo
-#                 # B. the wolf of wall street
-#                 # C. ...
-#                 # D. ...
-#                 # E. ...
-#                 # Answer:
-#                 hypotheses = options_sym
-#                 premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
-#             else:
-#                 hypotheses = options_text
-#                 premise = premise + uncond_premise
-
-#             examples += [{
-#                 'label': label,
-#                 'premise': premise,
-#                 'uncond_premise': uncond_premise,
-#                 'hypothesis0': hypotheses[0],
-#                 'hypothesis1': hypotheses[1],
-#                 'hypothesis2': hypotheses[2],
-#                 'hypothesis3': hypotheses[3],
-#                 'hypothesis4': hypotheses[4],
-#             }]
-#     return examples
-
-# def ruin_names_loader(path, args):
-#     if args.calibration_prompt is not None:
-#         uncond_premise = args.calibration_prompt
-#     else:
-#         uncond_premise = " the answer is:"
-#     examples = []
-
-#     with open(path) as json_file:
-#         data = json.load(json_file)
-#         task_prefix = data.get("task_prefix", "")
-#         for instance in data['examples']:
-#             options_text = list(instance['target_scores'].keys())
-#             num_options = len(options_text)
-#             options_sym = [chr(ord('A') + i) for i in range(num_options)]
-#             for target, score in instance['target_scores'].items():
-#                 if score == 1:
-#                     raw_label = target # e.g., stare wars
-#             label = options_text.index(raw_label)             
-#             premise = instance['input']
-#             premise = task_prefix + premise
-
-#             if getattr(args, 'multiple_choice_prompt', None) is not None:
-#                 # Question: "Which of the following is a humorous edit of this artist or movie name: 'star wars'?"
-#                 # A. stare wars
-#                 # B. stariwars
-#                 # C. ...
-#                 # D. ...
-#                 # Answer:
-#                 hypotheses = options_sym
-#                 # premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
-#                 premise = f"{args.multiple_choice_prompt} Question: {premise}\n"
-#                 for idx in range(num_options):
-#                     premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
-#                 premise += "Answer:"                
-#             else:
-#                 hypotheses = options_text
-#                 premise = premise + uncond_premise
-#             example = [{
-#                 'label': label,
-#                 'premise': premise,
-#                 'uncond_premise': uncond_premise,
-#             }]
-#             for idx in range(num_options):
-#                 example[0][f'hypothesis{idx}'] = hypotheses[idx]
-
-#             examples += example
-#     return examples
-
 def date_understanding_loader(path, args):
     if args.calibration_prompt is not None:
         uncond_premise = args.calibration_prompt
@@ -608,55 +540,6 @@ def date_understanding_loader(path, args):
                 examples += example
     return examples
 
-# def conceptual_combinations_loader(path, args):
-#     if args.calibration_prompt is not None:
-#         uncond_premise = args.calibration_prompt
-#     else:
-#         uncond_premise = " the answer is:"
-#     examples = []
-
-#     for one_path in path:
-#         with open(one_path) as json_file:
-#             data = json.load(json_file)
-#             task_prefix = data.get("task_prefix", "")
-#             for instance in data['examples']:
-#                 options_text = list(instance['target_scores'].keys())
-#                 num_options = len(options_text)
-#                 options_sym = [chr(ord('A') + i) for i in range(num_options)]
-#                 for target, score in instance['target_scores'].items():
-#                     if score == 1:
-#                         raw_label = target # e.g., stare wars
-#                 label = options_text.index(raw_label)             
-#                 premise = instance['input']
-#                 premise = task_prefix + premise
-
-#                 if getattr(args, 'multiple_choice_prompt', None) is not None:
-#                     # Question: "Which of the following is a humorous edit of this artist or movie name: 'star wars'?"
-#                     # A. stare wars
-#                     # B. stariwars
-#                     # C. ...
-#                     # D. ...
-#                     # Answer:
-#                     hypotheses = options_sym
-#                     # premise = f"{args.multiple_choice_prompt} Question: {premise}\nA. {options_text[0]}\nB. {options_text[1]}\nC. {options_text[2]}\nD. {options_text[3]}\nE. {options_text[4]}\nAnswer:"
-#                     premise = f"{args.multiple_choice_prompt} Question: {premise}\n"
-#                     for idx in range(num_options):
-#                         premise += f"{options_sym[idx]}. {options_text[idx]}\n" 
-#                     premise += "Answer:"                
-#                 else:
-#                     hypotheses = options_text
-#                     premise = premise + uncond_premise
-#                 example = [{
-#                     'label': label,
-#                     'premise': premise,
-#                     'uncond_premise': uncond_premise,
-#                 }]
-#                 for idx in range(num_options):
-#                     example[0][f'hypothesis{idx}'] = hypotheses[idx]
-
-#                 examples += example
-#     return examples
-
 def anli_loader(path, args):
     if args.calibration_prompt is not None:
         uncond_premise = args.calibration_prompt
@@ -699,3 +582,64 @@ def anli_loader(path, args):
                 examples += example
 
     return examples
+
+def generate_n_shot_demonstrations(n_shot_dataset):
+    n_shot_demonstrations = ""
+    for raw_instance in n_shot_dataset:
+        presmise = raw_instance['premise']
+        answer_index = raw_instance['label'].item()
+        answer = raw_instance[f"hypothesis{answer_index}"]
+        n_shot_instance = f"{presmise}{answer}\n\n"
+        n_shot_demonstrations += n_shot_instance
+    return n_shot_demonstrations
+
+def create_n_shot_splits(raw_dataset, n_shot_dataset, args):
+    if args.n_shot > 0:
+        # few-shot setting: sample from train split, dev split (COPA), or the only split (BB)
+        if n_shot_dataset is raw_dataset: # BB tasks: sampling from the only split, and use the rest
+            raw_dataset = raw_dataset.train_test_split(test_size=args.n_shot, seed=args.seed)
+            raw_dataset, n_shot_dataset = raw_dataset["train"], raw_dataset["test"]
+        else:
+            n_shot_dataset = n_shot_dataset.shuffle(seed=args.seed).select(range(args.n_shot))
+        n_shot_demonstrations = generate_n_shot_demonstrations(n_shot_dataset)
+
+    if args.sample is not None and args.sample <= len(raw_dataset):
+        # sample "sample" amount of data from raw_data
+        raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
+    
+    if args.n_shot > 0:
+        # append n_shot_demonstrations to each input.
+        raw_dataset = raw_dataset.map(lambda x: {"premise": n_shot_demonstrations + x["premise"]}) 
+    return raw_dataset, n_shot_dataset
+
+def generate_n_shot_poe_demonstrations(n_shot_dataset, num_of_options):
+    # designed for multiple_choice_prompt
+    alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:num_of_options]
+    last_option = alphabets[-1]
+    null_string = f"[MASK]"
+    n_shot_demonstrations = ""
+    n_shot_poe_demonstrations = ""
+    for raw_instance in n_shot_dataset:
+        premise = raw_instance['premise']
+        answer_index = raw_instance['label'].item()
+        answer = raw_instance[f"hypothesis{answer_index}"]
+        n_shot_instance = f"{premise}{answer}\n\n"
+        n_shot_demonstrations += n_shot_instance
+
+        # for mcp: randomly mask options to [MASK]
+        poe_premise = premise 
+        new_alphabets = alphabets.replace(alphabets[answer_index], "")
+        num_of_mask_options = random.randint(1, num_of_options-1)
+        mask_option_symbols = random.sample(new_alphabets, num_of_mask_options) # e.g., [B, C]
+        for symbol in mask_option_symbols:
+            option_start_index = poe_premise.rfind(f"{symbol}. ")
+            if symbol == last_option:
+                option_end_index = poe_premise.rfind(f"Answer:")
+            else:
+                option_end_index = poe_premise.rfind(f"{alphabets[alphabets.index(symbol) + 1]}. ") 
+            option = poe_premise[option_start_index:option_end_index]
+            poe_premise = poe_premise.replace(option, f"{symbol}. {null_string}\n")
+            
+        n_shot_poe_instance = f"{poe_premise}{answer}\n\n"        
+        n_shot_poe_demonstrations += n_shot_poe_instance
+    return n_shot_demonstrations, n_shot_poe_demonstrations

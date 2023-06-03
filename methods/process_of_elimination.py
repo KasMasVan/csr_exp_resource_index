@@ -27,6 +27,8 @@ from utils.data import(
     preprocess_function_causal_channel,
     preprocess_function_seq2seq_channel,
     create_multiple_choice_prompt,
+    generate_n_shot_poe_demonstrations,
+    create_n_shot_splits,
 )
 from utils.methods import(
     compute_conditional_score_seq2seq,
@@ -47,7 +49,7 @@ from utils.utils import(
 logger = logging.getLogger(__name__)
 
 def main():
-    # import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -99,15 +101,14 @@ def main():
         args.dataset = dataset
         # multiple_choice_prompt = args.multiple_choice_prompt
         args.multiple_choice_prompt = None
-        ending_names, header_name, raw_dataset = load_data(args)
-        if args.sample is not None and args.sample <= len(raw_dataset):
-            # sample "sample" amount of data from raw_data
-            raw_dataset = raw_dataset.shuffle(seed=args.seed).select(range(args.sample))
+        ending_names, header_name, raw_dataset, n_shot_dataset = load_data(args)
+        raw_dataset, n_shot_dataset = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
 
         logger.info(f"Preprocess data: {args.dataset}.")
         fn_kwargs = {"ending_names": ending_names, 
                     "header_name": header_name, 
                     "tokenizer": tokenizer,}
+        num_of_options = len(ending_names)
         tokenized_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
         eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
 
@@ -131,12 +132,10 @@ def main():
         elif scoring_method == "multiple_choice_prompt":
             mcp_args = copy.deepcopy(args)
             mcp_args.multiple_choice_prompt = multiple_choice_prompt
-            _, _, raw_mcp_dataset = load_data(mcp_args)
-            if args.sample is not None and args.sample <= len(raw_dataset):
-                # sample "sample" amount of data from raw_data
-                raw_mcp_dataset = raw_mcp_dataset.shuffle(seed=args.seed).select(range(args.sample))
-            tokenized_mcp_dataset = raw_mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
-            eval_mcp_dataloader = DataLoader(tokenized_mcp_dataset, batch_size=args.batch_size, shuffle=False)
+            _, _, raw_mcp_dataset, n_shot_mcp_dataset = load_data(mcp_args)
+            raw_mcp_dataset, n_shot_mcp_dataset = create_n_shot_splits(raw_mcp_dataset, n_shot_mcp_dataset, args)    
+            tokenized_dataset = raw_mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+            eval_mcp_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
             avg_log_probs, _, _ = inference_language_modeling(model, eval_mcp_dataloader, device, compute_func, tokenizer.pad_token_id)
         else:
             raise NotImplementedError # unlikely to happen.
@@ -160,9 +159,15 @@ def main():
         logger.info(f"Step 2: Creating multiple choice prompt. Prompting method: {prompting_method}.")
         # if args.prompting_method_for_process_of_elimination
         # mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
-        mcp_kwargs = {"multiple_choice_prompt": args.process_of_elimination_prompt,}
+        mcp_kwargs = {"multiple_choice_prompt": args.process_of_elimination_prompt,
+                      "scoring_method": scoring_method,
+                      "num_of_options": num_of_options,}
         mcp_dataset = masked_dataset.map(create_multiple_choice_prompt, fn_kwargs=mcp_kwargs)
-        
+        # change n_shot format.
+        if args.n_shot > 0 and args.prompting_method_for_process_of_elimination == "multiple_choice_prompt":
+            n_shot_demonstrations, n_shot_poe_demonstrations = generate_n_shot_poe_demonstrations(n_shot_mcp_dataset, num_of_options)
+            mcp_dataset = mcp_dataset.map(lambda x: {"premise": x['premise'].replace(n_shot_demonstrations, n_shot_poe_demonstrations)})
+
         logger.info(f"Step 3: Final Inference")
         mcp_dataset = mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
         eval_mcp_dataloader = DataLoader(mcp_dataset, batch_size=args.batch_size, shuffle=False)

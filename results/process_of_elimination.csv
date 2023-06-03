@@ -341,3 +341,4 @@ Pythia,EleutherAI/pythia-2.8b,FP16,piqa,16,process_of_elimination,multiple_choic
 Pythia,EleutherAI/pythia-2.8b,FP16,qasc,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,4,100,0.5700,0.1300
 Pythia,EleutherAI/pythia-2.8b,FP16,siqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,4,100,0.6300,0.3400
 Pythia,EleutherAI/pythia-2.8b,FP16,winogrande,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,4,100,0.5700,0.5700
+FLAN-T5,google/flan-t5-small,FP16,cqa,16,process_of_elimination,multiple_choice_prompt,multiple_choice_prompt,below_average,0,4,100,0.6700,0.3700

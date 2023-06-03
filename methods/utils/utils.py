@@ -97,6 +97,12 @@ def parse_args():
         help="Batch size for inference.",
     )
     parser.add_argument(
+        "--n_shot",
+        type=int,
+        default=0,
+        help="Number of few-shot demonstrations. 0 means zero-shot.",    
+    )
+    parser.add_argument(
         "--multiple_choice_prompt",
         type=str,
         default = None,
@@ -169,20 +175,25 @@ def parse_args():
 def load_data(args):
     # load test data for final performance.
     # load dev data to tune hyperparameters.
+    # commonsense reasoning datasets
+    train_file_path = None
     if args.dataset == "copa":
         ending_names = ['hypothesis0', 'hypothesis1']
         header_name = "premise"
         file_path = os.path.join("../data", args.dataset, "copa-test.xml")
+        train_file_path = os.path.join("../data", args.dataset, "copa-dev.xml")
         loader = copa_loader
     elif args.dataset == "cqa":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
         header_name = "premise"
         file_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        train_file_path = os.path.join("../data", args.dataset, "train.jsonl")
         loader = cqa_loader
     elif args.dataset == "obqa":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
         header_name = "premise"
         file_path = os.path.join("../data", args.dataset, "test.jsonl")
+        train_file_path = os.path.join("../data", args.dataset, "train.jsonl")
         loader = obqa_loader
     elif args.dataset == "piqa":
         ending_names = ['hypothesis0', 'hypothesis1']
@@ -190,11 +201,13 @@ def load_data(args):
         data_path = os.path.join("../data", args.dataset, "valid.jsonl")
         label_path = os.path.join("../data", args.dataset, "valid-labels.lst")
         file_path = [data_path, label_path]
+        train_file_path = [path.replace("valid", "train") for path in file_path]
         loader = piqa_loader
     elif args.dataset == "qasc":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4', 'hypothesis5', 'hypothesis6', 'hypothesis7']
         header_name = "premise"
         file_path = os.path.join("../data", args.dataset, "dev.jsonl")
+        train_file_path = os.path.join("../data", args.dataset, "train.jsonl")
         loader = qasc_loader
     elif args.dataset == "siqa":
         ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2']
@@ -202,6 +215,7 @@ def load_data(args):
         data_path = os.path.join("../data", args.dataset, "dev.jsonl")
         label_path = os.path.join("../data", args.dataset, "dev-labels.lst")
         file_path = [data_path, label_path]
+        train_file_path = [path.replace("dev", "train") for path in file_path]
         loader = siqa_loader
     elif args.dataset == "winogrande":
         ending_names = ['hypothesis0', 'hypothesis1']
@@ -209,6 +223,7 @@ def load_data(args):
         data_path = os.path.join("../data", args.dataset, "dev.jsonl")
         label_path = os.path.join("../data", args.dataset, "dev-labels.lst")
         file_path = [data_path, label_path]
+        train_file_path = [path.replace("dev", "train_xs") for path in file_path]
         loader = winogrande_loader
     # BIG-Bench tasks
     elif args.dataset == "disambiguation_qa":
@@ -302,6 +317,7 @@ def load_data(args):
         file_prefixes = ["R1", "R2", "R3"]
         for prefix in file_prefixes:
             file_path.append(os.path.join("../data", f"{args.dataset}", f"{prefix}_dev.jsonl"))
+        train_file_path = [path.replace("dev", "train") for path in file_path]
         loader = anli_loader
     else:
         print(f"{args.dataset}: downloader not implemented.")
@@ -309,8 +325,13 @@ def load_data(args):
 
     
     dev_data = loader(file_path, args)
-    dataset = Dataset.from_list(dev_data).with_format("torch")
-    return ending_names, header_name, dataset
+    dev_dataset = Dataset.from_list(dev_data).with_format("torch")
+    if train_file_path is not None:
+        train_data = loader(train_file_path, args)
+        train_dataset = Dataset.from_list(train_data).with_format("torch")
+    else: # BB tasks have no train set. 
+        train_dataset = dev_dataset
+    return ending_names, header_name, dev_dataset, train_dataset
 
 def load_model(device, model_path, args):
     if args.model_family in ["GPT2","Pythia", "OPT-IML", "Dolly"]:
@@ -348,17 +369,17 @@ def write_to_csv(save_path, args, total_accuracy):
         csvwriter = csv.writer(csvfile)
         if args.method == "process_of_elimination":
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "mask_strategy", "seed", "sample", "mask_accuracy", 'accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.seed, args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "mask_strategy", "seed", "n_shot", "sample", "mask_accuracy", 'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.seed, args.n_shot, args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
         elif args.method == "contrastive_decoding":
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample", 'expert_accuracy', 'amateur_accuracy','accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{args.expert_accuracy:.4f}", f"{args.amateur_accuracy:.4f}", f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed","n_shot", "sample", 'expert_accuracy', 'amateur_accuracy','accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.n_shot, args.sample, f"{args.expert_accuracy:.4f}", f"{args.amateur_accuracy:.4f}", f"{total_accuracy:.4f}"])
         elif args.method == "generate_synonyms":
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "number_of_synonyms", "seed", "sample",'accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.number_of_synonyms, args.seed, args.sample, f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "number_of_synonyms", "seed", "n_shot",  "sample",'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.number_of_synonyms, args.seed, args.n_shot, args.sample, f"{total_accuracy:.4f}"])
         else:
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "sample",'accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.sample, f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed", "n_shot",  "sample",'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, args.n_shot, args.sample, f"{total_accuracy:.4f}"])
