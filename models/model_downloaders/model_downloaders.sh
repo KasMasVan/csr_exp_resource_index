@@ -1,6 +1,6 @@
 # you may specify model families and checkpoints here
-model_families=("Dolly")
-checkpoints=("databricks/dolly-v2-7b")
+model_families=("Pythia")
+checkpoints=("EleutherAI/pythia-70m" "EleutherAI/pythia-2.8b")
 
 for model_family in "${model_families[@]}"
 do

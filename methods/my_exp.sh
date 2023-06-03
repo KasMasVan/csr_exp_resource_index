@@ -1,14 +1,13 @@
 #!/bin/bash
-# seeds=(0 1 2 3 4)
-seeds=(0)
-model_family="FLAN-T5" # "OPT-IML" "Dolly"
-checkpoints=("google/flan-t5-small") # "databricks/dolly-v2-7b" "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
+seeds=(0 1 2 3 4)
+model_family="Pythia" # "OPT-IML" "FLAN-T5"
+checkpoints=("EleutherAI/pythia-2.8b") # "facebook/opt-iml-1.3b" "facebook/opt-iml-max-1.3b" "google/flan-t5-large" "google/flan-t5-xl"
 loading_precision="FP16" # FP32 FP16 BF16(for 7b models) INT8
-amateur_checkpoint="google/flan-t5-small"
+amateur_checkpoint="EleutherAI/pythia-70m"
 # datasets="anli cqa siqa logical_deduction_five_objects disambiguation_qa conceptual_combinations strange_stories symbol_interpretation"
 # csr_datasets="copa cqa obqa piqa qasc siqa winogrande" 
 # datasets="disambiguation_qa conceptual_combinations date_understanding emoji_movie ruin_names temporal_sequences code_line_description penguins_in_a_table strange_stories symbol_interpretation tracking_shuffled_objects logical_deduction_three_objects logical_deduction_five_objects logical_deduction_seven_objects" 
-datasets="cqa" 
+datasets="copa cqa obqa piqa qasc siqa winogrande" 
 batch_size=16
 sample=100
 
@@ -29,20 +28,20 @@ for seed in "${seeds[@]}"; do
         --datasets "$datasets" \
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
-        # --sample ${sample} \
+        --sample ${sample} \
         # --push_data_to_hub \
         
 
     # contrastive decoding
-    # python language_modeling.py \
-    #     --seed ${seed} \
-    #     --model_family ${model_family} \
-    #     --checkpoint ${checkpoint} \
-    #     --amateur_checkpoint ${amateur_checkpoint} \
-    #     --datasets "$datasets" \
-    #     --batch_size  ${batch_size} \
-    #     --loading_precision ${loading_precision} \
-    #     --sample ${sample} \
+    python language_modeling.py \
+        --seed ${seed} \
+        --model_family ${model_family} \
+        --checkpoint ${checkpoint} \
+        --amateur_checkpoint ${amateur_checkpoint} \
+        --datasets "$datasets" \
+        --batch_size  ${batch_size} \
+        --loading_precision ${loading_precision} \
+        --sample ${sample} \
         # --push_data_to_hub \
         
 
@@ -55,7 +54,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --do_channel \
-        # --sample ${sample} \
+        --sample ${sample} \
         # --push_data_to_hub \
 
     # multiple choice prompt, using the same script as language modeling
@@ -67,7 +66,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --multiple_choice_prompt "$multiple_choice_prompt" \
-        # --sample ${sample} \
+        --sample ${sample} \
         # --push_data_to_hub \
     
     # calibration, i.e., PMI and PMI_DC.
@@ -79,7 +78,7 @@ for seed in "${seeds[@]}"; do
         --batch_size  ${batch_size} \
         --loading_precision ${loading_precision} \
         --calibration_prompt "${calibration_prompt}" \
-        # --sample ${sample} \
+        --sample ${sample} \
         # --push_data_to_hub \
 
     # process of elimination
@@ -94,7 +93,7 @@ for seed in "${seeds[@]}"; do
         --process_of_elimination_prompt "${process_of_elimination_prompt}" \
         --scoring_method_for_process_of_elimination "multiple_choice_prompt" \
         --mask_strategy_for_process_of_elimination "below_average" \
-    #     --sample ${sample} 
+        --sample ${sample} 
         # --push_data_to_hub 
 
     # generate synonyms
