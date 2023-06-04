@@ -97,7 +97,7 @@ def main():
     for dataset in args.datasets:
         args.dataset = dataset
         ending_names, header_name, raw_dataset, n_shot_dataset = load_data(args)
-        raw_dataset, n_shot_dataset = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
+        raw_dataset, n_shot_dataset, n_shot_demonstrations = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
 
         logger.info(f"Preprocess data: {args.dataset}.")
         fn_kwargs = {"ending_names": ending_names, 

@@ -594,6 +594,7 @@ def generate_n_shot_demonstrations(n_shot_dataset):
     return n_shot_demonstrations
 
 def create_n_shot_splits(raw_dataset, n_shot_dataset, args):
+    n_shot_demonstrations = ""
     if args.n_shot > 0:
         # few-shot setting: sample from train split, dev split (COPA), or the only split (BB)
         if n_shot_dataset is raw_dataset: # BB tasks: sampling from the only split, and use the rest
@@ -610,7 +611,9 @@ def create_n_shot_splits(raw_dataset, n_shot_dataset, args):
     if args.n_shot > 0:
         # append n_shot_demonstrations to each input.
         raw_dataset = raw_dataset.map(lambda x: {"premise": n_shot_demonstrations + x["premise"]}) 
-    return raw_dataset, n_shot_dataset
+    else: # zero-shot: no need to return n_shot_dataset
+        n_shot_dataset = None
+    return raw_dataset, n_shot_dataset, n_shot_demonstrations
 
 def generate_n_shot_poe_demonstrations(n_shot_dataset, num_of_options):
     # designed for multiple_choice_prompt

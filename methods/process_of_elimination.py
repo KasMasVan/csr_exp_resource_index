@@ -49,7 +49,7 @@ from utils.utils import(
 logger = logging.getLogger(__name__)
 
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
@@ -102,8 +102,13 @@ def main():
         # multiple_choice_prompt = args.multiple_choice_prompt
         args.multiple_choice_prompt = None
         ending_names, header_name, raw_dataset, n_shot_dataset = load_data(args)
-        raw_dataset, n_shot_dataset = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
-
+        raw_dataset, n_shot_dataset, n_shot_demonstrations = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
+        
+        mcp_args = copy.deepcopy(args)
+        mcp_args.multiple_choice_prompt = multiple_choice_prompt
+        _, _, raw_mcp_dataset, n_shot_mcp_dataset = load_data(mcp_args)
+        raw_mcp_dataset, n_shot_mcp_dataset, _ = create_n_shot_splits(raw_mcp_dataset, n_shot_mcp_dataset, args)    
+        
         logger.info(f"Preprocess data: {args.dataset}.")
         fn_kwargs = {"ending_names": ending_names, 
                     "header_name": header_name, 
@@ -130,10 +135,10 @@ def main():
         elif scoring_method == "language_modeling":
             avg_log_probs, _, _ = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
         elif scoring_method == "multiple_choice_prompt":
-            mcp_args = copy.deepcopy(args)
-            mcp_args.multiple_choice_prompt = multiple_choice_prompt
-            _, _, raw_mcp_dataset, n_shot_mcp_dataset = load_data(mcp_args)
-            raw_mcp_dataset, n_shot_mcp_dataset = create_n_shot_splits(raw_mcp_dataset, n_shot_mcp_dataset, args)    
+            # mcp_args = copy.deepcopy(args)
+            # mcp_args.multiple_choice_prompt = multiple_choice_prompt
+            # _, _, raw_mcp_dataset, n_shot_mcp_dataset = load_data(mcp_args)
+            # raw_mcp_dataset, n_shot_mcp_dataset = create_n_shot_splits(raw_mcp_dataset, n_shot_mcp_dataset, args)    
             tokenized_dataset = raw_mcp_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
             eval_mcp_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
             avg_log_probs, _, _ = inference_language_modeling(model, eval_mcp_dataloader, device, compute_func, tokenizer.pad_token_id)
@@ -164,8 +169,11 @@ def main():
                       "num_of_options": num_of_options,}
         mcp_dataset = masked_dataset.map(create_multiple_choice_prompt, fn_kwargs=mcp_kwargs)
         # change n_shot format.
-        if args.n_shot > 0 and args.prompting_method_for_process_of_elimination == "multiple_choice_prompt":
-            n_shot_demonstrations, n_shot_poe_demonstrations = generate_n_shot_poe_demonstrations(n_shot_mcp_dataset, num_of_options)
+        if args.n_shot > 0 : 
+            if args.scoring_method_for_process_of_elimination == "multiple_choice_prompt":
+                n_shot_demonstrations, n_shot_poe_demonstrations = generate_n_shot_poe_demonstrations(n_shot_mcp_dataset, num_of_options)
+            else:
+                _, n_shot_poe_demonstrations = generate_n_shot_poe_demonstrations(n_shot_mcp_dataset, num_of_options)            
             mcp_dataset = mcp_dataset.map(lambda x: {"premise": x['premise'].replace(n_shot_demonstrations, n_shot_poe_demonstrations)})
 
         logger.info(f"Step 3: Final Inference")
