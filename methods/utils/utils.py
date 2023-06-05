@@ -319,6 +319,19 @@ def load_data(args):
             file_path.append(os.path.join("../data", f"{args.dataset}", f"{prefix}_dev.jsonl"))
         train_file_path = [path.replace("dev", "train") for path in file_path]
         loader = anli_loader
+    elif args.dataset in ["anli_r1", "anli_r2", "anli_r3"]:
+        args.num_options = 3
+        ending_names = [f"hypothesis{i}" for i in range(args.num_options)]
+        # ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2']
+        header_name = "premise"
+        prefix = args.dataset.split("_")[-1]
+        file_path = [os.path.join("../data", "anli", f"{prefix.capitalize()}_dev.jsonl")]
+        # file_path = []
+        # file_prefixes = ["R1", "R2", "R3"]
+        # for prefix in file_prefixes:
+        #     file_path.append(os.path.join("../data", f"{args.dataset}", f"{prefix}_dev.jsonl"))
+        train_file_path = [path.replace("dev", "train") for path in file_path]
+        loader = anli_loader
     else:
         print(f"{args.dataset}: downloader not implemented.")
         return
