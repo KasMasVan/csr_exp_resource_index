@@ -2,6 +2,7 @@ from tqdm import tqdm
 
 import torch
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 from transformers import GenerationConfig
 
 def inference_language_modeling_old(model, eval_dataloader, device):
@@ -176,6 +177,41 @@ def inference_calibration(model, eval_dataloader, eval_calibration_dataloader, d
         avg_lm_accuracy = (avg_lm_predictions == labels).sum().item() / len(labels)
         pbar.set_description(f"Calibration accuracy: {lm_accuracy:.4f}, Average calibration accuracy: {avg_lm_accuracy:.4f}")
     avg_log_probs = torch.cat(avg_log_probs, dim=0)
+    return avg_log_probs, lm_accuracy, avg_lm_accuracy
+
+def inference_contrastive_decoding(method, model, **kwargs):
+    args = kwargs["args"]
+    raw_dataset = kwargs["raw_dataset"]
+    device = kwargs["device"]
+    compute_func = kwargs["compute_func"]
+    tokenizer = kwargs["tokenizer"]
+    ending_names = kwargs["ending_names"]
+    header_name = kwargs["header_name"]
+    preprocess_func = kwargs["preprocess_func"]
+    preprocess_func_channel = kwargs["preprocess_func_channel"]
+
+    fn_kwargs = {"ending_names": ending_names, 
+                    "header_name": header_name, 
+                    "tokenizer": tokenizer,}
+    num_of_options = len(ending_names)
+    tokenized_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+    eval_dataloader = DataLoader(tokenized_dataset, batch_size=args.batch_size, shuffle=False)
+    if method in ["language_modeling", "multiple_choice_prompt"]:
+        avg_log_probs, lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_dataloader, device, compute_func, tokenizer.pad_token_id)
+    elif method == "calibration":
+        fn_kwargs = {"ending_names": ending_names, 
+                    "header_name": "uncond_premise", # the difference is here
+                    "tokenizer": tokenizer,}
+        tokenized_calibration_dataset = raw_dataset.map(preprocess_func, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+        eval_calibration_dataloader = DataLoader(tokenized_calibration_dataset, batch_size=args.batch_size, shuffle=False)    
+        avg_log_probs, lm_accuracy, avg_lm_accuracy = inference_calibration(model, eval_dataloader, eval_calibration_dataloader,device, compute_func, tokenizer.pad_token_id)
+    elif method == "channel":
+        # simple solution: swap first sentence and second sentence in both preprocessing functions
+        tokenized_channel_dataset = raw_dataset.map(preprocess_func_channel, fn_kwargs=fn_kwargs, batched=True, batch_size=args.batch_size)
+        eval_channel_dataloader = DataLoader(tokenized_channel_dataset, batch_size=args.batch_size, shuffle=False)
+        avg_log_probs, lm_accuracy, avg_lm_accuracy = inference_language_modeling(model, eval_channel_dataloader, device, compute_func, tokenizer.pad_token_id)
+    else:
+        raise NotImplementedError
     return avg_log_probs, lm_accuracy, avg_lm_accuracy
 
 def compute_mask_process_of_elimination(avg_log_probs, mask_strategy):

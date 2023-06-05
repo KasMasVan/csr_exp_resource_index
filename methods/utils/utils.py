@@ -70,6 +70,20 @@ def parse_args():
         help="The amateur checkpoint name under a model family. For constrative decoding.",
     )
     parser.add_argument(
+        "--expert_method",
+        type=str,
+        choices=["language_modeling", "calibration", "channel", "multiple_choice_prompt"],
+        default="language_modeling",
+        help="The expert method. For constrative decoding.",
+    )
+    parser.add_argument(
+        "--amateur_method",
+        type=str,
+        choices=["language_modeling", "calibration", "channel", "multiple_choice_prompt"],
+        default="language_modeling",
+        help="The amateur method. For constrative decoding.",
+    )
+    parser.add_argument(
         "--loading_precision",
         type=str,
         choices=["FP32", "FP16", "BF16", "INT8"],
@@ -386,8 +400,8 @@ def write_to_csv(save_path, args, total_accuracy):
             csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.seed, int(args.n_shot), args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
         elif args.method == "contrastive_decoding":
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "seed","n_shot", "sample", 'expert_accuracy', 'amateur_accuracy','accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.seed, int(args.n_shot), args.sample, f"{args.expert_accuracy:.4f}", f"{args.amateur_accuracy:.4f}", f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision', 'dataset', 'batch_size', 'method', 'expert_method', "amateur_method", "seed","n_shot", "sample", 'expert_accuracy', 'amateur_accuracy','accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.expert_method, args.amateur_method, args.seed, int(args.n_shot), args.sample, f"{args.expert_accuracy:.4f}", f"{args.amateur_accuracy:.4f}", f"{total_accuracy:.4f}"])
         elif args.method == "generate_synonyms":
             if not csv_exists:
                 csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "number_of_synonyms", "seed", "n_shot",  "sample",'accuracy'])
