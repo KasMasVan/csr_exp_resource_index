@@ -40,7 +40,7 @@ from utils.utils import(
 logger = logging.getLogger(__name__)
 
 def main():
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     # step 1: argument parser, and logger
     args = parse_args()
