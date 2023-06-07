@@ -1,6 +1,6 @@
 # you may specify model families and checkpoints here
 model_families=("Pythia")
-checkpoints=("EleutherAI/pythia-70m" "EleutherAI/pythia-2.8b")
+checkpoints=("EleutherAI/pythia-160m" "EleutherAI/pythia-410m")
 
 for model_family in "${model_families[@]}"
 do
