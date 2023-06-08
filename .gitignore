@@ -2,6 +2,9 @@
 /data/*
 !/data/data_downloaders/
 
+# ignore temporary data that is uploaded to hub for LLM
+/temp_data/*
+
 # ignore actual models but keep the downloaders.
 /models/*
 !/models/model_downloaders/
@@ -12,3 +15,5 @@ methods/utils/__pycache__/
 
 # ignore results
 /results/*
+!/results/*.ipynb
+!/results/main_exp.csv
