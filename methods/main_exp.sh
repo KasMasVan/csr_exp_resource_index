@@ -105,7 +105,7 @@ for seed in "${seeds[@]}"; do
         --multiple_choice_prompt "$multiple_choice_prompt" \
         --process_of_elimination_prompt "${process_of_elimination_prompt}" \
         --scoring_method_for_process_of_elimination "multiple_choice_prompt" \
-        --mask_strategy_for_process_of_elimination "lowest" \
+        --mask_strategy_for_process_of_elimination "below_average" \ # "lowest"
         --n_shot ${n_shot} \
         --sample ${sample} \
         # --push_data_to_hub 
