@@ -119,6 +119,8 @@ def main():
         logger.info(f"Start inference (amateur method: {args.amateur_method}")
         ama_avg_log_probs, ama_lm_accuracy, ama_avg_lm_accuracy = inference_contrastive_decoding(args.amateur_method, amateur_model, **method_agnostic_kwargs)  
         avg_log_probs = exp_avg_log_probs - ama_avg_log_probs
+        # alternatively, use a reweighting parameter to combine the two scores
+        # avg_log_probs = exp_avg_log_probs + alpha * ama_avg_log_probs
         labels = raw_dataset['label']
         lm_accuracy = (avg_log_probs.argmin(dim=-1) == labels).sum().item() / len(labels)
         logger.info(f"Contrastive decoding accuracy: {lm_accuracy:.4f}.")
