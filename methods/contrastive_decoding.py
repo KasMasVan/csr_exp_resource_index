@@ -118,34 +118,42 @@ def main():
         exp_avg_log_probs, exp_lm_accuracy, exp_avg_lm_accuracy = inference_contrastive_decoding(args.expert_method, model, **method_agnostic_kwargs) 
         logger.info(f"Start inference (amateur method: {args.amateur_method}")
         ama_avg_log_probs, ama_lm_accuracy, ama_avg_lm_accuracy = inference_contrastive_decoding(args.amateur_method, amateur_model, **method_agnostic_kwargs)  
-        avg_log_probs = exp_avg_log_probs - ama_avg_log_probs
-        # alternatively, use a reweighting parameter to combine the two scores
-        # avg_log_probs = exp_avg_log_probs + alpha * ama_avg_log_probs
-        labels = raw_dataset['label']
-        lm_accuracy = (avg_log_probs.argmin(dim=-1) == labels).sum().item() / len(labels)
-        logger.info(f"Contrastive decoding accuracy: {lm_accuracy:.4f}.")
-        args.amateur_accuracy = ama_avg_lm_accuracy
-        args.expert_accuracy = exp_avg_lm_accuracy
-        # logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
+        # weighting_parameter = args.weighting_parameter
+        if args.num_random_search == 0:
+            weighting_parameters = [args.weighting_parameter] # -1
+        else:
+            # sample from [-2, 0]
+            weighting_parameters = np.random.uniform(-2, 0, args.num_random_search)
 
-        # step 6: some postprocessing, including saving and displyaing output.
-        save_path = os.path.join("../results", f"{args.method}.csv")
-        logger.info(f"Save results to {save_path}.")
-        write_to_csv(save_path, args, lm_accuracy)
+        for weighting_parameter in weighting_parameters:
+            args.weighting_parameter = weighting_parameter
+            logger.info(f"weighting parameter: {weighting_parameter}")
+            avg_log_probs = exp_avg_log_probs + weighting_parameter * ama_avg_log_probs
+            labels = raw_dataset['label']
+            lm_accuracy = (avg_log_probs.argmin(dim=-1) == labels).sum().item() / len(labels)
+            logger.info(f"Contrastive decoding accuracy: {lm_accuracy:.4f}.")
+            args.amateur_accuracy = ama_avg_lm_accuracy
+            args.expert_accuracy = exp_avg_lm_accuracy
+            # logger.info(f"Start inference (method: {args.method}) on {args.dataset} using {args.model_family} model: {args.checkpoint}.")
 
-        # does calibration needs copying as well?
-        # if args.method == "language_modeling":
-        #     avg_args = copy.deepcopy(args)
-        #     avg_args.method = "average_language_modeling"
-        #     write_to_csv(save_path, avg_args, avg_lm_accuracy)
-        
-        # step 7: push data to HuggingFace Hub.
-        # if args.push_data_to_hub:
-        #     logger.info(f"Push {args.dataset} to HuggingFace Hub.")
-        #     upload_to_huggingface_hub(tokenized_dataset, args)
-        
-        # step 8: delete tokenized_dataset to save memory.
-        # del tokenized_dataset
+            # step 6: some postprocessing, including saving and displyaing output.
+            save_path = os.path.join("../results", f"{args.method}.csv")
+            logger.info(f"Save results to {save_path}.")
+            write_to_csv(save_path, args, lm_accuracy)
+
+            # does calibration needs copying as well?
+            # if args.method == "language_modeling":
+            #     avg_args = copy.deepcopy(args)
+            #     avg_args.method = "average_language_modeling"
+            #     write_to_csv(save_path, avg_args, avg_lm_accuracy)
+            
+            # step 7: push data to HuggingFace Hub.
+            # if args.push_data_to_hub:
+            #     logger.info(f"Push {args.dataset} to HuggingFace Hub.")
+            #     upload_to_huggingface_hub(tokenized_dataset, args)
+            
+            # step 8: delete tokenized_dataset to save memory.
+            # del tokenized_dataset
             
 
 if __name__ == "__main__":
