@@ -94,7 +94,7 @@ def main():
     logger.info(f"Load data: {args.datasets}.")
     
     # evaluate on each dataset
-    for dataset in args.datasets:
+    for id, dataset in enumerate(args.datasets):
         args.dataset = dataset
         ending_names, header_name, raw_dataset, n_shot_dataset = load_data(args)
         raw_dataset, n_shot_dataset, n_shot_demonstrations = create_n_shot_splits(raw_dataset, n_shot_dataset, args)    
@@ -119,8 +119,11 @@ def main():
         logger.info(f"Start inference (amateur method: {args.amateur_method}")
         ama_avg_log_probs, ama_lm_accuracy, ama_avg_lm_accuracy = inference_contrastive_decoding(args.amateur_method, amateur_model, **method_agnostic_kwargs)  
         # weighting_parameter = args.weighting_parameter
-        if args.num_random_search == 0:
-            weighting_parameters = [args.weighting_parameter] # -1
+        if args.num_random_search == 0: # manually set weighting parameter
+            if args.weighting_parameters is not None:
+                weighting_parameters = [float(args.weighting_parameters.split()[id])]
+            else:
+                weighting_parameters = [args.weighting_parameter] # -1
         else:
             # sample from [-2, 0]
             weighting_parameters = np.random.uniform(-2, 0, args.num_random_search)

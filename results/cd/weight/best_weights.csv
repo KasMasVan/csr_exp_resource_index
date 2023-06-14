@@ -1,0 +1,13 @@
+model_family,checkpoint,amateur_checkpoint,loading_precision,dataset,batch_size,method,expert_method,amateur_method,weighting_parameter,seed,n_shot,sample,expert_accuracy,amateur_accuracy,accuracy
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,anli,16,contrastive_decoding,channel,language_modeling,-0.6045423508054584,4,0,,0.3278,0.3362,0.3337
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,code_line_description,16,contrastive_decoding,channel,language_modeling,-0.0480091550541323,3,0,,0.7069,0.5517,0.5172
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,conceptual_combinations,16,contrastive_decoding,channel,language_modeling,-0.1125038429707516,0,0,,0.3689,0.301,0.301
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,copa,16,contrastive_decoding,channel,language_modeling,-0.0474510904475165,4,0,,0.698,0.582,0.69
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,cqa,16,contrastive_decoding,channel,language_modeling,-0.0331986456493744,4,0,,0.4545,0.2735,0.4464
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,disambiguation_qa,16,contrastive_decoding,channel,language_modeling,-0.4651900658197523,4,0,,0.3059,0.3843,0.3255
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,emoji_movie,16,contrastive_decoding,channel,language_modeling,-0.0925155461102666,2,0,,0.32,0.23,0.3
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,obqa,16,contrastive_decoding,channel,language_modeling,-0.0866940645715281,4,0,,0.322,0.278,0.292
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,piqa,16,contrastive_decoding,channel,language_modeling,-0.0427633155344719,0,0,,0.5473,0.5947,0.5299
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,ruin_names,16,contrastive_decoding,channel,language_modeling,-1.9612660842594056,1,0,,0.1029,0.3177,0.1834
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,temporal_sequences,16,contrastive_decoding,channel,language_modeling,-1.8932749097658392,1,0,,0.345,0.039,0.674
+Pythia,EleutherAI/pythia-2.8b,EleutherAI/pythia-70m,FP16,winogrande,16,contrastive_decoding,channel,language_modeling,-0.1272327002791391,3,0,,0.4949,0.5122,0.4972

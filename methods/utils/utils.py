@@ -90,6 +90,12 @@ def parse_args():
         help="The weighting parameter for constrative decoding. It is applied to the amateur model.",
     )
     parser.add_argument(
+        "--weighting_parameters",
+        type=str,
+        default=None,
+        help="The weighting parameters for constrative decoding. One weight for one dataset.",
+    )
+    parser.add_argument(
         "--num_random_search",
         type=int,
         default=0,
