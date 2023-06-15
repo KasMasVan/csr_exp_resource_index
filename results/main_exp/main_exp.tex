@@ -1,17 +1,17 @@
 \begin{table}[h]
 \centering
-\caption{Accuracy scores of different methods on different datasets.}
+\caption{Accuracy scores (with standard deviation) on 8 benchmarks. LM refers to language modeling, MCP refers multiple choice prompt. Our method (PoE) achieves best or comparable performance on all benchmarks.}
 \label{tab:main_exp}
 \begin{tabular}{l|c|c|c|c|c|c|c|c}
-method & LM & LM (avg) & Calibration & Channel & MCP & PoE \\
+method & LM & AVG & Calibration & Channel & MCP & PoE \\
 dataset &  &  &  &  &  &  \\
-anli & 38.6\textsubscript{2.9} & 38.0\textsubscript{3.4} & 37.2\textsubscript{3.5} & 36.0\textsubscript{2.7} & 57.8\textsubscript{3.0} & 55.0\textsubscript{2.4} \\
-cqa & 64.4\textsubscript{5.9} & 54.2\textsubscript{1.3} & 69.6\textsubscript{4.8} & 44.6\textsubscript{5.6} & 87.2\textsubscript{2.6} & 89.2\textsubscript{2.2} \\
-siqa & 56.0\textsubscript{4.5} & 62.6\textsubscript{1.8} & 57.6\textsubscript{6.9} & 39.8\textsubscript{5.9} & 79.0\textsubscript{5.6} & 82.0\textsubscript{6.7} \\
-logical deduction & 48.8\textsubscript{2.7} & 45.8\textsubscript{4.5} & 39.2\textsubscript{4.0} & 20.8\textsubscript{3.6} & 39.8\textsubscript{3.7} & 53.6\textsubscript{7.0} \\
-disambiguation qa & 45.8\textsubscript{6.6} & 51.8\textsubscript{2.0} & 48.0\textsubscript{2.9} & 39.6\textsubscript{6.6} & 67.8\textsubscript{1.9} & 67.4\textsubscript{2.5} \\
-conceptual combinations & 44.8\textsubscript{0.8} & 51.8\textsubscript{0.8} & 54.4\textsubscript{0.5} & 44.0\textsubscript{0.7} & 60.2\textsubscript{1.5} & 72.2\textsubscript{0.8} \\
-strange stories & 39.0\textsubscript{2.5} & 40.6\textsubscript{1.8} & 43.4\textsubscript{1.7} & 26.6\textsubscript{1.7} & 74.0\textsubscript{0.7} & 76.6\textsubscript{0.9} \\
-symbol interpretation & 24.8\textsubscript{1.9} & 20.6\textsubscript{5.3} & 21.0\textsubscript{3.9} & 17.0\textsubscript{4.6} & 25.4\textsubscript{2.9} & 25.2\textsubscript{4.0} \\
+ANLI & 38.6\textsubscript{2.9} & 38.0\textsubscript{3.4} & 37.2\textsubscript{3.5} & 36.0\textsubscript{2.7} & 57.8\textsubscript{3.0} & 55.0\textsubscript{2.4} \\
+CQA & 64.4\textsubscript{5.9} & 54.2\textsubscript{1.3} & 69.6\textsubscript{4.8} & 44.6\textsubscript{5.6} & 87.2\textsubscript{2.6} & 89.2\textsubscript{2.2} \\
+SIQA & 56.0\textsubscript{4.5} & 62.6\textsubscript{1.8} & 57.6\textsubscript{6.9} & 39.8\textsubscript{5.9} & 79.0\textsubscript{5.6} & 82.0\textsubscript{6.7} \\
+LD & 48.8\textsubscript{2.7} & 45.8\textsubscript{4.5} & 39.2\textsubscript{4.0} & 20.8\textsubscript{3.6} & 39.8\textsubscript{3.7} & 53.6\textsubscript{7.0} \\
+DQA & 45.8\textsubscript{6.6} & 51.8\textsubscript{2.0} & 48.0\textsubscript{2.9} & 39.6\textsubscript{6.6} & 67.8\textsubscript{1.9} & 67.4\textsubscript{2.5} \\
+CC & 44.8\textsubscript{0.8} & 51.8\textsubscript{0.8} & 54.4\textsubscript{0.5} & 44.0\textsubscript{0.7} & 60.2\textsubscript{1.5} & 72.2\textsubscript{0.8} \\
+SS & 39.0\textsubscript{2.5} & 40.6\textsubscript{1.8} & 43.4\textsubscript{1.7} & 26.6\textsubscript{1.7} & 74.0\textsubscript{0.7} & 76.6\textsubscript{0.9} \\
+SIT & 24.8\textsubscript{1.9} & 20.6\textsubscript{5.3} & 21.0\textsubscript{3.9} & 17.0\textsubscript{4.6} & 25.4\textsubscript{2.9} & 25.2\textsubscript{4.0} \\
 \end{tabular}
 \end{table}

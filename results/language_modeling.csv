@@ -349,3 +349,11 @@ Pythia,EleutherAI/pythia-2.8b,FP16,ruin_names,16,language_modeling,4,0,100,0.400
 Pythia,EleutherAI/pythia-2.8b,FP16,ruin_names,16,average_language_modeling,4,0,100,0.2900
 Pythia,EleutherAI/pythia-2.8b,FP16,temporal_sequences,16,language_modeling,4,0,100,0.0100
 Pythia,EleutherAI/pythia-2.8b,FP16,temporal_sequences,16,average_language_modeling,4,0,100,0.0100
+FLAN-T5,google/flan-t5-small,FP16,logical_deduction_five_objects,16,language_modeling,0,0,100,0.2800
+FLAN-T5,google/flan-t5-small,FP16,logical_deduction_five_objects,16,average_language_modeling,0,0,100,0.2900
+FLAN-T5,google/flan-t5-small,FP16,disambiguation_qa,16,language_modeling,0,0,100,0.4500
+FLAN-T5,google/flan-t5-small,FP16,disambiguation_qa,16,average_language_modeling,0,0,100,0.4600
+FLAN-T5,google/flan-t5-small,FP16,conceptual_combinations,16,language_modeling,0,0,100,0.2700
+FLAN-T5,google/flan-t5-small,FP16,conceptual_combinations,16,average_language_modeling,0,0,100,0.3000
+FLAN-T5,google/flan-t5-small,FP16,strange_stories,16,language_modeling,0,0,100,0.2100
+FLAN-T5,google/flan-t5-small,FP16,strange_stories,16,average_language_modeling,0,0,100,0.2000
