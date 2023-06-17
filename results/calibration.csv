@@ -174,3 +174,4 @@ Pythia,EleutherAI/pythia-2.8b,FP16,disambiguation_qa,16,calibration,4,0,100,0.39
 Pythia,EleutherAI/pythia-2.8b,FP16,emoji_movie,16,calibration,4,0,100,0.3100
 Pythia,EleutherAI/pythia-2.8b,FP16,ruin_names,16,calibration,4,0,100,0.0300
 Pythia,EleutherAI/pythia-2.8b,FP16,temporal_sequences,16,calibration,4,0,100,0.0700
+FLAN-T5,google/flan-t5-small,FP16,siqa,16,calibration,0,0,100,0.3500
