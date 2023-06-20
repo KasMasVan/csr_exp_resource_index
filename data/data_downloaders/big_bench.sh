@@ -3,7 +3,7 @@ cd data/big_bench/
 
 proxy_prefix="https://ghproxy.com/"
 repo_prefix="https://raw.githubusercontent.com/google/BIG-bench/main/bigbench/benchmark_tasks/"
-single_tasks=("ruin_names" "temporal_sequences" "emoji_movie" "code_line_description" "penguins_in_a_table" "date_understanding")
+single_tasks=("disambiguation_qa" "ruin_names" "temporal_sequences" "emoji_movie" "code_line_description" "penguins_in_a_table" "date_understanding")
 conceptual_combinations_subtasks=("contradictions" "emergent_properties" "fanciful_fictional_combinations" "homonyms" "invented_words" "surprising_uncommon_combinations")
 strange_stories_subtasks=("boolean" "multiple_choice")
 symbol_interpretation_subtasks=("adversarial" "emoji_agnostic" "name_agnostic" "plain" "tricky")
