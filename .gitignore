@@ -14,6 +14,7 @@ methods/utils/__pycache__/
 
 
 # ignore results
-/results/*
-!/results/*.ipynb
-!/results/main_exp.csv
+# /results/*
+# !/results/*.ipynb
+# !/results/main_exp.csv
+# !/results/iter_poe/*
