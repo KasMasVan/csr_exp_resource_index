@@ -224,6 +224,13 @@ def compute_mask_process_of_elimination(avg_log_probs, mask_strategy):
         row_mean = avg_log_probs.mean(dim=1, keepdim=True)
         # Set values below the mean to 0
         masks[avg_log_probs > row_mean] = 0
+    elif mask_strategy == "lowest_iter":
+        # similar to lowest, but ignore inf, and mask from the remaining options.
+        # soft masking (v1), i.e., get rid of the least likely answer.
+        avg_log_probs[avg_log_probs == float("inf")] = float("-inf")
+        masks[torch.arange(avg_log_probs.shape[0]), avg_log_probs.argmax(dim=-1)] = 0
+        # set mask that correspond to inf to 0
+        masks[avg_log_probs == float("-inf")] = 0
     else:
         raise NotImplementedError
     return masks
