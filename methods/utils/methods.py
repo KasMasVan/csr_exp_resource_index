@@ -214,7 +214,7 @@ def inference_contrastive_decoding(method, model, **kwargs):
         raise NotImplementedError
     return avg_log_probs, lm_accuracy, avg_lm_accuracy
 
-def compute_mask_process_of_elimination(avg_log_probs, mask_strategy):
+def compute_mask_process_of_elimination(avg_log_probs, mask_strategy, **kwargs):
     masks = torch.ones_like(avg_log_probs)
     if mask_strategy == "lowest":
         # soft masking (v1), i.e., get rid of the least likely answer.
@@ -231,6 +231,12 @@ def compute_mask_process_of_elimination(avg_log_probs, mask_strategy):
         masks[torch.arange(avg_log_probs.shape[0]), avg_log_probs.argmax(dim=-1)] = 0
         # set mask that correspond to inf to 0
         masks[avg_log_probs == float("-inf")] = 0
+    elif mask_strategy == "min_k":
+        min_k = kwargs["min_k"]
+        # keep the min k options
+        avg_log_probs_f32 = avg_log_probs.float()
+        _, min_k_indices = avg_log_probs_f32.topk(min_k, dim=-1)
+        masks[torch.arange(avg_log_probs_f32.shape[0]).unsqueeze(-1), min_k_indices] = 0
     else:
         raise NotImplementedError
     return masks

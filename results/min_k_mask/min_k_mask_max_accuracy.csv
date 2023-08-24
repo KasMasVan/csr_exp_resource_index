@@ -1,0 +1,9 @@
+dataset,mask_strategy,accuracy
+anli,min_k_2,0.578
+conceptual_combinations,lowest,0.76
+cqa,lowest,0.895
+disambiguation_qa,lowest,0.678
+logical_deduction_five_objects,lowest,0.56
+siqa,below_average,0.82
+strange_stories,below_average,0.766
+symbol_interpretation,min_k_3,0.274

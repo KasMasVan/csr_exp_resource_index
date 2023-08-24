@@ -145,7 +145,16 @@ def main():
         else:
             raise NotImplementedError # unlikely to happen.
         
-        masks = compute_mask_process_of_elimination(avg_log_probs, args.mask_strategy_for_process_of_elimination)
+        mask_strategy = args.mask_strategy_for_process_of_elimination
+        if mask_strategy == "min_k":
+            # masking the most k UNLIKELY options
+            min_k = args.min_k 
+            if min_k >= num_of_options:
+                min_k = num_of_options - 1
+            mask_kwargs = {"min_k": min_k,}
+        else:
+            mask_kwargs = {}
+        masks = compute_mask_process_of_elimination(avg_log_probs, mask_strategy, **mask_kwargs)
         # construct an oracle mask that only keeps the correct lable to 1, and other options to 0
         # oracle_masks = torch.zeros_like(avg_log_probs)
         # oracle_masks[torch.arange(oracle_masks.size(0)), tokenized_dataset["label"]] = 1
@@ -184,7 +193,10 @@ def main():
         # step 6: some postprocessing, including saving and displyaing output.
         save_path = os.path.join("../results", f"{args.method}.csv")
         logger.info(f"Save results to {save_path}.")
-        write_to_csv(save_path, args, lm_accuracy)
+        save_args = copy.deepcopy(args)
+        if mask_strategy == "min_k":
+            save_args.mask_strategy_for_process_of_elimination = f"min_k_{min_k}"   
+        write_to_csv(save_path, save_args, lm_accuracy)
 
         # step 7: push data to HuggingFace Hub.
         if args.push_data_to_hub:

@@ -174,7 +174,7 @@ def parse_args():
     parser.add_argument(
         "--mask_strategy_for_process_of_elimination",
         type=str,
-        choices=["lowest", "below_average"],
+        choices=["lowest", "below_average", "min_k"],
         default="lowest",
         help="The mask strategy for process of elimination.",
     )
@@ -199,6 +199,11 @@ def parse_args():
         "--push_data_to_hub",
         action="store_true",
         help="Whether to push the data to Hugging Face Hub. This is convienient for LLM experiments.",
+    )
+    parser.add_argument(
+        "--min_k",
+        type=int,
+        help="A masking strategy that masks the k most unlikely options",
     )
 
     args = parser.parse_args()
