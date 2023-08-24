@@ -173,9 +173,16 @@ def main():
         logger.info(f"Step 2: Creating multiple choice prompt. Prompting method: {prompting_method}.")
         # if args.prompting_method_for_process_of_elimination
         # mcp_kwargs = {"multiple_choice_prompt": multiple_choice_prompt,}
+        mask_token = args.mask_token
+        if mask_token is not None:
+            if mask_token == "":
+                args.process_of_elimination_prompt = args.process_of_elimination_prompt.replace("[MASK]", "empty")   
+            else:
+                args.process_of_elimination_prompt = args.process_of_elimination_prompt.replace("[MASK]", mask_token)   
         mcp_kwargs = {"multiple_choice_prompt": args.process_of_elimination_prompt,
                       "scoring_method": scoring_method,
-                      "num_of_options": num_of_options,}
+                      "num_of_options": num_of_options,
+                      "mask_token": mask_token,}
         mcp_dataset = masked_dataset.map(create_multiple_choice_prompt, fn_kwargs=mcp_kwargs)
         # change n_shot format.
         if args.n_shot > 0 : 

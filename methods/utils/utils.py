@@ -205,6 +205,12 @@ def parse_args():
         type=int,
         help="A masking strategy that masks the k most unlikely options",
     )
+    parser.add_argument(
+        "--mask_token",
+        type=str,
+        default=None,
+        help="The mask token. If None, use the default mask token of the model.",
+    )
 
     args = parser.parse_args()
     return args
@@ -419,8 +425,8 @@ def write_to_csv(save_path, args, total_accuracy):
         csvwriter = csv.writer(csvfile)
         if args.method == "process_of_elimination":
             if not csv_exists:
-                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "mask_strategy", "seed", "n_shot", "sample", "mask_accuracy", 'accuracy'])
-            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.seed, int(args.n_shot), args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
+                csvwriter.writerow(['model_family', 'checkpoint', 'loading_precision','dataset', 'batch_size', 'method', "scoring_method", "prompting_method", "mask_strategy", "mask_token", "seed", "n_shot", "sample", "mask_accuracy", 'accuracy'])
+            csvwriter.writerow([args.model_family, args.checkpoint, args.loading_precision, args.dataset, args.batch_size, args.method, args.scoring_method_for_process_of_elimination, args.prompting_method_for_process_of_elimination, args.mask_strategy_for_process_of_elimination, args.mask_token, args.seed, int(args.n_shot), args.sample, f"{args.mask_accuracy:.4f}", f"{total_accuracy:.4f}"])
         elif args.method == "contrastive_decoding":
             if not csv_exists:
                 csvwriter.writerow(['model_family', 'checkpoint', "amateur_checkpoint", 'loading_precision', 'dataset', 'batch_size', 'method', 'expert_method', "amateur_method", "weighting_parameter","seed","n_shot", "sample", 'expert_accuracy', 'amateur_accuracy','accuracy'])

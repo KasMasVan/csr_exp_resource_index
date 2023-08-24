@@ -150,7 +150,11 @@ def create_multiple_choice_prompt(example, **kwargs):
     scoring_method = kwargs["scoring_method"]
     num_of_options = kwargs["num_of_options"]
     mask = example['mask']
-    null_string = f"[MASK]"
+    # null_string = f"[MASK]"
+    if kwargs['mask_token'] is not None:
+        null_string = kwargs['mask_token']
+    else:
+        null_string = f"[MASK]"
     mcp_example = {}
     # example['premise'] = premise = f"{multiple_choice_prompt} {premise}\nA. {options[0]}\nB. {options[1]}\nC. {options[2]}\nD. {options[3]}\nE. {options[4]}\nAnswer:"
     # premise = f"{multiple_choice_prompt} Question: {example['premise']}\n"
