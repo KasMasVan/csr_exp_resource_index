@@ -1,0 +1,9 @@
+dataset,method,checkpoint,n_shot,accuracy
+conceptual_combinations,multiple_choice_prompt,flan-t5-xl,0,0.6
+conceptual_combinations,multiple_choice_prompt,flan-t5-xl,3,0.768
+conceptual_combinations,process_of_elimination,flan-t5-xl,0,0.76
+conceptual_combinations,process_of_elimination,flan-t5-xl,3,0.77
+logical_deduction_five_objects,multiple_choice_prompt,flan-t5-xl,0,0.398
+logical_deduction_five_objects,multiple_choice_prompt,flan-t5-xl,3,0.176
+logical_deduction_five_objects,process_of_elimination,flan-t5-xl,0,0.5599999999999999
+logical_deduction_five_objects,process_of_elimination,flan-t5-xl,3,0.192
