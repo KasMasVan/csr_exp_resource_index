@@ -3,10 +3,12 @@ seeds=(0 1 2 3 4)
 model_family="FLAN-T5"  
 checkpoints=("google/flan-t5-xl") 
 loading_precision="FP16" 
-datasets="siqa"
+# datasets="siqa"
+datasets="logical_deduction_five_objects conceptual_combinations strange_stories symbol_interpretation"
 batch_size=16
 sample=100
-n_shots=(0 3)
+# n_shots=(0 3)
+n_shots=(0)
 
 multiple_choice_prompt=""
 calibration_prompt=" the answer is:"
