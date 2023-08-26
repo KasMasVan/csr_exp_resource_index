@@ -1,0 +1,9 @@
+dataset,method,accuracy
+code_line_description,multiple_choice_prompt,0.672
+crass_ai,multiple_choice_prompt,0.841
+evaluating_information_essentiality,multiple_choice_prompt,0.25
+identify_math_theorems,multiple_choice_prompt,0.34
+identify_odd_metaphor,multiple_choice_prompt,0.562
+logical_args,multiple_choice_prompt,0.5
+reasoning_about_colored_objects,multiple_choice_prompt,0.538
+riddle_sense,multiple_choice_prompt,0.551

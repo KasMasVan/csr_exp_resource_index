@@ -293,14 +293,14 @@ def load_data(args):
         header_name = "premise"
         file_path = [os.path.join("../data", "big_bench", f"{args.dataset}.json")]
         loader = date_understanding_loader
-    elif args.dataset == "emoji_movie":
+    elif args.dataset in ["emoji_movie", "evaluating_information_essentiality", "logical_args", "riddle_sense"]: 
         args.num_options = 5
         ending_names = [f"hypothesis{i}" for i in range(args.num_options)]
         # ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3', 'hypothesis4']
         header_name = "premise"
         file_path = [os.path.join("../data", "big_bench", f"{args.dataset}.json")]
         loader = date_understanding_loader
-    elif args.dataset in ["ruin_names", "temporal_sequences", "code_line_description"]:
+    elif args.dataset in ["ruin_names", "temporal_sequences", "code_line_description", "crass_ai", "identify_math_theorems", "identify_odd_metaphor"]:
         args.num_options = 4
         ending_names = [f"hypothesis{i}" for i in range(args.num_options)]
         # ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
@@ -321,6 +321,13 @@ def load_data(args):
         # ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
         header_name = "premise"
         file_path = [os.path.join("../data", "big_bench", f"{args.dataset}_multiple_choice.json")]
+        loader = date_understanding_loader
+    elif args.dataset == "reasoning_about_colored_objects":
+        args.num_options = 18
+        ending_names = [f"hypothesis{i}" for i in range(args.num_options)]
+        # ending_names = ['hypothesis0', 'hypothesis1', 'hypothesis2', 'hypothesis3']
+        header_name = "premise"
+        file_path = [os.path.join("../data", "big_bench", f"{args.dataset}.json")]
         loader = date_understanding_loader
     elif args.dataset == "symbol_interpretation":
         args.num_options = 5

@@ -4,12 +4,17 @@ cd data/big_bench/
 proxy_prefix="https://ghproxy.com/"
 repo_prefix="https://raw.githubusercontent.com/google/BIG-bench/main/bigbench/benchmark_tasks/"
 single_tasks=("disambiguation_qa" "ruin_names" "temporal_sequences" "emoji_movie" "code_line_description" "penguins_in_a_table" "date_understanding")
+single_tasks_rebuttal=("code_line_description" "reasoning_about_colored_objects" "crass_ai" "timedial" "evaluating_information_essentiality" "identify_math_theorems" "identify_odd_metaphor" "logical_args" "riddle_sense")
 conceptual_combinations_subtasks=("contradictions" "emergent_properties" "fanciful_fictional_combinations" "homonyms" "invented_words" "surprising_uncommon_combinations")
 strange_stories_subtasks=("boolean" "multiple_choice")
 symbol_interpretation_subtasks=("adversarial" "emoji_agnostic" "name_agnostic" "plain" "tricky")
 tracking_shuffled_objects_subtasks=("three_objects" "five_objects" "seven_objects")
 logical_deduction_subtasks=("three_objects" "five_objects" "seven_objects")
 
+for task in "${single_tasks_rebuttal[@]}"
+do
+    wget -O "${task}.json" "${proxy_prefix}${repo_prefix}${task}/task.json"
+done
 
 for task in "${single_tasks[@]}"
 do

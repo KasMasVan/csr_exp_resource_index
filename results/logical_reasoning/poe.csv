@@ -1,0 +1,9 @@
+dataset,method,accuracy
+code_line_description,process_of_elimination,0.759
+crass_ai,process_of_elimination,0.818
+evaluating_information_essentiality,process_of_elimination,0.191
+identify_math_theorems,process_of_elimination,0.472
+identify_odd_metaphor,process_of_elimination,0.5
+logical_args,process_of_elimination,0.688
+reasoning_about_colored_objects,process_of_elimination,0.606
+riddle_sense,process_of_elimination,0.49
