@@ -1,0 +1,10 @@
+| Task   | Best Mask   |   Accuracy |
+|:-------|:------------|-----------:|
+| ANLI   | Min K (2)   |       57.8 |
+| CC     | Lowest      |       76   |
+| CQA    | Lowest      |       89.5 |
+| DQA    | Lowest      |       67.8 |
+| LD     | Lowest      |       56   |
+| SIQA   | Lowest      |       81.7 |
+| SS     | Min K (2)   |       76.6 |
+| SIT    | Min K (3)   |       27.4 |

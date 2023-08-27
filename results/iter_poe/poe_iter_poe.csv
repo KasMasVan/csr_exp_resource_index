@@ -1,9 +1,9 @@
-dataset,poe_accuracy,iter_poe_accuracy,diff
-anli,0.556,0.556,0.0
-conceptual_combinations,0.76,0.742,0.018
-cqa,0.895,0.884,0.011
-disambiguation_qa,0.678,0.678,0.0
-logical_deduction_five_objects,0.56,0.572,-0.012
-siqa,0.817,0.82,-0.003
-strange_stories,0.756,0.766,-0.01
-symbol_interpretation,0.236,0.238,-0.002
+Task,PoE,Iter PoE,POE - Iter PoE
+ANLI,55.6,55.6,0.0
+CC,76.0,74.2,1.8
+CQA,89.2,88.4,0.8
+DQA,67.8,67.8,0.0
+LD,56.0,57.2,-1.2
+SIQA,82.0,82.0,0.0
+SS,75.6,76.6,-1.0
+SIT,23.4,23.8,-0.4
