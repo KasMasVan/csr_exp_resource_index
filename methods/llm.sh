@@ -4,10 +4,11 @@ model_family="FLAN-T5"
 checkpoints=("google/flan-t5-xl") 
 loading_precision="FP16" 
 # datasets="siqa"
-datasets="anli cqa siqa logical_deduction_five_objects disambiguation_qa conceptual_combinations strange_stories symbol_interpretation"
+# datasets="anli cqa siqa logical_deduction_five_objects disambiguation_qa conceptual_combinations strange_stories symbol_interpretation"
+datasets="code_line_description reasoning_about_colored_objects crass_ai evaluating_information_essentiality identify_math_theorems identify_odd_metaphor logical_args riddle_sense"
 batch_size=16
 sample=100
-n_shots=(3)
+n_shots=(0)
 
 multiple_choice_prompt=""
 calibration_prompt=" the answer is:"
