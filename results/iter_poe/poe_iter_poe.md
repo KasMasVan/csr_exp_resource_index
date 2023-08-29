@@ -1,4 +1,4 @@
-| Task   |   PoE |   Iter PoE |   POE - Iter PoE |
+| Task   |   PoE |   Iter PoE |   PoE - Iter PoE |
 |:-------|------:|-----------:|-----------------:|
 | ANLI   |  55.6 |       55.6 |              0   |
 | CC     |  76   |       74.2 |              1.8 |
