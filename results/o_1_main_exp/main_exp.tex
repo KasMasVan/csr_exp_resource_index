@@ -1,0 +1,17 @@
+\begin{table}[h]
+\centering
+\caption{Accuracy scores (with standard deviation) on 8 tasks. Best scores are \textbf{bold}, and second-best scores are \underline{underlined}. LM refers to language modeling, AVG refers to average language modeling, MCP refers to multiple choice prompting. Our method (PoE) achieves the best or comparable performance on all tasks.}
+\label{tab:main_exp}
+\begin{tabular}{l|c|c|c|c|c|c}
+Method & LM & AVG & Calibration & Channel & MCP & PoE \\
+Task &  &  &  &  &  &  \\
+ANLI & 38.2\textsubscript{3.4} & 38.0\textsubscript{3.4} & 37.2\textsubscript{3.5} & 36.2\textsubscript{2.5} & 57.8\textsubscript{3.0} & 54.8\textsubscript{2.4} \\
+CQA & 64.4\textsubscript{5.9} & 54.2\textsubscript{1.3} & 69.4\textsubscript{4.9} & 44.6\textsubscript{5.6} & 87.2\textsubscript{2.6} & 89.2\textsubscript{2.2} \\
+SIQA & 55.8\textsubscript{4.5} & 62.4\textsubscript{1.9} & 57.8\textsubscript{7.0} & 39.8\textsubscript{5.9} & 79.0\textsubscript{5.6} & 82.0\textsubscript{6.7} \\
+LD & 49.0\textsubscript{2.9} & 46.0\textsubscript{4.7} & 39.4\textsubscript{4.0} & 21.0\textsubscript{3.9} & 39.8\textsubscript{3.7} & 53.6\textsubscript{7.0} \\
+DQA & 45.8\textsubscript{6.6} & 51.8\textsubscript{2.0} & 48.0\textsubscript{2.9} & 39.4\textsubscript{7.0} & 67.8\textsubscript{1.9} & 67.4\textsubscript{2.5} \\
+CC & 44.8\textsubscript{0.8} & 51.8\textsubscript{0.8} & 54.8\textsubscript{0.8} & 43.6\textsubscript{0.9} & 60.4\textsubscript{1.1} & 72.2\textsubscript{0.8} \\
+SS & 39.0\textsubscript{2.5} & 40.6\textsubscript{1.8} & 42.8\textsubscript{2.2} & 26.6\textsubscript{1.7} & 74.0\textsubscript{0.7} & 76.6\textsubscript{0.9} \\
+SIT & 24.8\textsubscript{1.9} & 20.4\textsubscript{5.3} & 21.0\textsubscript{3.9} & 17.0\textsubscript{4.6} & 25.4\textsubscript{2.9} & 25.2\textsubscript{4.0} \\
+\end{tabular}
+\end{table}
