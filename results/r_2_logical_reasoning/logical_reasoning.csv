@@ -1,0 +1,9 @@
+dataset,mcp_accuracy,poe_accuracy,difference
+logical_args,50.0,68.8,18.8
+identify_math_theorems,34.0,47.199999999999996,13.2
+code_line_description,67.2,75.9,8.7
+reasoning_about_colored_objects,53.800000000000004,60.6,6.8
+crass_ai,84.1,81.8,-2.3
+evaluating_information_essentiality,25.0,19.1,-5.9
+riddle_sense,55.1,49.0,-6.1
+identify_odd_metaphor,56.2,50.0,-6.2
